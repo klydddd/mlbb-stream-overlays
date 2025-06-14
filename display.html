@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="css/main.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     <title>Display</title>
 </head>
 
@@ -14,7 +14,7 @@
     * {
         margin: 0;
         padding: 0;
-        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     }
 
     
@@ -32,7 +32,7 @@
     .ban-section {
         width: 100%;
         height: 70px;
-        /* background-color: yellow; */
+        background-color: white;
         display: flex;
         gap: 235px;
     }
@@ -45,14 +45,14 @@
     }
 
     .gap {
-        width: 270px;
+        width: 400px;
         height: 100%;
-        /* background-color: bisque; */
+        background-color: white;
     }
 
     .name-section {
         width: 100%;
-        height: 30px;
+        height: 35px;
 
     }
 
@@ -104,23 +104,18 @@
         transform: translateY(10px);
     }
 
-    /* .ban-portrait img {
-        object-fit: cover;
-        scale: 1.22;
-        transform: translateY(120px);
-        background-color: red;
-    } */
 
-  .hero-name {
-    height: 310px ;
-    width: 0;
-    position: absolute;
-    justify-content: center;
-    text-align: center;
-    z-index: 100;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.5s ease, transform 0.5s ease, height 2s ease;
+    /* Base style (already defined) */
+    .hero-name {
+        height: 310px;
+        width: 0;
+        position: absolute;
+        justify-content: center;
+        text-align: center;
+        z-index: 100;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.5s ease, transform 0.5s ease, height 2s ease;
     }
 
 
@@ -135,6 +130,7 @@
     }
 
     .hero-name-text {
+        animation: none !important;
         writing-mode: vertical-lr;
         padding-top: 10px;
         padding-left: 2px;
@@ -172,45 +168,45 @@
     }
 
     .team-name {
-        width: 60%;
+        width: 480px;
+        font-size: 30px;
+        font-weight: 800;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     }
 
     .team-logo {
-        width: 100px;
-        height: 100px;
-        background-color: brown;
+        width: 169px;
+        height: 70px;
+        /* background-color: rgb(65, 42, 165); */
         position: absolute;
-        top: -40px;
-    }
-
-    .blue-logo {
-        left: 10px;
+        top: 0px;
+        /* left: 0; */
     }
 
     .red-logo {
-        right: 10px;
+        right: 0px;
         
     }
 
     #red-team-name {
         text-align: right;
-        padding-right: 120px;
+        padding-right: 180px;
     }
 
     #blue-team-name {
         text-align: left;
-        padding-left: 120px;
+        padding-left: 180px;
     }
 
     .name-section {
         display: flex;
         flex-direction: row;
         width: 100vw;
-        height: 25px;
+        height: 30px;
         justify-content: center;
         align-items: center;
-        background-color: white;
-        padding-top: 10px;
+        /* background-color: white; */
+        /* padding-top: 10px; */
     }
 
     .blue-names, .red-names {
@@ -220,18 +216,26 @@
         justify-content: center;
         align-items: center;
         height: 30px;
-        background-color: white;
+        /* background-color: white; */
+    }
+
+    .blue-names {
+        background-color: blue;
     }
 
     .red-names {
         flex-direction: row-reverse;
+        background-color: red;
     }
 
     .name {
         width: 20%;
-        height: 30px;
+        height: 100%;
         /* background-color: wheat; */
         text-align: center;
+        /* padding-top: 15px; */
+        margin-top: 15px;
+        color: white;
     }
 
     p {
@@ -274,14 +278,6 @@
     animation-delay: 0.5s;
     animation-fill-mode: both;
     transition: filter 0.5s ease;
-
-    /* Feathering effect using mask */
-    -webkit-mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
-    mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
-    -webkit-mask-repeat: no-repeat;
-    mask-repeat: no-repeat;
-    -webkit-mask-size: 100% 100%;
-    mask-size: 100% 100%;
     }
 
     .hero-portrait-silent {
@@ -289,17 +285,8 @@
     height: 100%;
     object-fit: cover;
     animation: wipeDown 0.4s ease-out;
-    /* animation-delay: 0.5s; */
     animation-fill-mode: both;
     transition: filter 0.5s ease;
-
-    /* Feathering effect using mask */
-    -webkit-mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
-    mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
-    -webkit-mask-repeat: no-repeat;
-    mask-repeat: no-repeat;
-    -webkit-mask-size: 100% 100%;
-    mask-size: 100% 100%;    
     }
 
     
@@ -391,7 +378,9 @@
     100% { transform: translate(0, 10px); }
     }
 
-    
+    .timer {
+        height: 10px;
+    }
 
     
 
@@ -403,7 +392,7 @@
         
         <div class="blue-ban">
             <div class="team-name">
-                <div class="team-logo blue-logo"></div>
+                <div class="team-logo blue-logo" id="blue-team-logo" data-team="blue"></div>
                 <p id="blue-team-name">BLUE TEAM NAME</p>
             </div>
             <div id="ban-1" class="ban-container"></div>
@@ -415,7 +404,7 @@
         
         <div class="red-ban">
             <div class="team-name">
-                <div class="team-logo red-logo"></div>
+                <div class="team-logo red-logo" id="red-team-logo" data-team="red"></div>
                 <p id="red-team-name">RED TEAM NAME</p>
             </div>
             
@@ -460,7 +449,7 @@
             </div>
         </div>
         <div class="gap">
-
+            <p>MATCH </p>
 
         </div>
         <div class="red-pick pick">
@@ -468,34 +457,34 @@
                 <div class="hero-name red-hero-name" id="hero-name-bg-10">
                     <p id="hero-name-10" class="hero-name-text">HERO NAME</p>
                 </div>
-                <div class="media-container" id="hero-10"></div>
+                <div class="media-container red-portraits" id="hero-10"></div>
             </div>
             <div class="player-pick">
                 <div class="hero-name red-hero-name" id="hero-name-bg-9">
                     <p id="hero-name-9" class="hero-name-text">HERO NAME</p>
                 </div>
-                <div class="media-container" id="hero-9"></div>
+                <div class="media-container red-portraits" id="hero-9"></div>
             </div>
             
             <div class="player-pick">
                 <div class="hero-name red-hero-name" id="hero-name-bg-8">
                     <p id="hero-name-8" class="hero-name-text">HERO NAME</p>
                 </div>
-                <div class="media-container" id="hero-8"></div>
+                <div class="media-container red-portraits" id="hero-8"></div>
             </div>
             
             <div class="player-pick">
                 <div class="hero-name red-hero-name" id="hero-name-bg-7">
                     <p id="hero-name-7" class="hero-name-text">HERO NAME</p>
                 </div>
-                <div class="media-container" id="hero-7"></div>
+                <div class="media-container red-portraits" id="hero-7"></div>
             </div>
             
             <div class="player-pick">
                 <div class="hero-name red-hero-name" id="hero-name-bg-6">
                     <p id="hero-name-6" class="hero-name-text">HERO NAME</p>
                 </div>
-                <div class="media-container" id="hero-6"></div>
+                <div class="media-container red-portraits" id="hero-6"></div>
             </div>
             
         </div>
@@ -518,12 +507,14 @@
         </div>
         
     </div>
-
+    <div class="timer"></div>
     
 
 
 <script src="js/control.js"></script>
 <script src="js/swap.js"></script>
+<script src="js/showLogo.js"></script>
+
 
 <!-- <script src="js/portraits.js"></script> -->
 

@@ -1,4 +1,5 @@
 // const silentSwapKeys = new Set();
+// const overlayWindow = window.open('display.html', 'OverlayWindow');
 
 // Load picks from localStorage when controller.html loads
 for (let i = 1; i <= 10; i++) {

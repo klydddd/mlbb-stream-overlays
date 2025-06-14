@@ -225,9 +225,9 @@ input:focus::placeholder {
   color: #bbb;
 }
 
-input[type="image"] {
-  width: 500px; /* adjust as needed */
-  height: 30px;
+input[type="file"] {
+  width: 200px; /* adjust as needed */
+  height: 50px;
   border-radius: 8px;
   /* padding: 4px; */
   background-color: #33333368;
@@ -237,13 +237,13 @@ input[type="image"] {
   border: 2px solid transparent;
 }
 
-input[type="image"]:hover {
+input[type="file"]:hover {
   transform: scale(1.05);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
   border-color: #cd6d60;
 }
 
-input[type="image"]:active {
+input[type="file"]:active {
   transform: scale(0.95);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
@@ -260,7 +260,7 @@ input[type="image"]:active {
             <p>PLAYER NAMES/IGN</p>
             <div class="team-desc">
                 <input type="text" name="Team Name" id="blueTeamName" placeholder="BLUE TEAM NAME">
-                <input type="image" src="" alt="Click me" placeholder="">
+                <input type="file" class="team-logo-upload" accept="image/*" data-team="blue">
                 <input type="url" name="Cam Link" id="blue-team-cam-link" placeholder="CAMERA LINK">
                 <button>ADD SCORE</button>
                 <button>DEDUCT SCORE</button>
@@ -351,7 +351,7 @@ input[type="image"]:active {
 
             <div class="team-desc">
                 <input type="text" name="Team Name" id="redTeamName" placeholder="RED TEAM NAME">
-                <input type="image" src="" alt="Click me" placeholder="">
+                <input type="file" class="team-logo-upload" accept="image/*" data-team="red">
                 <input type="url" name="Cam Link" id="red-team-cam-link" placeholder="CAMERA LINK">
                 <button>ADD SCORE</button>
                 <button>DEDUCT SCORE</button>
@@ -459,8 +459,7 @@ input[type="image"]:active {
     
 <script src="js/control.js"></script>
 <script src="js/swap.js"></script>
-
-
+<script src="js/showLogo.js"></script>
 <script src="js/autocomplete.js"></script>
     
 </body>
