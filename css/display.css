@@ -144,7 +144,7 @@ body {
     width: 70px;
     position: relative;
     overflow: hidden; 
-    background-color: rgba(0, 0, 0, 0.543);
+    background-color: rgb(33, 33, 33);
 
 }
 
@@ -406,23 +406,6 @@ transition: filter 0.5s ease-in-out;
     background-color: rgba(0, 0, 255, 0.173);
 }
 
-.pick-background {
-    position: absolute;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    object-fit: cover;
-}
-
-.pick-background img {
-    scale: 0.7;
-    position: absolute;
-    left: -135px;
-    bottom: -500px;
-    opacity: .6;
-    
-}
-
 .ban {
     position: relative;
 }
@@ -437,13 +420,18 @@ transition: filter 0.5s ease-in-out;
     width: 100%;
     position: absolute;
     z-index: -1;
-    opacity: .5;
+    opacity: 1;
     /* padding: 0 30px;
     margin: 0 30px; */
+    object-fit: contain;
+    /* background-color: yellow; */
+    /* bottom: -1px; */
+    filter: brightness(0.4);
 }
 
 #blue-team-logo img, #red-team-logo img {
-    filter: blur(8px);
+    /* filter: blur(1px); */
+    /* scale: 1.1; */
 }
 
 #blue-team-logo {
