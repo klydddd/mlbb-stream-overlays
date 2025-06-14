@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control Panel</title>
+</head>
+
+<style>
+
+* {
+    margin: 0;
+    padding: 0;
+    font-size: 11px;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    /* font-weight: bold; */
+    color: white;
+    text-transform: capitalize;
+}
+
+
+input, button {
+    text-align: center;
+    background-color: #333;
+}
+
+button {
+    padding: 0px 24px;
+  background-color: #0cbdd5; /* Indigo */
+  color: #ffffff;
+  border: none;
+  border-radius: 5px;
+  /* font-size: 16px;
+  font-weight: 600; */
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+  transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+  height: 33px;
+}
+
+button:hover {
+  background-color: #914d68; /* Lighter indigo */
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(79, 70, 229, 0.3);
+}
+
+button:active {
+  transform: scale(0.96);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+}
+
+p {
+    margin-left: 10px;
+}
+
+
+
+body {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #232629;
+}
+
+.main-container {
+    display: flex;
+    width: 100%;
+    height:100vh;
+}
+
+.blue-side {
+    background: linear-gradient(135deg, #a494e9da, #584ec4c6);
+    width: 50%;
+    height: 100%;
+}
+
+.red-side {
+    background: linear-gradient(135deg,  #e98b78da, #a63a1fc6);
+
+    width: 50%;
+    height: 100%;
+}
+
+input {
+    height: 25px;
+    width: 25%;
+    background-color: #333;
+}
+
+
+
+.names, .picks, .team-desc, .camLinks, .bans{
+    display: flex;
+    gap: 5px;
+    margin: 5px;
+}
+
+.swapping-area {
+    margin: 5px;
+    display: flex;
+    justify-content:space-around;
+    
+
+}
+
+.swapping-area button {
+
+    height: 20px;
+    width: 80px;
+    margin-left: 2%;
+    margin-right: 2%;
+    text-align: center;
+}
+
+.second-container {
+    display: flex;
+    width: 100vw;
+}
+
+.timer-control, .team-control {
+    margin: 10px;
+    width: 50%;
+}
+
+.timer-control button, .team-control button{
+    height: 30px;
+    width: 100px;
+}
+
+.input-wrapper {
+  position: relative;
+}
+
+.dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #111;
+  border: 1px solid #333;
+  max-height: 200px;
+  overflow-y: auto;
+  display: none;
+  z-index: 10;
+  
+}
+
+.dropdown-option {
+  padding: 8px 12px;
+  cursor: pointer;
+  color: white;
+}
+
+.dropdown-option:hover {
+  background-color: #444;
+}
+
+.picks input, .bans input {
+    width: 97%;
+}
+
+.dropdown-option {
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+.dropdown-option.active,
+.dropdown-option:hover {
+  background-color: #007bff;
+  color: white;
+}
+
+.swap-selected {
+  background-color: #ffd966;
+  outline: 2px solid #ffcc00;
+}
+
+.hero-portrait-silent {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    animation: none !important;
+    filter: none !important;
+    }
+
+.hero-portrait.no-anim {
+  animation: none !important;
+  transition: none !important;
+}
+
+#next {
+    width: 120px;
+}
+
+input {
+  padding: 12px 16px;
+  /* font-size: 16px; */
+  border: 1px solid #333;
+  border-radius: 5px;
+  outline: none;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  width: 100%;
+  max-width: 300px;
+  background-color: #333;
+  color: #333;
+  box-sizing: border-box;
+  color: white;
+  height: 30px;
+}
+
+input::placeholder {
+  color: #aaa;
+  transition: color 0.2s ease;
+}
+
+input:focus {
+  border-color: #904d67; /* Indigo */
+  box-shadow: 0 0 0 3px #904d6790;
+  background-color: #904d67;
+}
+
+input:focus::placeholder {
+  color: #bbb;
+}
+
+input[type="image"] {
+  width: 500px; /* adjust as needed */
+  height: 30px;
+  border-radius: 8px;
+  /* padding: 4px; */
+  background-color: #33333368;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+  border: 2px solid transparent;
+}
+
+input[type="image"]:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
+  border-color: #cd6d60;
+}
+
+input[type="image"]:active {
+  transform: scale(0.95);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+
+</style>
+
+<body data-page="controller">
+    <!-- <P>GAME PANEL</P> -->
+    <div class="main-container">
+        <div class="blue-side team-container">
+            <br>
+          
+            <p>PLAYER NAMES/IGN</p>
+            <div class="team-desc">
+                <input type="text" name="Team Name" id="blueTeamName" placeholder="BLUE TEAM NAME">
+                <input type="image" src="" alt="Click me" placeholder="">
+                <input type="url" name="Cam Link" id="blue-team-cam-link" placeholder="CAMERA LINK">
+                <button>ADD SCORE</button>
+                <button>DEDUCT SCORE</button>
+            </div>
+
+
+
+            <div class="camLinks">
+                <input type="url" id="cam-1" placeholder="CAMERA LINK">
+                <input type="url" id="cam-2" placeholder="CAMERA LINK"> 
+                <input type="url" id="cam-3" placeholder="CAMERA LINK">
+                <input type="url" id="cam-4" placeholder="CAMERA LINK"> 
+                <input type="url" id="cam-5" placeholder="CAMERA LINK"> 
+            </div>
+            <div class="names">
+                <input type="text" id="input-name-1" placeholder="PLAYER ONE">
+                <input type="text" id="input-name-2" placeholder="PLAYER TWO"> 
+                <input type="text" id="input-name-3" placeholder="PLAYER THREE">
+                <input type="text" id="input-name-4" placeholder="PLAYER FOUR"> 
+                <input type="text" id="input-name-5" placeholder="PLAYER FIVE"> 
+            </div>
+            <br>
+
+            <p>PLAYER PICKS</p>
+
+            <div class="picks">
+                <div class="input-wrapper">
+                    <input type="text" id="pick-1" placeholder="PLAYER ONE" autocomplete="off">
+                    <div class="dropdown" id="dropdown-1"></div>
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" id="pick-2" placeholder="PLAYER TWO" autocomplete="off">
+                    <div class="dropdown" id="dropdown-2"></div>
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" id="pick-3" placeholder="PLAYER THREE" autocomplete="off">
+                    <div class="dropdown" id="dropdown-3"></div>
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" id="pick-4" placeholder="PLAYER FOUR" autocomplete="off">
+                    <div class="dropdown" id="dropdown-4"></div>
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" id="pick-5" placeholder="PLAYER FIVE" autocomplete="off">
+                    <div class="dropdown" id="dropdown-5"></div>
+                </div>
+            </div>
+            
+            
+            <div class="swapping-area" id="blue-swap">
+                <button id="swap-1">swap</button>
+                <button id="swap-2">swap</button>
+                <button id="swap-3">swap</button>
+                <button id="swap-4">swap</button>
+                <button id="swap-5">swap</button>
+            </div>
+
+            <br>
+            <p>BANS</p>
+            <div class="bans">
+                <div class="input-wrapper">
+                    <input type="text" name="Ban" id="ban-1" placeholder="BLUE BAN 1" autocomplete="off">
+                    <div class="dropdown" id="dropdown-ban-1"></div>
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" name="Ban" id="ban-2" placeholder="BLUE BAN 2" autocomplete="off">
+                    <div class="dropdown" id="dropdown-ban-2"></div>
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" name="Ban" id="ban-3" placeholder="BLUE BAN 3" autocomplete="off">
+                    <div class="dropdown" id="dropdown-ban-3"></div>
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" name="Ban" id="ban-4" placeholder="BLUE BAN 4" autocomplete="off">
+                    <div class="dropdown" id="dropdown-ban-4"></div>
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" name="Ban" id="ban-5" placeholder="BLUE BAN 5" autocomplete="off">
+                    <div class="dropdown" id="dropdown-ban-5"></div>
+                </div>
+            </div>
+            
+        </div>
+    
+        <div class="red-side team-container">
+            <br>
+             <p>PLAYER NAMES/IGN</p>
+
+            <div class="team-desc">
+                <input type="text" name="Team Name" id="redTeamName" placeholder="RED TEAM NAME">
+                <input type="image" src="" alt="Click me" placeholder="">
+                <input type="url" name="Cam Link" id="red-team-cam-link" placeholder="CAMERA LINK">
+                <button>ADD SCORE</button>
+                <button>DEDUCT SCORE</button>
+            </div> 
+
+            <div class="camLinks">
+                
+                 
+                <input type="url" id="cam-10" placeholder="CAMERA LINK">
+                <input type="url" id="cam-9" placeholder="CAMERA LINK"> 
+                <input type="url" id="cam-8" placeholder="CAMERA LINK">
+                <input type="url" id="cam-7" placeholder="CAMERA LINK">
+                <input type="url" id="cam-6" placeholder="CAMERA LINK"> 
+            </div>
+
+            <div class="names">
+                <input type="text" id="input-name-10" placeholder="PLAYER FIVE">
+                <input type="text" id="input-name-9" placeholder="PLAYER FOUR">
+                <input type="text" id="input-name-8" placeholder="PLAYER THREE">
+                <input type="text" id="input-name-7" placeholder="PLAYER TWO"> 
+                <input type="text" id="input-name-6" placeholder="PLAYER ONE"> 
+                 
+            </div>
+            
+            <br>
+
+            <p>PLAYER PICKS</p>
+
+            <div class="picks">
+                <div class="input-wrapper">
+                    <input type="text" id="pick-10" placeholder="PLAYER FIVE" autocomplete="off">
+                    <div class="dropdown" id="dropdown-10"></div>
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" id="pick-9" placeholder="PLAYER FOUR" autocomplete="off">
+                    <div class="dropdown" id="dropdown-9"></div>
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" id="pick-8" placeholder="PLAYER THREE" autocomplete="off">
+                    <div class="dropdown" id="dropdown-8"></div>
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" id="pick-7" placeholder="PLAYER TWO" autocomplete="off">
+                    <div class="dropdown" id="dropdown-7"></div>
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" id="pick-6" placeholder="PLAYER ONE" autocomplete="off">
+                    <div class="dropdown" id="dropdown-6"></div>
+                </div>
+            </div>
+            
+            
+            <div class="swapping-area" id="red-swap">
+                <button id="swap-10">swap</button>
+                <button id="swap-9">swap</button>
+                <button id="swap-8">swap</button>
+                <button id="swap-7">swap</button>
+                <button id="swap-6">swap</button>
+            </div>
+
+            <br>
+            <p>BANS</p>
+            <div class="bans">
+                <div class="input-wrapper">
+                    <input type="text" name="Ban" id="ban-10" placeholder="RED BAN 5" autocomplete="off">
+                    <div class="dropdown" id="dropdown-ban-10"></div>
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" name="Ban" id="ban-9" placeholder="RED BAN 4" autocomplete="off">
+                    <div class="dropdown" id="dropdown-ban-9"></div>
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" name="Ban" id="ban-8" placeholder="RED BAN 3" autocomplete="off">
+                    <div class="dropdown" id="dropdown-ban-8"></div>
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" name="Ban" id="ban-7" placeholder="RED BAN 2" autocomplete="off">
+                    <div class="dropdown" id="dropdown-ban-7"></div>
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" name="Ban" id="ban-6" placeholder="RED BAN 1" autocomplete="off">
+                    <div class="dropdown" id="dropdown-ban-6"></div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+    <div class="second-container">
+        <div class="team-control">
+            <p>TEAM CONTROL</p>
+            <button id="reset">RESET DRAFT</button>
+            <button>CLEAR NAMES</button>
+            <button>CLEAR LOGO</button>
+            <button id="switch">SWITCH TEAMS</button>
+        </div>
+        <div class="timer-control">
+            <p>TIMER CONTROL</p>    
+            <button>START</button>
+            <button>STOP</button>
+            <button id="next">NEXT PHASE</button>
+            <button >RESET</button>
+        </div>
+    </div>
+    
+    
+<script src="js/control.js"></script>
+<script src="js/swap.js"></script>
+
+
+<script src="js/autocomplete.js"></script>
+    
+</body>
+
+
+</html>

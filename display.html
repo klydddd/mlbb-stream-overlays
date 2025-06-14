@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <title>Display</title>
+</head>
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    }
+
+    
+
+    body {
+        background-color: darkblue;
+        height: auto;
+        width: 100vw;
+        bottom: 0;
+        display: block;
+        position: absolute;
+        bottom: 0;
+    }
+
+    .ban-section {
+        width: 100%;
+        height: 70px;
+        /* background-color: yellow; */
+        display: flex;
+        gap: 235px;
+    }
+
+    .pick-section {
+        /* background-color: red; */
+        width: 100%;
+        height: 310px;
+        display: flex;
+    }
+
+    .gap {
+        width: 270px;
+        height: 100%;
+        /* background-color: bisque; */
+    }
+
+    .name-section {
+        width: 100%;
+        height: 30px;
+
+    }
+
+    .name {
+        font-weight: bolder;
+    }
+
+    .pick {
+        height: 100%;
+        width: 50%;
+        /* background-color: aquamarine; */
+        display: flex;
+        
+    }
+
+    .player-pick {
+        height: 100%;
+        width: 20%;
+        /* border-style: solid; */
+        /* border-width: 0.1px; */
+        /* background-color: lightblue; */
+        display: flex;
+    }
+
+    .media-container, .ban-container {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        overflow: hidden; /* optional, hides overflow if cover crops image */
+        /* background-color: yellow; */
+    }
+
+    .media-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover; /* or 'contain' depending on your preference */
+        display: block; /* remove inline space below images */
+        scale: 1.2;
+        transform: translateY(10px);
+    }
+
+
+    .ban-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain; /* or 'contain' depending on your preference */
+        display: block; /* remove inline space below images */
+        scale: 1.7;
+        transform: translateY(10px);
+    }
+
+    /* .ban-portrait img {
+        object-fit: cover;
+        scale: 1.22;
+        transform: translateY(120px);
+        background-color: red;
+    } */
+
+  .hero-name {
+    height: 310px ;
+    width: 0;
+    position: absolute;
+    justify-content: center;
+    text-align: center;
+    z-index: 100;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease, transform 0.5s ease, height 2s ease;
+    }
+
+
+
+    .blue-hero-name {
+        background-color: rgba(0, 0, 255, 0.699);
+    }
+
+    .red-hero-name {
+        background-color: rgba(255, 0, 0, 0.7);
+        /* right: 0; */
+    }
+
+    .hero-name-text {
+        writing-mode: vertical-lr;
+        padding-top: 10px;
+        padding-left: 2px;
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        font-weight: 1000;
+        color: white;
+        text-align: center;
+        
+    }
+
+    .blue-ban, .red-ban {
+        display: flex;
+        width: 50%;
+        /* justify-content: center; */
+        align-items: center;
+    }
+
+    .red-ban {
+        flex-direction: row-reverse;
+    }
+
+    .ban-container {
+        height: 70px;
+        width: 70px;
+        position: relative;
+        overflow: hidden; 
+    }
+
+    .ban-portrait {
+        width: 100%;
+        height: 100%;
+        object-fit:cover;
+        transition: filter 0.5s ease;
+        
+    }
+
+    .team-name {
+        width: 60%;
+    }
+
+    .team-logo {
+        width: 100px;
+        height: 100px;
+        background-color: brown;
+        position: absolute;
+        top: -40px;
+    }
+
+    .blue-logo {
+        left: 10px;
+    }
+
+    .red-logo {
+        right: 10px;
+        
+    }
+
+    #red-team-name {
+        text-align: right;
+        padding-right: 120px;
+    }
+
+    #blue-team-name {
+        text-align: left;
+        padding-left: 120px;
+    }
+
+    .name-section {
+        display: flex;
+        flex-direction: row;
+        width: 100vw;
+        height: 25px;
+        justify-content: center;
+        align-items: center;
+        background-color: white;
+        padding-top: 10px;
+    }
+
+    .blue-names, .red-names {
+        display: flex;
+        flex-direction: row;
+        width: 50%;
+        justify-content: center;
+        align-items: center;
+        height: 30px;
+        background-color: white;
+    }
+
+    .red-names {
+        flex-direction: row-reverse;
+    }
+
+    .name {
+        width: 20%;
+        height: 30px;
+        /* background-color: wheat; */
+        text-align: center;
+    }
+
+    p {
+        text-transform:uppercase;
+    }
+
+    @keyframes wipeDown {
+        0% {
+            clip-path: inset(0 0 100% 0);
+            opacity: 0;
+        }
+        100% {
+            clip-path: inset(0 0 0 0);
+            opacity: 1;
+        }
+    }
+
+    @keyframes wipeUp {
+    0% {
+        clip-path: inset(0 0 0 0);
+        opacity: 1;
+    }
+    100% {
+        clip-path: inset(0 0 100% 0);
+        opacity: 0;
+    }
+    }
+
+    .wipeUp {
+    animation: wipeUp 0.4s ease-out forwards;
+    }
+
+
+    /* Glow effects */
+    .hero-portrait {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    animation: wipeDown 0.4s ease-out;
+    animation-delay: 0.5s;
+    animation-fill-mode: both;
+    transition: filter 0.5s ease;
+
+    /* Feathering effect using mask */
+    -webkit-mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+    mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+    }
+
+    .hero-portrait-silent {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    animation: wipeDown 0.4s ease-out;
+    /* animation-delay: 0.5s; */
+    animation-fill-mode: both;
+    transition: filter 0.5s ease;
+
+    /* Feathering effect using mask */
+    -webkit-mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+    mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;    
+    }
+
+    
+
+
+    @keyframes floatUpDown {
+    0%, 100% { transform: translateY(10px); }
+    50% { transform: translateY(-5px); }
+    }
+
+    
+
+    .float {
+    animation: floatUpDown 5s ease-in-out infinite;
+    }
+
+    .glow-blue-1 {
+    filter: brightness(1.1) saturate(1.1) drop-shadow(0 0 8px #00aaff);
+    }
+    .glow-blue-2 {
+    filter: brightness(1.2) saturate(1.2) drop-shadow(0 0 12px #0088ff);
+    }
+    .glow-blue-3 {
+    filter: brightness(1.3) saturate(1.3) drop-shadow(0 0 16px #33ccff);
+    }
+
+    .glow-red-1 {
+    filter: brightness(1.1) saturate(1.1) drop-shadow(0 0 8px #ff3366);
+    }
+    .glow-red-2 {
+    filter: brightness(1.2) saturate(1.2) drop-shadow(0 0 12px #ff0033);
+    }
+    .glow-red-3 {
+    filter: brightness(1.3) saturate(1.3) drop-shadow(0 0 16px #ff6666);
+    }
+    /* Optional: glow state applied dynamically */
+    .hero-portrait.glow {
+    filter: brightness(1.4) drop-shadow(0 0 10px rgba(255, 255, 255, 0.6));
+    transition: filter 0.5s ease-in-out;
+    }
+            
+    @keyframes blue-glow {
+    0% {
+        box-shadow: inset 0 0 0px rgba(68, 0, 255, 0.7);
+    }
+    50% {
+        box-shadow: inset 0 0 50px rgba(68, 0, 255, 0.7);
+    }
+    100% {
+        box-shadow: inset 0 0 0px rgba(68, 0, 255, 0.7);
+    }
+    }
+
+    @keyframes red-glow {
+    0% {
+        box-shadow: inset 0 0 0px rgb(255, 50, 50, 0.9);
+    }
+    50% {
+        box-shadow: inset 0 0 50px rgb(255, 50, 50, 0.9);
+    }
+    100% {
+        box-shadow: inset 0 0 0px rgb(255, 50, 50, 0.9);
+    }
+    }
+
+    .media-container.blue-glow {
+    animation: blue-glow 1s ease-out;
+    }
+
+    .media-container.red-glow {
+    animation: red-glow 1s ease-out;
+    }
+
+
+    .shake {
+    animation: shake 0.3s ease-in-out;
+    }
+
+    .grayscale {
+    filter: grayscale(100%);
+    }
+
+    @keyframes shake {
+    0%   { transform: translate(0, 10px); }
+    20%  { transform: translate(-5px, 9px); }
+    40%  { transform: translate(5px, 11px); }
+    60%  { transform: translate(-3px, 9px); }
+    80%  { transform: translate(3px, 11px); }
+    100% { transform: translate(0, 10px); }
+    }
+
+    
+
+    
+
+</style>
+
+<body data-page="index">
+    
+    <div class="ban-section" >
+        
+        <div class="blue-ban">
+            <div class="team-name">
+                <div class="team-logo blue-logo"></div>
+                <p id="blue-team-name">BLUE TEAM NAME</p>
+            </div>
+            <div id="ban-1" class="ban-container"></div>
+            <div id="ban-2" class="ban-container"></div>
+            <div id="ban-3" class="ban-container"></div>
+            <div id="ban-4" class="ban-container"></div>
+            <div id="ban-5" class="ban-container"></div>
+        </div>
+        
+        <div class="red-ban">
+            <div class="team-name">
+                <div class="team-logo red-logo"></div>
+                <p id="red-team-name">RED TEAM NAME</p>
+            </div>
+            
+            <div id="ban-6" class="ban-container"></div>
+            <div id="ban-7" class="ban-container"></div>
+            <div id="ban-8" class="ban-container"></div>
+            <div id="ban-9" class="ban-container"></div>
+            <div id="ban-10" class="ban-container"></div>
+        </div>
+    </div>
+    <div class="pick-section">
+        <div class="blue-pick pick">
+            <div class="player-pick">
+            <div class="hero-name blue-hero-name" id="hero-name-bg-1">
+                    <p id="hero-name-1" class="hero-name-text">HERO NAME</p>
+                </div>
+                <div class="media-container" id="hero-1"></div>
+            </div>
+            <div class="player-pick">
+                <div class="hero-name blue-hero-name" id="hero-name-bg-2">
+                    <p id="hero-name-2" class="hero-name-text">HERO NAME</p>
+                </div>
+                <div class="media-container" id="hero-2"></div>
+            </div>
+            <div class="player-pick">
+                <div class="hero-name blue-hero-name" id="hero-name-bg-3">
+                    <p id="hero-name-3" class="hero-name-text">HERO NAME</p>
+                </div>
+                <div class="media-container" id="hero-3"></div>
+            </div>
+            <div class="player-pick">
+                <div class="hero-name blue-hero-name" id="hero-name-bg-4">
+                    <p id="hero-name-4" class="hero-name-text">HERO NAME</p>
+                </div>
+                <div class="media-container" id="hero-4"></div>
+            </div>
+            <div class="player-pick">
+                <div class="hero-name blue-hero-name" id="hero-name-bg-5">
+                    <p id="hero-name-5" class="hero-name-text">HERO NAME</p>
+                </div>
+                <div class="media-container" id="hero-5"></div>
+            </div>
+        </div>
+        <div class="gap">
+
+
+        </div>
+        <div class="red-pick pick">
+            <div class="player-pick">
+                <div class="hero-name red-hero-name" id="hero-name-bg-10">
+                    <p id="hero-name-10" class="hero-name-text">HERO NAME</p>
+                </div>
+                <div class="media-container" id="hero-10"></div>
+            </div>
+            <div class="player-pick">
+                <div class="hero-name red-hero-name" id="hero-name-bg-9">
+                    <p id="hero-name-9" class="hero-name-text">HERO NAME</p>
+                </div>
+                <div class="media-container" id="hero-9"></div>
+            </div>
+            
+            <div class="player-pick">
+                <div class="hero-name red-hero-name" id="hero-name-bg-8">
+                    <p id="hero-name-8" class="hero-name-text">HERO NAME</p>
+                </div>
+                <div class="media-container" id="hero-8"></div>
+            </div>
+            
+            <div class="player-pick">
+                <div class="hero-name red-hero-name" id="hero-name-bg-7">
+                    <p id="hero-name-7" class="hero-name-text">HERO NAME</p>
+                </div>
+                <div class="media-container" id="hero-7"></div>
+            </div>
+            
+            <div class="player-pick">
+                <div class="hero-name red-hero-name" id="hero-name-bg-6">
+                    <p id="hero-name-6" class="hero-name-text">HERO NAME</p>
+                </div>
+                <div class="media-container" id="hero-6"></div>
+            </div>
+            
+        </div>
+    </div>
+    <div class="name-section">
+        <div class="blue-names">
+            <div class="name" id="name-1">PLAYER 1</div>
+            <div class="name" id="name-2">PLAYER 2</div>
+            <div class="name" id="name-3">PLAYER 3</div>
+            <div class="name" id="name-4">PLAYER 4</div>
+            <div class="name" id="name-5">PLAYER 5</div>
+        </div>
+        <div class="gap"></div>
+        <div class="red-names">
+            <div class="name" id="name-6">PLAYER 6</div>
+            <div class="name" id="name-7">PLAYER 7</div>
+            <div class="name" id="name-8">PLAYER 8</div>
+            <div class="name" id="name-9">PLAYER 9</div>
+            <div class="name" id="name-10">PLAYER 10</div>
+        </div>
+        
+    </div>
+
+    
+
+
+<script src="js/control.js"></script>
+<script src="js/swap.js"></script>
+
+<!-- <script src="js/portraits.js"></script> -->
+
+
+</body>
+
+
+</html>
+
