@@ -27,12 +27,18 @@
       if (!match) return;
 
       const team = match[1];
-      const logoDiv = document.querySelector(`.team-logo[data-team="${team}"]`);
-      if (logoDiv) {
-        logoDiv.innerHTML = `<img src="${data}" style="width: 100%; height: 100%; object-fit: cover;">`;
-      } else {
-        console.warn(`Missing .team-logo[data-team="${team}"] in display`);
-      }
+
+      // Get all potential containers for this team logo
+      const containers = [
+        document.querySelector(`.team-logo[data-team="${team}"]`),
+        document.getElementById(`${team}-team-logo`)
+      ];
+
+      containers.forEach(container => {
+        if (container) {
+          container.innerHTML = `<img src="${data}" style="width: 100%; height: 100%; object-fit: cover;">`;
+        }
+      });
     });
   }
 })();

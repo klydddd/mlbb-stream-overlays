@@ -225,28 +225,48 @@ input:focus::placeholder {
   color: #bbb;
 }
 
-input[type="file"] {
-  width: 200px; /* adjust as needed */
-  height: 50px;
+
+.custom-file-upload {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 5px 10px;
+  color: white;
+  background: linear-gradient(135deg, #3b82f6, #60a5fa); /* Blue gradient */
   border-radius: 8px;
-  /* padding: 4px; */
-  background-color: #33333368;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
   cursor: pointer;
-  border: 2px solid transparent;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  user-select: none;
+  /* margin: 10px; */
+  height: auto;
+  width: 300px;
 }
 
-input[type="file"]:hover {
-  transform: scale(1.05);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
-  border-color: #cd6d60;
+.custom-file-upload label {
+    width: 100px;
 }
 
-input[type="file"]:active {
-  transform: scale(0.95);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+.custom-file-upload:hover {
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
 }
+
+.custom-file-upload input[type="file"] {
+  display: none;
+}
+
+/* Optional: red version */
+.custom-file-upload.red {
+  background: linear-gradient(135deg, #ef4444, #f87171);
+}
+
+.custom-file-upload.red:hover {
+  background: linear-gradient(135deg, #dc2626, #ef4444);
+}
+
 
 
 </style>
@@ -260,7 +280,10 @@ input[type="file"]:active {
             <p>PLAYER NAMES/IGN</p>
             <div class="team-desc">
                 <input type="text" name="Team Name" id="blueTeamName" placeholder="BLUE TEAM NAME">
-                <input type="file" class="team-logo-upload" accept="image/*" data-team="blue">
+                <label class="custom-file-upload">
+                    <input type="file" class="team-logo-upload" accept="image/*" data-team="blue">
+                    Upload Logo
+                </label>
                 <input type="url" name="Cam Link" id="blue-team-cam-link" placeholder="CAMERA LINK">
                 <button>ADD SCORE</button>
                 <button>DEDUCT SCORE</button>
@@ -351,7 +374,10 @@ input[type="file"]:active {
 
             <div class="team-desc">
                 <input type="text" name="Team Name" id="redTeamName" placeholder="RED TEAM NAME">
+                <label class="custom-file-upload red">
                 <input type="file" class="team-logo-upload" accept="image/*" data-team="red">
+                Upload Logo
+                </label>
                 <input type="url" name="Cam Link" id="red-team-cam-link" placeholder="CAMERA LINK">
                 <button>ADD SCORE</button>
                 <button>DEDUCT SCORE</button>
