@@ -28,13 +28,13 @@
 
       const team = match[1];
 
-      // Get all potential containers for this team logo
-      const containers = [
-        document.querySelector(`.team-logo[data-team="${team}"]`),
-        document.getElementById(`${team}-team-logo`)
-      ];
+      // Define target IDs for each team
+      const targetIds = team === 'blue'
+        ? ['team-logo-1', 'team-logo-2']
+        : ['team-logo-3', 'team-logo-4'];
 
-      containers.forEach(container => {
+      targetIds.forEach(id => {
+        const container = document.getElementById(id);
         if (container) {
           container.innerHTML = `<img src="${data}" style="width: 100%; height: 100%; object-fit: cover;">`;
         }

@@ -1,9 +1,3 @@
-const page = document.body.getAttribute("data-page"); // to determine which page is display and controller
-const channel = new BroadcastChannel("team_channel");
-
-// const silentSwapKeys = new Set();
-// const overlayWindow = window.open('display.html', 'OverlayWindow');
-
 const heroes = [
     { name: 'Aamon', img: 'Assets/HeroPick/aamon.png', voice: 'Assets/Voicelines/aamon.ogg' },
     { name: 'Akai', img: 'Assets/HeroPick/akai.png', voice: 'Assets/Voicelines/akai.ogg' },
@@ -136,78 +130,265 @@ const heroes = [
 
 ];
 
+const blueName = localStorage.getItem(`blue-team-name`);
+const redName = localStorage.getItem(`red-team-name`);
 
-const switchBtn = document.getElementById("switch");
-
-
-// Switch Function Logic
-if (switchBtn) {
-switchBtn.addEventListener("click", () => {
-    // 1. Team names
-    const blueTeamInput = document.getElementById("blueTeamName");
-    const redTeamInput = document.getElementById("redTeamName");
-
-    const blueTeamName = blueTeamInput?.value ?? "";
-    const redTeamName = redTeamInput?.value ?? "";
-
-    // 2. Store picks and names first (to avoid overwriting before reading)
-    const picks = {};
-    const names = {};
-
-    for (let i = 1; i <= 5; i++) {
-    const pickBlue = document.getElementById(`pick-${i}`);
-    const pickRed = document.getElementById(`pick-${i + 5}`);
-    const nameBlue = document.getElementById(`input-name-${i}`);
-    const nameRed = document.getElementById(`input-name-${i + 5}`);
-
-    // add heroPick swap later
-
-    picks[`pick-${i}`] = pickBlue?.value ?? "";
-    picks[`pick-${i + 5}`] = pickRed?.value ?? "";
-
-    names[`input-name-${i}`] = nameBlue?.value ?? "";
-    names[`input-name-${i + 5}`] = nameRed?.value ?? "";
+function initializeHeroNames() {
+  for (let i = 1; i <= 10; i++) {
+    const heroNameP = document.getElementById(`hero-name-${i}`);
+    if (heroNameP && heroNameP.textContent.trim() === '') {
+      heroNameP.parentElement.style.opacity = '0';
+      heroNameP.parentElement.style.pointerEvents = 'none';
+      heroNameP.parentElement.style.height = '0';
+      heroNameP.parentElement.style.overflow = 'hidden';
     }
+  }
+}
 
-    // 3. Now perform the swap
-    for (let i = 1; i <= 5; i++) {
-    const pickBlue = document.getElementById(`pick-${i}`);
-    const pickRed = document.getElementById(`pick-${i + 5}`);
-    const nameBlue = document.getElementById(`input-name-${i}`);
-    const nameRed = document.getElementById(`input-name-${i + 5}`);
-
-    if (pickBlue && pickRed) {
-        pickBlue.value = picks[`pick-${i + 5}`];
-        pickRed.value = picks[`pick-${i}`];
-    }
-
-    if (nameBlue && nameRed) {
-        nameBlue.value = names[`input-name-${i + 5}`];
-        nameRed.value = names[`input-name-${i}`];
-    }
-    }
-
-    // 4. Send updated values to overlay
-    // 4. Build fresh values from DOM after swap
-    const swappedPicks = {};
-    const swappedNames = {};
-
-    for (let i = 1; i <= 10; i++) {
-      const pickInput = document.getElementById(`pick-${i}`);
-      const nameInput = document.getElementById(`input-name-${i}`);
-      if (pickInput) swappedPicks[`pick-${i}`] = pickInput.value;
-      if (nameInput) swappedNames[`input-name-${i}`] = nameInput.value;
-    }
-
-    channel.postMessage({
-      type: "switch",
-      blueTeamName: redTeamName,
-      redTeamName: blueTeamName,
-      picks: swappedPicks,
-      names: swappedNames
-    });
-
+function initializeSavedTeamNames() {
     
+    const blueNameDisplay = document.getElementById("blue-team-name");
+    blueNameDisplay.innerHTML = blueName;
+
+    const redNameDisplay = document.getElementById("red-team-name");
+    redNameDisplay.innerHTML = redName;
+
+
+    // Default team names when the app is loaded the first time
+    if (blueName === null && redName === null) {
+        blueNameDisplay.innerHTML = "BLUE TEAM NAME"; // default blue name
+        redNameDisplay.innerHTML = "RED TEAM NAME"; // default red name
+    }
+}
+
+function initializeNames() {
+    for (let i = 1; i <= 10; i++) {
+        const playerNameDisplay = document.getElementById(`name-${i}`);
+        const playerName = localStorage.getItem(`player-name-${i}`);
+        if (playerName !== null) {
+            playerNameDisplay.innerHTML = playerName;
+        } 
+    }
+}
+
+window.addEventListener('DOMContentLoaded', initializeHeroNames);
+window.addEventListener('DOMContentLoaded', initializeSavedTeamNames);
+window.addEventListener('DOMContentLoaded', initializeNames);
+
+
+const containers = [...Array(10)].map((_, i) => document.getElementById(`hero-${i + 1}`));
+
+function updateHeroPick(index, heroName, silent = false) {
+  const hero = heroes.find(h => h.name.toLowerCase() === heroName.toLowerCase());
+  const container = containers[index];
+  const heroSlot = index + 1;
+
+  if (!container) return;
+
+  container.innerHTML = "";
+
+  if (!hero) {
+    const nameText = document.getElementById(`hero-name-${heroSlot}`);
+    const nameDiv = document.getElementById(`hero-name-bg-${heroSlot}`);
+    if (nameText) nameText.textContent = '';
+    if (nameDiv) {
+      nameDiv.style.opacity = '0';
+      nameDiv.style.pointerEvents = 'none';
+      nameDiv.style.width = '0';
+      nameDiv.style.overflow = 'hidden';
+    }
+    return;
+  }
+
+  const isBlueTeam = heroSlot >= 1 && heroSlot <= 5;
+  const flashGlowClass = isBlueTeam ? "blue-glow" : "red-glow";
+
+  if (!silent) {
+    container.classList.add(flashGlowClass);
+    setTimeout(() => container.classList.remove(flashGlowClass), 1000);
+  }
+
+  const img = document.createElement('img');
+  img.src = hero.img;
+  img.alt = hero.name;
+  img.className = "hero-portrait";
+
+  if (!silent) {
+    img.classList.add("wipeDown");
+  }
+
+  setTimeout(() => {
+    container.appendChild(img);
+
+    if (!silent) {
+      const audio = document.createElement('audio');
+      audio.autoplay = true;
+      const source = document.createElement('source');
+      source.src = hero.voice;
+      source.type = 'audio/ogg';
+      audio.appendChild(source);
+      container.appendChild(audio);
+    }
+
+    const nameText = document.getElementById(`hero-name-${heroSlot}`);
+    const nameDiv = document.getElementById(`hero-name-bg-${heroSlot}`);
+    if (nameText && nameDiv) {
+      nameText.textContent = hero.name;
+      nameDiv.style.transition = 'opacity 0.3s ease, width 1s ease';
+      nameDiv.style.opacity = '1';
+      nameDiv.style.pointerEvents = 'auto';
+      nameDiv.style.height = '310px';
+      nameDiv.style.width = '30px';
+      nameDiv.style.overflow = 'visible';
+    }
+
+    if (!silent) {
+      setTimeout(() => {
+        img.classList.add("float");
+
+        const glowClasses = isBlueTeam
+          ? ["glow-blue-1", "glow-blue-2", "glow-blue-3"]
+          : ["glow-red-1", "glow-red-2", "glow-red-3"];
+
+        let currentGlow = "";
+
+        setInterval(() => {
+          if (currentGlow) img.classList.remove(currentGlow);
+
+          const nextGlow = Math.random() > 0.4
+            ? glowClasses[Math.floor(Math.random() * glowClasses.length)]
+            : "";
+
+          if (nextGlow) img.classList.add(nextGlow);
+          currentGlow = nextGlow;
+        }, 2500 + Math.random() * 1500);
+      }, 900);
+    }
+
+  }, silent ? 0 : 100);
+}
+
+function updateHeroPickSilent(index, heroName) {
+  const hero = heroes.find(h => h.name.toLowerCase() === heroName.toLowerCase());
+  const container = containers[index];
+  const heroSlot = index + 1;
+
+  if (!container) return;
+
+  // Clear previous content
+  container.innerHTML = "";
+
+  if (!hero) {
+    const nameText = document.getElementById(`hero-name-${heroSlot}`);
+    const nameDiv = document.getElementById(`hero-name-bg-${heroSlot}`);
+    if (nameText) nameText.textContent = '';
+    if (nameDiv) {
+      nameDiv.style.opacity = '0';
+      nameDiv.style.pointerEvents = 'none';
+      nameDiv.style.width = '0';
+      nameDiv.style.overflow = 'hidden';
+    }
+    return;
+  }
+
+  const isBlueTeam = heroSlot >= 1 && heroSlot <= 5;
+  const glowClasses = isBlueTeam
+    ? ["glow-blue-1", "glow-blue-2", "glow-blue-3"]
+    : ["glow-red-1", "glow-red-2", "glow-red-3"];
+
+  // Create animated portrait (with wipeDown, float)
+  const img = document.createElement('img');
+  img.src = hero.img;
+  img.alt = hero.name;
+  img.className = "hero-portrait-silent wipeDown"; // use both classes
+
+  // Append image to container
+  container.appendChild(img);
+
+  // Show hero name bar
+  const nameText = document.getElementById(`hero-name-${heroSlot}`);
+  const nameDiv = document.getElementById(`hero-name-bg-${heroSlot}`);
+  if (nameText && nameDiv) {
+    nameText.textContent = hero.name;
+    nameDiv.style.transition = 'opacity 0.3s ease, width 1s ease';
+    nameDiv.style.opacity = '1';
+    nameDiv.style.pointerEvents = 'auto';
+    nameDiv.style.height = '310px';
+    nameDiv.style.width = '30px';
+    nameDiv.style.overflow = 'visible';
+  }
+
+  // ✅ Start floating and glow effects after wipeDown finishes
+  setTimeout(() => {
+    img.classList.add("float");
+
+    let currentGlow = "";
+
+    setInterval(() => {
+      if (currentGlow) img.classList.remove(currentGlow);
+
+      const nextGlow = Math.random() > 0.4
+        ? glowClasses[Math.floor(Math.random() * glowClasses.length)]
+        : "";
+
+      if (nextGlow) img.classList.add(nextGlow);
+      currentGlow = nextGlow;
+    }, 2500 + Math.random() * 1500);
+  }, 900); // matches .wipeDown duration
+}
+
+function updateBanPick(index, heroName) {
+  const hero = heroes.find(h => h.name.toLowerCase() === heroName.toLowerCase());
+  const container = document.getElementById(`ban-${index + 1}`);
+  if (!container) return;
+
+  // Clear existing content
+  container.innerHTML = "";
+
+  if (!hero) return;
+
+  // Create the image
+  const img = document.createElement("img");
+  img.src = hero.img;
+  img.alt = hero.name;
+  img.className = "ban-portrait shake"; // Initial shake class
+
+  container.appendChild(img);
+
+  // After shake animation (~300ms), remove shake and apply grayscale
+  setTimeout(() => {
+    img.classList.remove("shake");
+    img.classList.add("grayscale");
+  }, 300);
+}
+
+const channel = new BroadcastChannel("team_channel");
+
+// Initial check on page load
+for (let i = 0; i < 10; i++) {
+    const name = localStorage.getItem(`heroPick-${i + 1}`);
+    if (name) updateHeroPickSilent(i, name);
+}
+
+for (let i = 0; i < 10; i++) {
+  const name = localStorage.getItem(`banPick-${i + 1}`);
+  if (name) updateBanPick(i, name);
+}
+
+
+
+channel.onmessage = (event) => {
+  const data = event.data;
+
+  // 🔁 SWITCH BLOCK (Team names + picks + names)
+  if (data.type === "switch") {
+    // Team names
+    const blue = document.getElementById("blue-team-name");
+    const red = document.getElementById("red-team-name");
+
+    if (blue) blue.textContent = data.blueTeamName || "Blue Team Name";
+    if (red) red.textContent = data.redTeamName || "Red Team Name";
+
     // Picks
     for (let i = 1; i <= 10; i++) {
       if (data.picks?.[`pick-${i}`] !== undefined) {
@@ -216,147 +397,136 @@ switchBtn.addEventListener("click", () => {
       }
     }
 
-    // 5. Finally, swap team name inputs
-    if (blueTeamInput && redTeamInput) {
-    blueTeamInput.value = redTeamName;
-    redTeamInput.value = blueTeamName; 
-    }
-  });
-
-  
-
-}
-
-// Reset button logic (CLEAR ALL INPUTS)
-const resetBtn = document.getElementById("reset");
-
-if (resetBtn) {
-  resetBtn.addEventListener("click", () => {
-    // 1. Clear all text input fields
-    document.querySelectorAll("input[type='text']").forEach(input => input.value = "");
-
-    // 2. Reset all image inputs to a default image
-    document.querySelectorAll("input[type='image']").forEach(img => {
-      img.src = "default.png"; // replace with your fallback image path
-    });
-
-    // 3. Clear all media-container content
-    document.querySelectorAll(".media-container").forEach(container => {
-      container.innerHTML = "";
-    });
-
-    // 4. Clear localStorage (if you're using it)
+    // Names
     for (let i = 1; i <= 10; i++) {
-      localStorage.clear();
-    }
-
-    // 5. Broadcast a reset message to index.html
-    channel.postMessage({ type: "reset" });
-
-    document.querySelectorAll(".hero-name").forEach(container => {
-        container.innerHTML = "";
-    })
-
-    document.querySelectorAll(".team-logo").forEach(container => {
-      container.innerHTML = "";
-    })
-  });
-
-    // 6. Clear Logos 
-
-}
-
-// 🔵 Blue Team
-const blueInput = document.getElementById("blueTeamName");
-if (blueInput) {
-  blueInput.addEventListener("input", () => {
-        localStorage.setItem(`blue-team-name`, blueInput.value);
-        const blueName = localStorage.getItem(`blue-team-name`);
-        channel.postMessage({ blueTeamName: blueName });
-  });
-}
-
-// 🔴 Red Team
-const redInput = document.getElementById("redTeamName");
-if (redInput) {
-  redInput.addEventListener("input", () => {
-    localStorage.setItem(`red-team-name`, redInput.value);
-    const redName = localStorage.getItem(`red-team-name`);
-    channel.postMessage({ redTeamName: redName });
-  });
-}
-
-// 🟨 Picks (pick-1 to pick-10)
-for (let i = 1; i <= 10; i++) {
-  const pickInput = document.getElementById(`pick-${i}`);
-
-  const pickInputs = [...Array(10)].map((_, i) => document.getElementById(`pick-${i + 1}`));
-
-  pickInputs.forEach((input, index) => {
-      input.addEventListener('keydown', (e) => {
-        if (e.key === "Enter") {
-          localStorage.setItem(`heroPick-${index + 1}`, input.value.trim());
-    }
-  });
-  });
-}
-
-for (let i = 1; i <= 10; i++) {
-  const banInput = document.getElementById(`ban-${i}`);
-  
-  const inputs = [...Array(10)].map((_, i) => document.getElementById(`ban-${i + 1}`));
-  
-  // Bans (ban-1 to ban-10)
-  inputs.forEach((input, index) => {
-    input.addEventListener('keydown', (e) => {
-      if (e.key === "Enter") {
-        localStorage.setItem(`banPick-${index + 1}`, input.value.trim());
+      if (data.names?.[`input-name-${i}`] !== undefined) {
+        const name = document.getElementById(`name-${i}`);
+        if (name) name.textContent = data.names[`input-name-${i}`] || `Player ${i}`;
       }
-    });
-  });
-}
+    }
 
-// 🟦 Names (input-name-1 to input-name-10)
-for (let i = 1; i <= 10; i++) {
-  const nameInput = document.getElementById(`input-name-${i}`);
-  const inputs = [...Array(10)].map((_, i) => document.getElementById(`input-name-${i + 1}`));
-  
-  if (nameInput) {
-    nameInput.addEventListener("input", () => {
-      channel.postMessage({ [`input-name-${i}`]: nameInput.value });
-      
-    });
+    return;
   }
 
-  inputs.forEach((input, index) => {
-    input.addEventListener("input", () => {
-      localStorage.setItem(`player-name-${index + 1}`, input.value.trim());
-    })
-  });
-}
+  // 🔄 RESET BLOCK (CLEAR ALL DISPLAY)
+  if (data.type === "reset") {
+    // Reset team names
+    const resetText = (id, fallback) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = fallback;
+    };
+    resetText("blue-team-name", "Blue Team Name");
+    resetText("red-team-name", "Red Team Name");
 
-// Player Camera Links (storing to a localStorage for later use) 
-for (let i = 1; i <= 10; i++) {
-  const inputs = [...Array(10)].map((_, i) => document.getElementById(`cam-${i + 1}`));
+    const resetLogo = (id, fallback) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = fallback;
+    };
+    // Reset Logo Containers (add fallback or default later)
+    for (let i = 1; i <= 4; i++) {
+        resetLogo(`team-logo-${i}`, ``);
+    }
 
-  inputs.forEach((input, index) => {
-    input.addEventListener("input", () => {
-      localStorage.setItem(`camera-link-${index + 1}`, input.value.trim());
-    })
-  });
-  
-}
+    // Reset hero names and player names
+    for (let i = 1; i <= 10; i++) {
+      resetText(`hero-name-${i}`, ``);
+      resetText(`name-${i}`, `PLAYER ${i}`);
+    }
 
-// Team Camera 
+    // Reset static hero-imgs (if used)
+    for (let i = 1; i <= 10; i++) {
+      const img = document.getElementById(`hero-img-${i}`);
+      if (img) img.src = "default.png";
+    }
 
-for (let i = 1; i <= 2; i++) {
-  const inputs = [...Array(2)].map((_, i) => document.getElementById(`team-cam-link-${i + 1}`));
+    // Reset media containers
+    for (let i = 1; i <= 10; i++) {
+      const container = document.getElementById(`hero-${i}`);
+      if (container) {
+        container.innerHTML = "";
+        // container.textContent = `Pick ${i}`;
+      }
+    }
 
-  inputs.forEach((input, index) => {
-    input.addEventListener("input", () => {
-      localStorage.setItem(`team-cam-link-${index + 1}`, input.value.trim());
-    })
-  });
-}
+    for (let i = 1; i <= 10; i++) {
+      const container = document.getElementById(`ban-${i}`);
+      if (container) {
+        container.innerHTML = "";
+        // container.textContent = `Pick ${i}`;
+      }
+    }
 
+    for (let i = 1; i <=10; i++) {
+        const container = document.getElementById(`hero-name-bg-${i}`);
+        if (container) {
+            container.style.width = '0';
+        }
+    }
 
+    return;
+  }
+
+  // 🟦 Single Blue Team update
+  if (data.blueTeamName !== undefined) {
+   
+    const blueDiv = document.getElementById("blue-team-name");
+    if (blueDiv) blueDiv.textContent = data.blueTeamName || "Blue Team Name";
+  }
+
+  // 🔴 Single Red Team update
+  if (data.redTeamName !== undefined) {
+    const redDiv = document.getElementById("red-team-name");
+    if (redDiv) redDiv.textContent = data.redTeamName || "Red Team Name";
+  }
+
+  // 🟨 Single Pick updates
+  for (let i = 1; i <= 10; i++) {
+    if (data[`pick-${i}`] !== undefined) {
+      const heroDiv = document.getElementById(`hero-name-${i}`);
+      if (heroDiv) heroDiv.textContent = data[`pick-${i}`] || `Pick ${i}`;
+    }
+  }
+
+  // 🟦 Single Player name updates
+  for (let i = 1; i <= 10; i++) {
+    if (data[`input-name-${i}`] !== undefined) {
+      const nameDiv = document.getElementById(`name-${i}`);
+      if (nameDiv) nameDiv.textContent = data[`input-name-${i}`] || `Player ${i}`;
+    }
+  }
+};
+
+// storage listener
+
+let heroPickListeningLocked = false;
+
+window.addEventListener('storage', (e) => {
+  const isHeroPick = e.key && e.key.startsWith('heroPick-');
+  const isBanPick = e.key && e.key.startsWith('banPick-');
+
+  // ✅ Always respond to ban picks
+  if (isBanPick) {
+    const index = parseInt(e.key.split('-')[1]) - 1;
+    updateBanPick(index, e.newValue);
+    return;
+  }
+
+  if (isHeroPick) {
+    const index = parseInt(e.key.split('-')[1]) - 1;
+
+    // 🔁 Simulate localStorage with updated value
+    const tempStorage = { ...localStorage };
+    tempStorage[`heroPick-${index + 1}`] = e.newValue;
+
+    const allFilled = [...Array(10)].every((_, i) =>
+      (i === index ? e.newValue : localStorage.getItem(`heroPick-${i + 1}`))
+    );
+
+    if (allFilled) {
+      heroPickListeningLocked = true;
+      updateHeroPickSilent(index, e.newValue); // ✅ LAST ONE gets full animation/audio
+    } else {
+      updateHeroPick(index, e.newValue, false); // ✅ Normal behavior
+    }
+  }
+});

@@ -414,7 +414,7 @@ transition: filter 0.5s ease-in-out;
     z-index: 1;
 }
 
-#blue-team-logo, #red-team-logo {
+#team-logo-2, #team-logo-4 {
     /* background-color: rgb(174, 17, 17); */
     height: 100%;
     width: 100%;
@@ -429,15 +429,10 @@ transition: filter 0.5s ease-in-out;
     filter: brightness(0.4);
 }
 
-#blue-team-logo img, #red-team-logo img {
-    /* filter: blur(1px); */
-    /* scale: 1.1; */
-}
-
-#blue-team-logo {
+#team-logo-2 {
     left: -100px;
 }
 
-#red-team-logo {
+#team-logo-4 {
     right: -100px;
 }
