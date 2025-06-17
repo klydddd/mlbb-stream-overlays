@@ -1,3 +1,5 @@
+import { heroes, updateBanPick, updateHeroPick, updateHeroPickSilent } from "./hero.js";
+
 function setupHeroDropdown(inputPrefix, dropdownPrefix, count, localStorageKeyPrefix, onSelect) {
   for (let i = 1; i <= count; i++) {
     const input = document.getElementById(`${inputPrefix}-${i}`);
@@ -91,7 +93,7 @@ function setupHeroDropdown(inputPrefix, dropdownPrefix, count, localStorageKeyPr
 }
 
 setupHeroDropdown("pick", "dropdown", 10, "heroPick", (i, name) => {
-  updateHeroPick(i - 1, name);
+  updateHeroPick(i - 1, name, false);
 });
 
 setupHeroDropdown("ban", "dropdown-ban", 10, "banPick", (i, name) => {
