@@ -1,7 +1,5 @@
 import { heroes, updateBanPick, updateHeroPick, updateHeroPickSilent } from "./hero.js";
 
-
-
 const blueName = localStorage.getItem(`blue-team-name`);
 const redName = localStorage.getItem(`red-team-name`);
 
