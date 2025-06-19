@@ -3,12 +3,153 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/display.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/display.css">
     <title>Display</title>
 </head>
+
+<style>
+    body {
+        overflow: hidden;
+    }
+
+    .timer-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        width: 100%;
+        height: auto;
+        
+    }
+    .timer {
+        width: 100px;
+        color: rgb(0, 16, 31);
+        font-size: 4rem;
+        font-family: monospace;
+        font-family: anton;
+    }      
+
+    .progress-container {
+        width: 100%;
+        height: 10px;
+        position: relative;
+        display: flex;
+        justify-content: center;
+    }
+    .progress-track {
+        width: 100%;
+        height: 100%;
+        background-color: rgba(255, 255, 255, 0.2);
+        position: relative;
+        overflow: hidden;
+    }
+    .progress-fill {
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        background: radial-gradient( #0043c8,  #0055ff);
+        box-shadow: 0 0 10px #24314B;
+        left: 0;
+        right: 0;
+        margin: auto;
+        transform-origin: center;
+    }
+    .warning .progress-fill {
+        animation: pulse 1s infinite;
+    }
+    @keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.5; }
+        100% { opacity: 1; }
+    }
+
+    .match-info {
+        margin-top: 30px;
+        color: rgb(0, 2, 32);
+        text-align: center;
+        font-family: Roboto;
+        font-size: 1.3rem;
+        font-weight: 900;
+    }
+
+    span {
+        font-family: roboto;
+    }
+
+    
+    @keyframes redPick {
+        0% {transform: translateX(0);}
+        40% {transform: translateX(15px);}
+        80% {transform: translateX(0) rotateX(0deg);}
+        90% {transform: rotateX(90deg);}
+        100% {transform: rotateX(0deg);}
+    }
+
+    @keyframes bluePick {
+        0% {transform: translateX(0);}
+        40% {transform: translateX(-15px);}
+        80% {transform: translateX(0) rotateX(0deg);}
+        90% {transform: rotateX(90deg);}
+        100% {transform: rotateX(0deg);}
+    }
+
+    #triangle-left {
+        width: 0;
+        height: 0;
+        border-top: 25px solid transparent;
+        border-right: 50px solid blue;
+        border-bottom: 25px solid transparent;
+        animation: bluePick 2s ease-in-out 2s infinite;
+        margin-right: 10px;
+        opacity: 1;
+    }
+
+    #triangle-right {
+        width: 0;
+        height: 0;
+        border-top: 25px solid transparent;
+        border-left: 50px solid #ff0000;
+        border-bottom: 25px solid transparent;
+        margin-left: 10px;
+        animation: redPick 2s ease-in-out 2s infinite;
+        opacity: 1;
+    }
+
+    .container {
+        width: 100%;
+        height: 100%;
+        background-color: rgba(255, 0, 0, 0.136);
+    }
+
+    .name-section .gap {
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .blue-score, .red-score {
+        display: flex;
+        align-items: center;
+        width: 50%;
+        height: 100%;
+        gap: 5px;
+        margin: 0 10px;
+    }
+
+    .red-score {
+        justify-content: right;
+    }
+
+    .score {
+        width: 40px;
+        height: 50%;
+        background-color: rgba(24, 24, 24, 0.229);
+    }
+
+</style>
 
 
 
@@ -79,7 +220,16 @@
             </div>
         </div>
         <div class="gap">
-            <p>MATCH </p>
+            <div class="match-info">
+                 GAME <span id="gameNumber">0</span> MATCH <span id="matchNumber">0</span>   
+            </div>
+            <div class="timer-container">
+                <div id="triangle-left"></div>
+                <div class="timer" id="timerDisplay">50</div>
+                <div id="triangle-right"></div>
+            </div>
+            <div class="container">
+            </div>
 
         </div>
         <div class="red-pick pick">
@@ -127,7 +277,18 @@
             <div class="name" id="name-4">PLAYER 4</div>
             <div class="name" id="name-5">PLAYER 5</div>
         </div>
-        <div class="gap"></div>
+        <div class="gap">
+            <div class="blue-score">
+                <div class="score"></div>
+                <div class="score"></div>
+                <div class="score"></div>
+            </div>
+            <div class="red-score">
+                <div class="score"></div>
+                <div class="score"></div>
+                <div class="score"></div>
+            </div>
+        </div>
         <div class="red-names">
             <div class="name" id="name-6">PLAYER 6</div>
             <div class="name" id="name-7">PLAYER 7</div>
@@ -137,7 +298,13 @@
         </div>
         
     </div>
-    <div class="timer"></div>
+     <div class="phase-text" id="phaseText"></div>
+        <div class="progress-container">
+            <div class="progress-track" id="progressTrack">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+
     
     <div class="pick-section pick-section-background">
         
@@ -183,7 +350,8 @@
 <script type="module" src="js/display.js"></script>
 <script src="js/swap.js"></script>
 <script src="js/showLogo.js"></script>
-
+<script src="js/displayTimer.js"></script>
+<script src="js/activePick.js"></script>
 
 </body>
 

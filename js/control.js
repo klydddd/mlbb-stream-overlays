@@ -6,7 +6,6 @@ const channel = new BroadcastChannel("team_channel");
 
 const switchBtn = document.getElementById("switch");
 
-
 // Switch Function Logic
 if (switchBtn) {
 switchBtn.addEventListener("click", () => {
@@ -45,7 +44,9 @@ switchBtn.addEventListener("click", () => {
 
     if (pickBlue && pickRed) {
         pickBlue.value = picks[`pick-${i + 5}`];
+        localStorage.setItem(`heroPick-${i}`, picks[`pick-${i + 5}`])
         pickRed.value = picks[`pick-${i}`];
+        localStorage.setItem(`heroPick-${i + 5}`, picks[`pick-${i}`])
     }
 
     if (nameBlue && nameRed) {

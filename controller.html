@@ -24,30 +24,7 @@ input, button {
     background-color: #333;
 }
 
-button {
-    padding: 0px 24px;
-  background-color: #0cbdd5; /* Indigo */
-  color: #ffffff;
-  border: none;
-  border-radius: 5px;
-  /* font-size: 16px;
-  font-weight: 600; */
-  cursor: pointer;
-  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
-  transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-  height: 33px;
-}
 
-button:hover {
-  background-color: #914d68; /* Lighter indigo */
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(79, 70, 229, 0.3);
-}
-
-button:active {
-  transform: scale(0.96);
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
-}
 
 p {
     margin-left: 10px;
@@ -127,6 +104,30 @@ input {
 .timer-control button, .team-control button{
     height: 30px;
     width: 100px;
+}
+
+button {
+  background-color: #0cbdd5; /* Indigo */
+  color: #ffffff;
+  border: none;
+  border-radius: 5px;
+  /* font-size: 16px;
+  font-weight: 600; */
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+  transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+
+}
+
+button:hover {
+  background-color: #914d68; /* Lighter indigo */
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(79, 70, 229, 0.3);
+}
+
+button:active {
+  transform: scale(0.96);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
 }
 
 .input-wrapper {
@@ -267,6 +268,19 @@ input:focus::placeholder {
   background: linear-gradient(135deg, #dc2626, #ef4444);
 }
 
+.phase-info {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: white;
+            border-radius: 5px;
+            color: black;
+            font-size: large;
+        }
+
+#currentPhase {
+    color: black;
+    font-size: large;
+}
 
 
 </style>
@@ -470,7 +484,7 @@ input:focus::placeholder {
             <p>DRAFT CONTROL</p>
             <button id="reset">RESET DRAFT</button>
             <button id="switch">SWITCH TEAMS</button>
-            <BR></BR>
+            <BR>
             <p>TEAM CONTROLS</p>
             <button id="clear-names">CLEAR NAMES</button>
             <button id="clear-picks">CLEAR PICKS</button>
@@ -481,19 +495,23 @@ input:focus::placeholder {
         </div>
         <div class="timer-control">
             <p>TIMER CONTROL</p>    
-            <button>START</button>
-            <button>STOP</button>
-            <button id="next">NEXT PHASE</button>
-            <button >RESET</button>
+            <button id="startBtn">START</button>
+            <button id="resetPhase">RESET</button>
+            <button id="nextPhaseBtn">NEXT PHASE</button>
+            <div class="phase-info" id="phaseInfo">
+                Current Phase: <span id="currentPhase">0</span>/13
+            </div>
         </div>
     </div>
     
     
-<script src="js/control.js"></script>
+<script type="module" src="js/control.js"></script>
 <script src="js/swap.js"></script>
 <script src="js/showLogo.js"></script>
 <script src="js/clear.js"></script>
 <script type="module" src="js/autocomplete.js"></script>
+<script src="js/timer.js"></script>
+
     
 </body>
 

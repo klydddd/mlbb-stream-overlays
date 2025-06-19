@@ -212,15 +212,10 @@ window.addEventListener('storage', (e) => {
   if (isHeroPick) {
     const index = parseInt(e.key.split('-')[1]) - 1;
 
-    // 🔁 Simulate localStorage with updated value
-    const tempStorage = { ...localStorage };
-    tempStorage[`heroPick-${index + 1}`] = e.newValue;
+    // Checks if we are in the final phase of drafting
+    const isFinalPhase = localStorage.getItem('phase-number') === '14';
 
-    const allFilled = [...Array(10)].every((_, i) =>
-      (i === index ? e.newValue : localStorage.getItem(`heroPick-${i + 1}`))
-    );
-
-    if (allFilled) {
+    if (isFinalPhase) {
       heroPickListeningLocked = true;
       updateHeroPickSilent(index, e.newValue); // ✅ LAST ONE gets full animation/audio
     } else {
