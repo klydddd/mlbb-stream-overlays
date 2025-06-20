@@ -55,7 +55,6 @@ body {
 
 .red-side {
     background: linear-gradient(135deg,  #e98b78da, #a63a1fc6);
-
     width: 50%;
     height: 100%;
 }
@@ -66,20 +65,10 @@ input {
     background-color: #333;
 }
 
-
-
-.names, .picks, .team-desc, .camLinks, .bans{
-    display: flex;
-    gap: 5px;
-    margin: 5px;
-}
-
 .swapping-area {
     margin: 5px;
     display: flex;
     justify-content:space-around;
-    
-
 }
 
 .swapping-area button {
@@ -132,6 +121,7 @@ button:active {
 
 .input-wrapper {
   position: relative;
+  width: 100%;
 }
 
 .dropdown {
@@ -158,9 +148,9 @@ button:active {
   background-color: #444;
 }
 
-.picks input, .bans input {
-    width: 97%;
-}
+/* .picks input, .bans input {
+    width: 100%;
+} */
 
 .dropdown-option {
   padding: 6px 12px;
@@ -203,7 +193,7 @@ input {
   outline: none;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
   width: 100%;
-  max-width: 300px;
+  max-width: auto;
   background-color: #333;
   color: #333;
   box-sizing: border-box;
@@ -269,17 +259,28 @@ input:focus::placeholder {
 }
 
 .phase-info {
-            margin-top: 20px;
-            padding: 10px;
-            background-color: white;
-            border-radius: 5px;
-            color: black;
-            font-size: large;
-        }
+    margin-top: 20px;
+    padding: 10px;
+    background-color: white;
+    border-radius: 5px;
+    color: black;
+    font-size: large;
+}
 
 #currentPhase {
     color: black;
     font-size: large;
+}
+
+.names, .picks, .team-desc, .camLinks, .bans{
+    display: flex;
+    gap: 5px;
+    margin: 5px;
+}
+
+.picks, .bans {
+    align-items: center;
+    justify-content: center;
 }
 
 
