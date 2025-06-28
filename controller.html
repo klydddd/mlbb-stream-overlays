@@ -85,12 +85,18 @@ input {
     width: 100vw;
 }
 
+
+
 .timer-control, .team-control {
     margin: 10px;
     width: 50%;
 }
 
-.timer-control button, .team-control button{
+.timer-control {
+    /* display: inline-flex; */
+}
+
+.timer-control button, .team-control button, .team-control input, .timer-control input {
     height: 30px;
     width: 100px;
 }
@@ -100,8 +106,8 @@ button {
   color: #ffffff;
   border: none;
   border-radius: 5px;
-  /* font-size: 16px;
-  font-weight: 600; */
+  /* font-size: 16px; */
+  /*font-weight: 600; */
   cursor: pointer;
   box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
   transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
@@ -259,17 +265,20 @@ input:focus::placeholder {
 }
 
 .phase-info {
-    margin-top: 20px;
-    padding: 10px;
+    display: inline;
+    /* width: 200px; */
+    /* margin-top: 10px; */
+    margin-left: 10px;
+    padding: 7px;
     background-color: white;
     border-radius: 5px;
     color: black;
-    font-size: large;
+    font-size: small;
 }
 
 #currentPhase {
     color: black;
-    font-size: large;
+    font-size: small;
 }
 
 .names, .picks, .team-desc, .camLinks, .bans{
@@ -486,6 +495,7 @@ input:focus::placeholder {
             <button id="reset">RESET DRAFT</button>
             <button id="switch">SWITCH TEAMS</button>
             <BR>
+            <br>
             <p>TEAM CONTROLS</p>
             <button id="clear-names">CLEAR NAMES</button>
             <button id="clear-picks">CLEAR PICKS</button>
@@ -495,12 +505,18 @@ input:focus::placeholder {
             <button id="clear-cam-links">CLEAR CAM LINK</button>
         </div>
         <div class="timer-control">
+            
+            <p>MATCH INFO CONTROL</p>
+            <input type="text" placeholder="GAME NUMBER">
+            <input type="text" placeholder="MATCH NUMBER">
+            <br>
+            <br>
             <p>TIMER CONTROL</p>    
             <button id="startBtn">START</button>
             <button id="resetPhase">RESET</button>
             <button id="nextPhaseBtn">NEXT PHASE</button>
             <div class="phase-info" id="phaseInfo">
-                Current Phase: <span id="currentPhase">0</span>/13
+                CURRENT PHASE: <span id="currentPhase">0</span>/14
             </div>
         </div>
     </div>

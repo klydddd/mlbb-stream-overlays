@@ -172,7 +172,7 @@ export function updateHeroPick(index, heroName, silent = false) {
   }
 
   const isBlueTeam = heroSlot >= 1 && heroSlot <= 5;
-  const flashGlowClass = isBlueTeam ? "blue-glow" : "red-glow";
+  const flashGlowClass = isBlueTeam ? "blue-select" : "red-select";
 
   if (!silent) {
     container.classList.add(flashGlowClass);
@@ -325,16 +325,19 @@ export function updateBanPick(index, heroName) {
   container.innerHTML = "";
 
   if (!hero) return;
-
+  
   const img = document.createElement("img");
-  img.src = hero.img;
-  img.alt = hero.name;
-  img.className = "ban-portrait shake";
-
-  container.appendChild(img);
+  setTimeout(() => {
+    img.src = hero.img;
+    img.alt = hero.name;
+    img.className = "ban-portrait shake";
+    
+    container.appendChild(img);
+  }, 1000);
 
   setTimeout(() => {
     img.classList.remove("shake");
     img.classList.add("grayscale");
   }, 300);
+
 }

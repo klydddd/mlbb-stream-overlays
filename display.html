@@ -7,6 +7,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Anton&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/display.css">
+    <link rel="stylesheet" href="css/animation.css">
     <title>Display</title>
 </head>
 
@@ -29,11 +30,11 @@
                 <div id="team-logo-2" data-team="blue"></div>
                 <p id="blue-team-name">BLUE TEAM NAME</p>
             </div>
-            <div id="ban-1" class="ban-container"></div>
-            <div id="ban-2" class="ban-container"></div>
-            <div id="ban-3" class="ban-container"></div>
-            <div id="ban-4" class="ban-container"></div>
-            <div id="ban-5" class="ban-container"></div>
+            <div id="ban-1" class="ban-container ban-1"></div>
+            <div id="ban-2" class="ban-container ban-3"></div>
+            <div id="ban-3" class="ban-container ban-6"></div>
+            <!-- <div id="ban-4" class="ban-container ban-8"></div> -->
+            <!-- <div id="ban-5" class="ban-container ban-10"></div> -->
         </div>
         <div class="gap">
 
@@ -45,11 +46,11 @@
                 <p id="red-team-name">RED TEAM NAME</p>
             </div>
             
-            <div id="ban-6" class="ban-container"></div>
-            <div id="ban-7" class="ban-container"></div>
-            <div id="ban-8" class="ban-container"></div>
-            <div id="ban-9" class="ban-container"></div>
-            <div id="ban-10" class="ban-container"></div>
+            <div id="ban-6" class="ban-container ban-2"></div>
+            <div id="ban-7" class="ban-container ban-4"></div>
+            <div id="ban-8" class="ban-container ban-5"></div>
+            <!-- <div id="ban-9" class="ban-container ban-7"></div> -->
+            <!-- <div id="ban-10" class="ban-container ban-9"></div> -->
         </div>
     </div>
     <div class="pick-section">
@@ -93,6 +94,9 @@
                 <div id="triangle-left"></div>
                 <div class="timer" id="timerDisplay">50</div>
                 <div id="triangle-right"></div>
+            </div>
+            <div class="phaseDiv" style="width: 100%; height: 60px; text-align: center;">
+                <span id="pickOrBan" style="font-weight: 900;">DRAFTING</span>
             </div>
             <div class="container">
             </div>
@@ -175,38 +179,38 @@
     <div class="pick-section pick-section-background">
         
         <div class="blue-pick pick">
-            <div class="media-container phase-2">
+            <div class="media-container pick-1">
                 <img src="Assets/defaults/EXP.png" alt="" >
             </div>
-            <div class="media-container">
+            <div class="media-container pick-4">
                 <img src="Assets/defaults/GOLD.png" alt="">
             </div>
-            <div class="media-container">
+            <div class="media-container pick-5">
                 <img src="Assets/defaults/JG.png" alt="">
             </div>
-            <div class="media-container">
+            <div class="media-container pick-8">
                 <img src="Assets/defaults/MID.png" alt="">
             </div>
-            <div class="media-container">
+            <div class="media-container pick-9">
                 <img src="Assets/defaults/ROAM.png" alt="">
             </div>
             
         </div>
         <div class="gap"></div>
         <div class="red-pick pick">
-            <div class="media-container">
+            <div class="media-container pick-10">
                 <img src="Assets/defaults/ROAM.png" alt="">
             </div>
-            <div class="media-container">
+            <div class="media-container pick-7">
                 <img src="Assets/defaults/MID.png" alt="">
             </div>
-            <div class="media-container">
+            <div class="media-container pick-6">
                 <img src="Assets/defaults/JG.png" alt="">
             </div>
-            <div class="media-container">
+            <div class="media-container pick-3">
                 <img src="Assets/defaults/GOLD.png" alt="">
             </div>
-            <div class="media-container">
+            <div class="media-container pick-2">
                 <img src="Assets/defaults/EXP.png" alt="">
             </div>
         </div>

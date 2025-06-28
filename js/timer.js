@@ -70,7 +70,7 @@ nextPhaseBtn.addEventListener('click', () => {
     }
 
     if (draftState.currentPhase === 14) {
-      phaseInfo.textContent = "FINALIZE COMPS";
+      alert("Draft completed! Finaize Comps");
       
     }
 });
