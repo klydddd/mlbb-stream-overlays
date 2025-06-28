@@ -333,11 +333,12 @@ export function updateBanPick(index, heroName) {
     img.className = "ban-portrait shake";
     
     container.appendChild(img);
-  }, 1000);
-
-  setTimeout(() => {
+    setTimeout(() => {
     img.classList.remove("shake");
     img.classList.add("grayscale");
   }, 300);
+  }, 1000);
+
+  
 
 }
