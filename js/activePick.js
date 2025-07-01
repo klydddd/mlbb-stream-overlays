@@ -2,7 +2,8 @@ const bluePickIdentifier = document.querySelector("#triangle-left");
 const redPickIdentifier = document.querySelector("#triangle-right");
 const progressBar = document.querySelector("#progressFill");
 const phaseTexts = document.getElementById("pickOrBan");
-let phase = 0;
+let phase = 1;
+let reservedPhase;
 
 // Define visual phase ranges
 const threeVisualPhases = [
@@ -91,6 +92,15 @@ function removeVisual(first, last, pick = false, blue = false) {
   }
 }
 
+function removeVisualBanAndPick() {
+  for (let i = 1; i <= 10; i++) {
+     const ban = document.querySelector(`.ban-${i}`);
+     const pick = document.querySelector(`.pick-${i}`);
+     if (ban) ban.classList.remove(ban.classList[pick.classList.length - 1]);
+     if (pick) pick.classList.remove(pick.classList[pick.classList.length - 1]);
+  }
+}
+
 
 
 // Checks changes in phase-number
@@ -100,14 +110,21 @@ window.addEventListener('storage', (e) => {
   // ✅ Always respond to ban picks
   if (isPhase) {
 
+
     const phaseNumber = parseInt(localStorage.getItem("phase-number"));
+    
     console.log("Storage event:", phaseNumber);
 
     const current = threeVisualPhases[phaseNumber - 1];
     if (current) {
-      if (current.set) setVisual(...current.set);
-      if (current.remove) removeVisual(...current.remove);
-      phase++;
+      if ( phase !== 0) {
+        if (current.set) setVisual(...current.set);
+        if (current.remove) removeVisual(...current.remove);
+        phase++; 
+        
+      } else {
+        if (reservedPhase.remove) removeVisual(...reservedPhase.remove);
+      }
     }
 
 
@@ -117,7 +134,10 @@ window.addEventListener('storage', (e) => {
     
     if (phaseNumber === null) {
         // Keep defaults (both visible)
+        phaseTexts.textContent = "DRAFT STARTING SOON";
+        reservedPhase = current;
         phase = 0;
+        
     } else if (phaseNumber <= 8) {
         
         // Even: red visible, odd: blue visible
@@ -129,9 +149,11 @@ window.addEventListener('storage', (e) => {
         blueOpacity = phaseNumber % 2 ? 0 : 1;
         redOpacity = phaseNumber % 2 ? 1 : 0;
         progressBar.style.background = phaseNumber % 2 ? "red" : "blue";
-    } else {
+    } else if (phaseNumber >= 14){
       progressBar.style.background = "linear-gradient(90deg, blue, red)";
       phaseTexts.textContent = "FINALIZING DRAFT";
+    } else {
+      phaseTexts.textContent = "DRAFT STARTING SOON";
     }
     // For phaseNumber >= 14, keep defaults (both visible)
     bluePickIdentifier.style.opacity = blueOpacity;

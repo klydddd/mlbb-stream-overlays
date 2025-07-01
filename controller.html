@@ -102,7 +102,7 @@ input {
 }
 
 button {
-  background-color: #0cbdd5; /* Indigo */
+  background-color: #0cbdd5;
   color: #ffffff;
   border: none;
   border-radius: 5px;
@@ -292,6 +292,55 @@ input:focus::placeholder {
     justify-content: center;
 }
 
+.menu {
+    display: inline-block;
+    position: relative;
+    width: 220px;
+    user-select: none;
+}
+
+.menu-toggle {
+    background-color: #0cbdd5;
+    color: white;
+    padding: 9px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.3s;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.menu-toggle:hover {
+    background-color: #914d68;
+}
+
+.menu-options {
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    width: 100%;
+    margin-bottom: 8px;
+    background-color: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    display: none;
+    z-index: 10;
+}
+
+.menu-options div {
+    padding: 12px 20px;
+    cursor: pointer;
+    transition: background 0.2s;
+    color: black;
+}
+
+.menu-options div:hover {
+    background-color: #f0f0f0;
+}
+
+.menu.active .menu-options {
+    display: block;
+}
 
 </style>
 
@@ -507,8 +556,16 @@ input:focus::placeholder {
         <div class="timer-control">
             
             <p>MATCH INFO CONTROL</p>
-            <input type="text" placeholder="GAME NUMBER">
-            <input type="text" placeholder="MATCH NUMBER">
+            <input type="text" placeholder="GAME NUMBER" id="gameNumberInput">
+            <input type="text" placeholder="MATCH NUMBER" id="matchNumberInput">
+            <div class="menu" id="customMenu">
+                <div class="menu-toggle" id="menuToggle">Select Match</div>
+                <div class="menu-options">
+                    <div>GRAND FINALS</div>
+                    <div>SEMI FINAL</div>
+                    <div>PLAYOFFS</div>
+                </div>
+            </div>
             <br>
             <br>
             <p>TIMER CONTROL</p>    
@@ -527,9 +584,7 @@ input:focus::placeholder {
 <script src="js/showLogo.js"></script>
 <script src="js/clear.js"></script>
 <script type="module" src="js/autocomplete.js"></script>
-<script src="js/timer.js"></script>
-
-    
+<script src="js/timer.js"></script>   
 </body>
 
 

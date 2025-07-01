@@ -5,6 +5,37 @@ const channel = new BroadcastChannel("team_channel");
 // const overlayWindow = window.open('display.html', 'OverlayWindow');
 
 const switchBtn = document.getElementById("switch");
+const menu = document.getElementById('customMenu');
+const toggle = document.getElementById('menuToggle');
+const options = menu.querySelectorAll('.menu-options div');
+const matchNumberInput = document.getElementById('matchNumberInput');
+const gameNumberInput = document.getElementById('gameNumberInput');
+
+
+if (gameNumberInput) {
+  gameNumberInput.addEventListener("Enter", () => {
+    localStorage.setItem()
+  });
+}
+// Round Name Dropdown
+toggle.addEventListener('click', () => {
+      menu.classList.toggle('active');
+    });
+
+    options.forEach(option => {
+      option.addEventListener('click', () => {
+        toggle.textContent = option.textContent;
+        menu.classList.remove('active');
+        // localStorage.removeItem('round-name');
+        localStorage.setItem('round-name', option.textContent);
+      });
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!menu.contains(e.target)) {
+        menu.classList.remove('active');
+      }
+    });
 
 // Switch Function Logic
 if (switchBtn) {

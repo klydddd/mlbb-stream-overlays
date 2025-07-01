@@ -2,6 +2,7 @@ import { heroes, updateBanPick, updateHeroPick, updateHeroPickSilent } from "./h
 
 const blueName = localStorage.getItem(`blue-team-name`);
 const redName = localStorage.getItem(`red-team-name`);
+const roundName = document.getElementById('roundName');
 
 const resetText = (id, fallback) => {
       const el = document.getElementById(id);
@@ -50,9 +51,6 @@ window.addEventListener('DOMContentLoaded', initializeHeroNames);
 window.addEventListener('DOMContentLoaded', initializeSavedTeamNames);
 window.addEventListener('DOMContentLoaded', initializeNames);
 
-
-
-
 const channel = new BroadcastChannel("team_channel");
 
 // Initial check on page load
@@ -65,8 +63,6 @@ for (let i = 0; i < 10; i++) {
   const name = localStorage.getItem(`banPick-${i + 1}`);
   if (name) updateBanPick(i, name);
 }
-
-
 
 channel.onmessage = (event) => {
   const data = event.data;
@@ -201,6 +197,7 @@ let heroPickListeningLocked = false;
 window.addEventListener('storage', (e) => {
   const isHeroPick = e.key && e.key.startsWith('heroPick-');
   const isBanPick = e.key && e.key.startsWith('banPick-');
+  const isRoundName = e.key && e.key.startsWith('round-name');
 
   // ✅ Always respond to ban picks
   if (isBanPick) {
@@ -221,5 +218,9 @@ window.addEventListener('storage', (e) => {
     } else {
       updateHeroPick(index, e.newValue, false); // ✅ Normal behavior
     }
+  }
+
+  if (isRoundName) {
+    roundName.textContent = localStorage.getItem('round-name');
   }
 });
