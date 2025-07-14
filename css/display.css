@@ -1,28 +1,38 @@
+/* Define CSS variables for colors and fonts */
+:root {
+    --blue-color: rgba(0, 0, 255, 0.699);
+    --red-color: rgba(255, 0, 0, 0.7);
+    --white-color: rgba(255, 255, 255, 0.7);
+    --font-primary: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    --font-secondary: 'Anton', sans-serif;
+    --font-tertiary: 'Roboto', sans-serif;
+}
+
+/* Global reset */
 * {
     margin: 0;
     padding: 0;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-family: var(--font-primary);
 }
 
+/* Consolidate font styles */
 .anton-regular {
-  font-family: "Anton", sans-serif;
-  font-weight: 400;
-  font-style: normal;
+    font-family: var(--font-secondary);
+    font-weight: 400;
+    font-style: normal;
 }
-
 
 .roboto {
-  font-family: "Roboto", sans-serif;
-  font-optical-sizing: auto;
-  font-weight: normal;
-  font-style: normal;
-  font-variation-settings:  "wdth" 100;
+    font-family: var(--font-tertiary);
+    font-optical-sizing: auto;
+    font-weight: normal;
+    font-style: normal;
+    font-variation-settings: "wdth" 100;
 }
 
-
+/* Optimize body styles */
 body {
     background-color: transparent;
-    height: auto;
     width: 100vw;
     bottom: 0;
     display: block;
@@ -31,16 +41,72 @@ body {
     overflow: hidden;
 }
 
+/* Remove redundant and unused properties */
+.media-container img, .ban-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
 .ban-section {
     width: 100%;
     height: 70px;
-    /* background-color: white; */
     display: flex;
-    
 }
 
 .pick-section {
-    /* background-color: red; */
+    width: 100%;
+    height: 310px;
+    display: flex;
+}
+
+.gap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    width: 400px;
+    height: 100%;
+    background-color: aliceblue;
+}
+
+.name-section {
+    width: 100%;
+    height: 35px;
+}
+
+.name {
+    font-weight: bolder;
+}
+
+.pick, .pick-background, .ban {
+    height: 100%;
+    width: 50%;
+    display: flex;
+}
+
+.player-pick {
+    height: 100%;
+    width: 20%;
+    display: flex;
+}
+
+.media-container, .ban-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    overflow: hidden; /* optional, hides overflow if cover crops image */
+    /* background-color: yellow; */
+}
+
+.ban-section {
+    width: 100%;
+    height: 70px;
+    display: flex;
+}
+
+.pick-section {
     width: 100%;
     height: 310px;
     display: flex;
@@ -69,7 +135,6 @@ body {
 .pick, .pick-background, .ban {
     height: 100%;
     width: 50%;
-    /* background-color: aquamarine; */
     display: flex;
     
 }
@@ -77,9 +142,6 @@ body {
 .player-pick {
     height: 100%;
     width: 20%;
-    /* border-style: solid; */
-    /* border-width: 0.1px; */
-    /* background-color: lightblue; */
     display: flex;
 }
 
@@ -127,11 +189,11 @@ body {
 
 
 .blue-hero-name {
-    background-color: rgba(0, 0, 255, 0.699);
+    background-color: var(--blue-color);
 }
 
 .red-hero-name {
-    background-color: rgba(255, 0, 0, 0.7);
+    background-color: var(--red-color);
     /* right: 0; */
 }
 
@@ -181,7 +243,7 @@ body {
     width: 73.35%; /*Change to 55.7% if 5-ban, 73.35% if 3-ban*/
     font-size: 30px;
     font-weight: 800;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-family: var(--font-primary);
     /* background-color: rgb(20, 20, 20); */
     height: 100%;
     display: flex;
@@ -642,10 +704,6 @@ transition: filter 0.5s ease-in-out;
     /* font-family: Roboto; */
     font-size: 1.1rem;
     font-weight: 900;
-}
-
-span {
-    /* font-family: roboto; */
 }
 
 .container {
