@@ -546,7 +546,7 @@ input:focus::placeholder {
             <p>DRAFT CONTROL</p>
             <button id="reset">RESET DRAFT</button>
             <button id="switch">SWITCH TEAMS</button>
-            <button id="show-display-button" >SHOW DISPLAY</button>
+            <button id="show-display-button">SHOW DISPLAY</button>
             <BR>
             <br>
             <p>TEAM CONTROLS</p>
@@ -589,95 +589,7 @@ input:focus::placeholder {
 <script src="js/clear.js"></script>
 <script type="module" src="js/autocomplete.js"></script>
 <script src="js/timer.js"></script>   
-
-
-<script>
-// === OBS WebSocket Integration for SHOW DISPLAY ===
-const OBS_WEBSOCKET_URL = "ws://localhost:4455"; // Change if needed
-const OBS_WEBSOCKET_PASSWORD = "1JNTFbSBN3BG8zHz"; // Set your OBS WebSocket password if any
-const DISPLAY_SOURCE_NAME = "Display Overlay";
-const DISPLAY_BROWSER_URL = "http://127.0.0.1:3000/display.html"; // Change to your display URL
-
-// Helper: SHA256 + base64
-async function sha256Base64(str) {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(str);
-    const hash = await window.crypto.subtle.digest('SHA-256', data);
-    return btoa(String.fromCharCode(...new Uint8Array(hash)));
-}
-
-async function createObsBrowserSource() {
-    if (!window.WebSocket) {
-        alert("WebSocket not supported in this browser.");
-        return;
-    }
-    const ws = new WebSocket(OBS_WEBSOCKET_URL);
-    ws.onopen = () => {
-        ws.send(JSON.stringify({
-            op: 1,
-            d: { rpcVersion: 1 }
-        }));
-    };
-    ws.onmessage = async (event) => {
-        const msg = JSON.parse(event.data);
-        // Handle authentication (challenge-response)
-        if (msg.op === 2 && msg.d.authentication) {
-            // Compute challenge response
-            const { challenge, salt } = msg.d.authentication;
-            // Step 1: base64(sha256(password + salt))
-            const secret = await sha256Base64(OBS_WEBSOCKET_PASSWORD + salt);
-            // Step 2: base64(sha256(secret + challenge))
-            const authResp = await sha256Base64(secret + challenge);
-            ws.send(JSON.stringify({
-                op: 3,
-                d: {
-                    rpcVersion: 1,
-                    authentication: authResp
-                }
-            }));
-        } else if (msg.op === 2 && msg.d.negotiatedRpcVersion) {
-            // Authenticated, create source
-            sendCreateSource(ws);
-        } else if (msg.op === 7) {
-            // Request response
-            if (msg.d.requestStatus && msg.d.requestStatus.result) {
-                alert("Display browser source created in OBS!");
-            } else {
-                alert("Failed to create browser source: " + (msg.d.requestStatus?.comment || "Unknown error"));
-            }
-            ws.close();
-        }
-    };
-    ws.onerror = (err) => {
-        alert("Failed to connect to OBS WebSocket. Is OBS running and WebSocket enabled?");
-    };
-}
-
-function sendCreateSource(ws) {
-    // Create a browser source in the current scene
-    ws.send(JSON.stringify({
-        op: 6,
-        d: {
-            requestType: "CreateInput",
-            requestId: "create-browser-source-" + Date.now(),
-            requestData: {
-                sceneName: "Scene", // Current scene
-                inputName: DISPLAY_SOURCE_NAME,
-                inputKind: "browser_source",
-                inputSettings: {
-                    url: DISPLAY_BROWSER_URL,
-                    width: 1920,
-                    height: 1080   
-                },
-                sceneItemEnabled: true
-            }
-        }
-    }));
-}
-
-document.getElementById("show-display-button").addEventListener("click", createObsBrowserSource);
-</script>
-
+<script src="js/obsWebsocket/showDisplay.js"></script>
 </body>
 
 
