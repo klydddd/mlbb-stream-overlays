@@ -1,0 +1,55 @@
+.gap {
+    background-color: aliceblue;
+}
+
+.blue-hero-name {
+    background-color: var(--blue-color);
+}
+
+.red-hero-name {
+    background-color: var(--red-color);
+}
+
+.ban-container {
+    background-color: rgb(33, 33, 33);
+}
+
+.blue-names {
+    background-color: blue;
+}
+
+.red-names {
+    background-color: red;
+}
+
+.pick-section-background {
+    background-color: rgba(0, 0, 0, 0.9);
+}
+
+.pick-section-background .red-pick {
+    background-color: aliceblue;
+}
+
+.pick-section-background .blue-pick {
+    background-color: aliceblue;
+}
+
+.progress-track {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.score {
+    background-color: rgba(24, 24, 24, 0.229);
+}
+
+.match-info {
+    color: rgb(0, 2, 32);
+}
+
+.hero-name-text, .team-name, .name, .countdown{
+    color: white;
+}
+
+.timer {
+    color: rgb(0, 16, 31);
+}
