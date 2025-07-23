@@ -68,7 +68,7 @@ body {
     justify-content: flex-end;
     width: 400px;
     height: 100%;
-    background-color: aliceblue;
+    
 }
 
 .name-section {
@@ -97,7 +97,6 @@ body {
     height: 100%;
     position: relative;
     overflow: hidden; /* optional, hides overflow if cover crops image */
-    /* background-color: yellow; */
 }
 
 .ban-section {
@@ -119,7 +118,6 @@ body {
     justify-content: end;
     width: 400px;
     height: 100%;
-    background-color: aliceblue;
 }
 
 .name-section {
@@ -150,7 +148,6 @@ body {
     height: 100%;
     position: relative;
     overflow: hidden; /* optional, hides overflow if cover crops image */
-    /* background-color: yellow; */
 }
 
 .media-container img {
@@ -188,14 +185,7 @@ body {
 
 
 
-.blue-hero-name {
-    background-color: var(--blue-color);
-}
 
-.red-hero-name {
-    background-color: var(--red-color);
-    /* right: 0; */
-}
 
 .hero-name-text {
     animation: none !important;
@@ -203,8 +193,7 @@ body {
     padding-top: 10px;
     padding-left: 2px;
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-    font-weight: 1000;
-    color: white;
+    font-weight: 1000;    
     text-align: center;
     
 }
@@ -226,9 +215,7 @@ body {
     height: 70px;
     width: 70px;
     position: relative;
-    overflow: hidden; 
-    background-color: rgb(33, 33, 33);
-    
+    overflow: hidden;    
 }
 
 .ban-portrait {
@@ -244,18 +231,15 @@ body {
     font-size: 30px;
     font-weight: 800;
     font-family: var(--font-primary);
-    /* background-color: rgb(20, 20, 20); */
     height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
 }
 
 .team-logo {
     width: 20%;
     height: 70px;
-    /* background-color: rgb(65, 42, 165); */
     position: absolute;
     top: 0px;
     /* left: 0; */
@@ -273,13 +257,11 @@ body {
 #red-team-name {
     text-align: right;
     margin-right: 160px;
-    /* background-color: #ff0033; */
 }
 
 #blue-team-name {
     text-align: center;
     margin-left: 160px;
-    /* background-color: #ff0033; */
 }
 
 .name-section {
@@ -289,8 +271,6 @@ body {
     height: 30px;
     justify-content: center;
     align-items: center;
-    /* background-color: white; */
-    /* padding-top: 10px; */
 }
 
 .blue-names, .red-names {
@@ -300,26 +280,17 @@ body {
     justify-content: center;
     align-items: center;
     height: 30px;
-    /* background-color: white; */
-}
-
-.blue-names {
-    background-color: blue;
 }
 
 .red-names {
     flex-direction: row-reverse;
-    background-color: red;
 }
 
 .name {
     width: 20%;
     height: 100%;
-    /* background-color: wheat; */
     text-align: center;
-    /* padding-top: 15px; */
     margin-top: 15px;
-    color: white;
 }
 
 p {
@@ -512,7 +483,6 @@ transition: filter 0.5s ease-in-out;
 }
 
 .pick-section-background {
-    background-color: rgba(0, 0, 0, 0.9);
     position: absolute;
     top: 70px;
     z-index: -1;
@@ -556,13 +526,6 @@ transition: filter 0.5s ease-in-out;
     filter: invert();
 }
 
-.pick-section-background .red-pick {
-    background-color: aliceblue;
-}
-
-.pick-section-background .blue-pick {
-    background-color: aliceblue;
-}
 
 .ban {
     position: relative;
@@ -573,7 +536,6 @@ transition: filter 0.5s ease-in-out;
 }
 
 #team-logo-2, #team-logo-4 {
-    /* background-color: rgb(174, 17, 17); */
     height: 100%;
     width: 100%;
     position: absolute;
@@ -582,7 +544,6 @@ transition: filter 0.5s ease-in-out;
     /* padding: 0 30px;
     margin: 0 30px; */
     object-fit: contain;
-    /* background-color: yellow; */
     /* bottom: -1px; */
     filter: brightness(0.4);
 }
@@ -596,7 +557,6 @@ transition: filter 0.5s ease-in-out;
 }
 
 .countdown {
-    color: white;
     font-size: 80px;
 }
 
@@ -608,20 +568,19 @@ transition: filter 0.5s ease-in-out;
     align-items: center;
     text-align: center;
     width: 100%;
-    height: 80px;
+    height: 200px;
     
 }
 .timer {
     width: 100px;
-    color: rgb(0, 16, 31);
-    font-size: 4rem;
+    font-size: 3.5rem;
     font-family: monospace;
     font-family: anton;
 }      
 
 .progress-container {
     width: 100%;
-    height: 10px;
+    height: 5px;
     position: relative;
     display: flex;
     justify-content: center;
@@ -629,7 +588,6 @@ transition: filter 0.5s ease-in-out;
 .progress-track {
     width: 100%;
     height: 100%;
-    background-color: rgba(255, 255, 255, 0.2);
     position: relative;
     overflow: hidden;
 }
@@ -699,7 +657,6 @@ transition: filter 0.5s ease-in-out;
 
 .match-info {
     margin-top: 30px;
-    color: rgb(0, 2, 32);
     text-align: center;
     /* font-family: Roboto; */
     font-size: 1.1rem;
@@ -709,7 +666,6 @@ transition: filter 0.5s ease-in-out;
 .container {
     width: 100%;
     height: 100%;
-    /* background-color: rgba(255, 0, 0, 0.136); */
 }
 
 .name-section .gap {
@@ -734,6 +690,5 @@ transition: filter 0.5s ease-in-out;
 .score {
     width: 40px;
     height: 50%;
-    background-color: rgba(24, 24, 24, 0.229);
 }
 
