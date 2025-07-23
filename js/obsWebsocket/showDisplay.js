@@ -2,7 +2,7 @@
 const OBS_WEBSOCKET_URL = "ws://localhost:4455"; // Change if needed
 const OBS_WEBSOCKET_PASSWORD = "1JNTFbSBN3BG8zHzw"; // Set your OBS WebSocket password if any
 const DISPLAY_SOURCE_NAME = "Draft Overlay"; // Name of the browser source in OBS
-const DISPLAY_BROWSER_URL = "https://mlbb-stream-overlay.vercel.app/display.html"; // Change to your display URL
+const DISPLAY_BROWSER_URL = "https://mlbb-stream-overlays.vercel.app/display.html"; // Change to your display URL
 
 async function createObsBrowserSource() {
     if (!window.WebSocket) {
