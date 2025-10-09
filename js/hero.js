@@ -96,6 +96,7 @@ export const heroes = [
     { name: 'Natan', img: 'Assets/HeroPick/natan.png', voice: 'Assets/Voicelines/natan.ogg' },
     { name: 'Nolan', img: 'Assets/HeroPick/nolan.png', voice: 'Assets/Voicelines/nolan.ogg' },
     { name: 'Novaria', img: 'Assets/HeroPick/novaria.png', voice: 'Assets/Voicelines/novaria.ogg' },
+    { name: 'Obsidia', img: 'Assets/HeroPick/obsidia.png', voice: 'Assets/Voicelines/obsidia.ogg' },
     { name: 'Odette', img: 'Assets/HeroPick/odette.png', voice: 'Assets/Voicelines/odette.ogg' },
     { name: 'Paquito', img: 'Assets/HeroPick/paquito.png', voice: 'Assets/Voicelines/paquito.ogg' },
     { name: 'Parsha', img: 'Assets/HeroPick/parsha.png', voice: 'Assets/Voicelines/parsha.ogg' },
@@ -125,6 +126,7 @@ export const heroes = [
     { name: 'Yuzhong', img: 'Assets/HeroPick/yuzhong.png', voice: 'Assets/Voicelines/yuzhong.ogg' },
     { name: 'Yve', img: 'Assets/HeroPick/yve.png', voice: 'Assets/Voicelines/yve.ogg' },
     { name: 'Zhask', img: 'Assets/HeroPick/zhask.png', voice: 'Assets/Voicelines/zhask.ogg' },
+    { name: 'Zetian', img: 'Assets/HeroPick/zetian.png', voice: 'Assets/Voicelines/zetian.ogg' },
     { name: 'Zhuxin', img: 'Assets/HeroPick/zhuxin.png', voice: 'Assets/Voicelines/zhuxin.ogg' },
     { name: 'Zilong', img: 'Assets/HeroPick/zilong.png', voice: 'Assets/Voicelines/zilong.ogg' }
 
