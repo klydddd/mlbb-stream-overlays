@@ -1,12 +1,112 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MLBB Overlay System</title>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      height: 100vh;
+      width: 100vw;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Poppins', sans-serif;
+      color: white;
+      text-align: center;
+      overflow: hidden;
+      background: linear-gradient(120deg, #000428, #004e92);
+      background-size: 200% 200%;
+      animation: gradientShift 8s ease-in-out infinite;
+    }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    h1 {
+      font-size: 2.8rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-shadow: 0 0 20px rgba(0, 191, 255, 0.7);
+      margin-bottom: 15px;
+    }
+
+    p {
+      font-size: 1.1rem;
+      opacity: 0.9;
+      max-width: 500px;
+      margin-bottom: 40px;
+      line-height: 1.5;
+      color: #cde8ff;
+    }
+
+    button {
+      padding: 14px 40px;
+      border: none;
+      border-radius: 40px;
+      background: linear-gradient(135deg, #00ffff, #007bff);
+      color: #fff;
+      font-size: 18px;
+      font-weight: 500;
+      cursor: pointer;
+      box-shadow: 0 0 25px rgba(0, 191, 255, 0.6);
+      transition: all 0.3s ease;
+    }
+
+    button:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 0 40px rgba(0, 191, 255, 0.8);
+    }
+
+    button:active {
+      transform: translateY(0);
+      box-shadow: 0 0 20px rgba(0, 191, 255, 0.5);
+    }
+
+    footer {
+      position: absolute;
+      bottom: 15px;
+      font-size: 0.8rem;
+      color: #7bbaff;
+      opacity: 0.7;
+    }
+  </style>
 </head>
+
 <body>
-    <p>Copy this</p>
-    <p>https://mlbb-stream-overlay.vercel.app/controller.html</p>
+  <h1>MLBB Overlay System</h1>
+  <p>Seamlessly control your tournament overlays with just one click — built for streamers and esports broadcasters.</p>
+  <button id="copy-btn">Copy Controller Link</button>
+
+  <footer>© 2025 MLBB Overlay System</footer>
+
+  <script>
+    const copyBtn = document.getElementById('copy-btn');
+
+    copyBtn.addEventListener('click', () => {
+      const link = 'https://mlbb-stream-overlays.vercel.app/controller.html';
+      navigator.clipboard.writeText(link)
+        .then(() => {
+          copyBtn.textContent = '✅ Link Copied!';
+          setTimeout(() => {
+            copyBtn.textContent = 'Copy Controller Link';
+          }, 2000);
+        })
+        .catch(() => alert('Failed to copy link.'));
+    });
+  </script>
 </body>
 </html>
