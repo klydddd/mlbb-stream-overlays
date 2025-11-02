@@ -44,8 +44,6 @@ Follow these steps to integrate the **MLBB Overlay System** into OBS:
 5. In your **Draft Overlay Source**:  
    - ✅ Enable **Control Audio via OBS**  
    - ✅ Enable **Use Custom Frame Rate (60 FPS)**  
-   - In **Custom CSS**, remove any existing code and **paste the following clean CSS**:  
-     *(Your custom overlay CSS here — remove bloat code before pasting)*  
 
 Once done, your overlay and controller are now linked!  
 Any changes in the controller will automatically reflect in your live OBS scene.  
