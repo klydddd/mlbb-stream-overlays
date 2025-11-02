@@ -83,6 +83,12 @@
       color: #7bbaff;
       opacity: 0.7;
     }
+
+    #a {
+      margin-top: 20px;
+      font-size: 1rem;
+      color: #a0d2ff;
+    }
   </style>
 </head>
 
@@ -90,7 +96,8 @@
   <h1>MLBB Overlay System</h1>
   <p>Seamlessly control your tournament overlays with just one click — built for streamers and esports broadcasters.</p>
   <button id="copy-btn">Copy Controller Link</button>
-
+  <br>
+  <p id="a" style="opacity: 0;">Now paste the link in a browser source in OBS Studio</p>
   <footer>© 2025 MLBB Overlay System</footer>
 
   <script>
@@ -98,6 +105,8 @@
 
     copyBtn.addEventListener('click', () => {
       const link = 'https://mlbb-stream-overlays.vercel.app/controller.html';
+      const aTag = document.getElementById('a');
+      aTag.style.opacity = '1';
       navigator.clipboard.writeText(link)
         .then(() => {
           copyBtn.textContent = '✅ Link Copied!';
