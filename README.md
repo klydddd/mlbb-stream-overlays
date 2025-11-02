@@ -1,4 +1,4 @@
-# 🎮 MLBB Overlay System  
+# 🎮 MLBB Stream Overlay  
 
 An **OBS browser source controller** built for **Mobile Legends: Bang Bang** tournaments and livestreams.  
 This project provides an intuitive way for streamers and tournament hosts to **control team logos, names, scores, and overlays in real time** — all within a browser interface.  
