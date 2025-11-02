@@ -1,0 +1,297 @@
+/* Global Reset & Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    font-size: 11px;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    color: white;
+    text-transform: capitalize;
+}
+
+body {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #232629;
+}
+
+a {
+    text-decoration: none;
+}
+
+p {
+    margin-left: 10px;
+}
+
+/* Layout Containers */
+.main-container {
+    display: flex;
+    width: 100%;
+    height: 100vh;
+}
+
+.blue-side {
+    background: linear-gradient(135deg, #a494e9da, #584ec4c6);
+    width: 50%;
+    height: 100%;
+}
+
+.red-side {
+    background: linear-gradient(135deg, #e98b78da, #a63a1fc6);
+    width: 50%;
+    height: 100%;
+}
+
+.second-container {
+    display: flex;
+    width: 100vw;
+}
+
+.timer-control, .team-control {
+    margin: 10px;
+    width: 50%;
+}
+
+/* Inputs & Buttons */
+input, button {
+    text-align: center;
+    background-color: #333;
+    border-radius: 5px;
+    border: 1px solid #333;
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    box-sizing: border-box;
+    color: white;
+}
+
+input {
+    padding: 12px 16px;
+    width: 100%;
+    height: 30px;
+    background-color: #333;
+    max-width: auto;
+}
+
+input::placeholder {
+    color: #aaa;
+    transition: color 0.2s;
+}
+
+input:focus {
+    border-color: #904d67;
+    box-shadow: 0 0 0 3px #904d6790;
+    background-color: #904d67;
+}
+
+input:focus::placeholder {
+    color: #bbb;
+}
+
+button {
+    background-color: #0cbdd5;
+    border: none;
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
+}
+
+button:hover {
+    background-color: #914d68;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(79, 70, 229, 0.3);
+}
+
+button:active {
+    transform: scale(0.96);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+}
+
+.timer-control button, .team-control button,
+.timer-control input, .team-control input {
+    height: 30px;
+    width: 100px;
+}
+
+/* Swapping Area */
+.swapping-area {
+    margin: 5px;
+    display: flex;
+    justify-content: space-around;
+}
+
+.swapping-area button {
+    height: 20px;
+    width: 80px;
+    margin: 0 2%;
+    text-align: center;
+}
+
+/* Picks, Bans, Names, etc. */
+.names, .picks, .team-desc, .camLinks, .bans {
+    display: flex;
+    gap: 5px;
+    margin: 5px;
+}
+
+.picks, .bans {
+    align-items: center;
+    justify-content: center;
+}
+
+/* Input Wrapper & Dropdown */
+.input-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #111;
+    border: 1px solid #333;
+    max-height: 200px;
+    overflow-y: auto;
+    display: none;
+    z-index: 10;
+}
+
+.dropdown-option {
+    padding: 8px 12px;
+    cursor: pointer;
+    color: white;
+    transition: background 0.2s;
+}
+
+.dropdown-option:hover,
+.dropdown-option.active {
+    background-color: #007bff;
+    color: white;
+}
+
+/* Swap Selected */
+.swap-selected {
+    background-color: #ffd966;
+    outline: 2px solid #ffcc00;
+}
+
+/* Hero Portraits */
+.hero-portrait-silent,
+.hero-portrait.no-anim {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    animation: none !important;
+    filter: none !important;
+    transition: none !important;
+}
+
+/* Custom File Upload */
+.custom-file-upload {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 5px 10px;
+    color: white;
+    background: linear-gradient(135deg, #3b82f6, #60a5fa);
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    user-select: none;
+    width: 300px;
+}
+
+.custom-file-upload label {
+    width: 100px;
+}
+
+.custom-file-upload:hover {
+    background: linear-gradient(135deg, #2563eb, #3b82f6);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+}
+
+.custom-file-upload input[type="file"] {
+    display: none;
+}
+
+.custom-file-upload.red {
+    background: linear-gradient(135deg, #ef4444, #f87171);
+}
+
+.custom-file-upload.red:hover {
+    background: linear-gradient(135deg, #dc2626, #ef4444);
+}
+
+/* Phase Info */
+.phase-info {
+    display: inline;
+    margin-left: 10px;
+    padding: 7px;
+    background-color: white;
+    border-radius: 5px;
+    color: black;
+    font-size: small;
+}
+
+#currentPhase {
+    color: black;
+    font-size: small;
+}
+
+/* Menu Dropdown */
+.menu {
+    display: inline-block;
+    position: relative;
+    width: 220px;
+    user-select: none;
+}
+
+.menu-toggle {
+    background-color: #0cbdd5;
+    color: white;
+    padding: 9px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.3s;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.menu-toggle:hover {
+    background-color: #914d68;
+}
+
+.menu-options {
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    width: 100%;
+    margin-bottom: 8px;
+    background-color: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    display: none;
+    z-index: 10;
+}
+
+.menu-options div {
+    padding: 12px 20px;
+    cursor: pointer;
+    color: black;
+    transition: background 0.2s;
+}
+
+.menu-options div:hover {
+    background-color: #f0f0f0;
+}
+
+.menu.active .menu-options {
+    display: block;
+}
+
