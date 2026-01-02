@@ -108,7 +108,7 @@ export const heroes = [
   { name: 'Saber', img: 'Assets/HeroPick/saber.png', voice: 'Assets/Voicelines/saber.ogg' },
   { name: 'Selena', img: 'Assets/HeroPick/selena.png', voice: 'Assets/Voicelines/selena.ogg' },
   { name: 'Silvanna', img: 'Assets/HeroPick/silvanna.png', voice: 'Assets/Voicelines/silvanna.ogg' },
-  { name: 'Sora', img: 'Assets/HeroPick/sora.png', voice: 'Assets/Voicelines/sora.ogg' },
+  { name: 'Sora', img: 'Assets/HeroPick/sora.png', voice: 'Assets/Voicelines/silvanna.ogg' },
   { name: 'Sun', img: 'Assets/HeroPick/sun.png', voice: 'Assets/Voicelines/sun.ogg' },
   { name: 'Suyou', img: 'Assets/HeroPick/suyou.png', voice: 'Assets/Voicelines/suyou.ogg' },
   { name: 'Terizla', img: 'Assets/HeroPick/terizla.png', voice: 'Assets/Voicelines/terizla.ogg' },
@@ -192,6 +192,9 @@ export function updateHeroPick(index, heroName, silent = false) {
   }
 
   setTimeout(() => {
+    // Clear the container inside the callback to prevent race condition
+    // where multiple calls to updateHeroPick would each schedule an append
+    container.innerHTML = "";
     container.appendChild(img);
 
     if (!silent) {
