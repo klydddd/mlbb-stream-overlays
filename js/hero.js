@@ -100,7 +100,7 @@ export const heroes = [
   { name: 'Odette', img: 'Assets/HeroPick/odette.png', voice: 'Assets/Voicelines/odette.ogg' },
   { name: 'Paquito', img: 'Assets/HeroPick/paquito.png', voice: 'Assets/Voicelines/paquito.ogg' },
   { name: 'Parsha', img: 'Assets/HeroPick/parsha.png', voice: 'Assets/Voicelines/parsha.ogg' },
-  { name: 'Phoveus', img: 'Assets/HeroPick/phoveus.png', voice: 'Assets/Voicelines/paquito.ogg' },
+  { name: 'Phoveus', img: 'Assets/HeroPick/phoveus.png', voice: 'Assets/Voicelines/phoveus.ogg' },
   { name: 'Popol and Kupa', img: 'Assets/HeroPick/popolandkupa.png', voice: 'Assets/Voicelines/popolandkupa.ogg' },
   { name: 'Rafaela', img: 'Assets/HeroPick/rafaela.png', voice: 'Assets/Voicelines/rafaela.ogg' },
   { name: 'Roger', img: 'Assets/HeroPick/roger.png', voice: 'Assets/Voicelines/roger.ogg' },
@@ -108,7 +108,7 @@ export const heroes = [
   { name: 'Saber', img: 'Assets/HeroPick/saber.png', voice: 'Assets/Voicelines/saber.ogg' },
   { name: 'Selena', img: 'Assets/HeroPick/selena.png', voice: 'Assets/Voicelines/selena.ogg' },
   { name: 'Silvanna', img: 'Assets/HeroPick/silvanna.png', voice: 'Assets/Voicelines/silvanna.ogg' },
-  { name: 'Sora', img: 'Assets/HeroPick/sora.png', voice: 'Assets/Voicelines/silvanna.ogg' },
+  { name: 'Sora', img: 'Assets/HeroPick/sora.png', voice: 'Assets/Voicelines/sora.ogg' },
   { name: 'Sun', img: 'Assets/HeroPick/sun.png', voice: 'Assets/Voicelines/sun.ogg' },
   { name: 'Suyou', img: 'Assets/HeroPick/suyou.png', voice: 'Assets/Voicelines/suyou.ogg' },
   { name: 'Terizla', img: 'Assets/HeroPick/terizla.png', voice: 'Assets/Voicelines/terizla.ogg' },
@@ -130,7 +130,6 @@ export const heroes = [
   { name: 'Zetian', img: 'Assets/HeroPick/zetian.png', voice: 'Assets/Voicelines/zetian.ogg' },
   { name: 'Zhuxin', img: 'Assets/HeroPick/zhuxin.png', voice: 'Assets/Voicelines/zhuxin.ogg' },
   { name: 'Zilong', img: 'Assets/HeroPick/zilong.png', voice: 'Assets/Voicelines/zilong.ogg' }
-
 ];
 
 const containers = [...Array(10)].map((_, i) => document.getElementById(`hero-${i + 1}`));
@@ -141,10 +140,8 @@ export function updateHeroPick(index, heroName, silent = false) {
 
   if (!container) return;
 
-  // Clean up if heroName is missing, null, or just whitespace
   if (!heroName || typeof heroName !== "string" || heroName.trim() === "") {
     container.innerHTML = "";
-
     const nameText = document.getElementById(`hero-name-${heroSlot}`);
     const nameDiv = document.getElementById(`hero-name-bg-${heroSlot}`);
     if (nameText) nameText.textContent = '';
@@ -158,7 +155,6 @@ export function updateHeroPick(index, heroName, silent = false) {
   }
 
   const hero = heroes.find(h => h.name.toLowerCase() === heroName.toLowerCase());
-
   container.innerHTML = "";
 
   if (!hero) {
@@ -192,8 +188,6 @@ export function updateHeroPick(index, heroName, silent = false) {
   }
 
   setTimeout(() => {
-    // Clear the container inside the callback to prevent race condition
-    // where multiple calls to updateHeroPick would each schedule an append
     container.innerHTML = "";
     container.appendChild(img);
 
@@ -222,29 +216,23 @@ export function updateHeroPick(index, heroName, silent = false) {
     if (!silent) {
       setTimeout(() => {
         img.classList.add("float");
-
         const glowClasses = isBlueTeam
           ? ["glow-blue-1", "glow-blue-2", "glow-blue-3"]
           : ["glow-red-1", "glow-red-2", "glow-red-3"];
 
         let currentGlow = "";
-
         setInterval(() => {
           if (currentGlow) img.classList.remove(currentGlow);
-
           const nextGlow = Math.random() > 0.4
             ? glowClasses[Math.floor(Math.random() * glowClasses.length)]
             : "";
-
           if (nextGlow) img.classList.add(nextGlow);
           currentGlow = nextGlow;
         }, 2500 + Math.random() * 1500);
       }, 900);
     }
-
   }, silent ? 0 : 100);
 }
-
 
 export function updateHeroPickSilent(index, heroName) {
   const hero = heroes.find(h => h.name.toLowerCase() === heroName.toLowerCase());
@@ -252,8 +240,6 @@ export function updateHeroPickSilent(index, heroName) {
   const heroSlot = index + 1;
 
   if (!container) return;
-
-  // Clear previous content
   container.innerHTML = "";
 
   if (!hero) {
@@ -274,16 +260,13 @@ export function updateHeroPickSilent(index, heroName) {
     ? ["glow-blue-1", "glow-blue-2", "glow-blue-3"]
     : ["glow-red-1", "glow-red-2", "glow-red-3"];
 
-  // Create animated portrait (with wipeDown, float)
   const img = document.createElement('img');
   img.src = hero.img;
   img.alt = hero.name;
-  img.className = "hero-portrait-silent wipeDown"; // use both classes
+  img.className = "hero-portrait-silent wipeDown";
 
-  // Append image to container
   container.appendChild(img);
 
-  // Show hero name bar
   const nameText = document.getElementById(`hero-name-${heroSlot}`);
   const nameDiv = document.getElementById(`hero-name-bg-${heroSlot}`);
   if (nameText && nameDiv) {
@@ -296,28 +279,22 @@ export function updateHeroPickSilent(index, heroName) {
     nameDiv.style.overflow = 'visible';
   }
 
-  // ✅ Start floating and glow effects after wipeDown finishes
   setTimeout(() => {
     img.classList.add("float");
-
     let currentGlow = "";
-
     setInterval(() => {
       if (currentGlow) img.classList.remove(currentGlow);
-
       const nextGlow = Math.random() > 0.4
         ? glowClasses[Math.floor(Math.random() * glowClasses.length)]
         : "";
-
       if (nextGlow) img.classList.add(nextGlow);
       currentGlow = nextGlow;
     }, 2500 + Math.random() * 1500);
-  }, 900); // matches .wipeDown duration
+  }, 900);
 }
 
 export function updateBanPick(index, heroName) {
   if (!heroName || typeof heroName !== "string" || heroName.trim() === "") {
-    // Optionally: clear the container if heroName is empty
     const container = document.getElementById(`ban-${index + 1}`);
     if (container) container.innerHTML = "";
     return;
@@ -327,9 +304,7 @@ export function updateBanPick(index, heroName) {
   const container = document.getElementById(`ban-${index + 1}`);
   if (!container) return;
 
-  // Clear existing content
   container.innerHTML = "";
-
   if (!hero) return;
 
   const img = document.createElement("img");
@@ -344,7 +319,4 @@ export function updateBanPick(index, heroName) {
       img.classList.add("grayscale");
     }, 300);
   }, 1000);
-
-
-
 }

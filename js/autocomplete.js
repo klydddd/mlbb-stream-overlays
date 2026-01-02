@@ -1,4 +1,4 @@
-import { heroes, updateBanPick, updateHeroPick, updateHeroPickSilent } from "./hero.js";
+import { heroes, updateBanPick, updateHeroPick } from "./hero.js";
 
 function setupHeroDropdown(inputPrefix, dropdownPrefix, count, localStorageKeyPrefix, onSelect) {
   for (let i = 1; i <= count; i++) {
@@ -47,8 +47,6 @@ function setupHeroDropdown(inputPrefix, dropdownPrefix, count, localStorageKeyPr
       });
 
       dropdown.style.display = "block";
-
-      // Highlight the first option by default
       currentFocus = 0;
       setActive(dropdown.querySelectorAll(".dropdown-option"), currentFocus);
     });

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,7 +15,7 @@
     <div class="main-container">
         <div class="blue-side team-container">
             <br>
-          
+
             <p>PLAYER NAMES/IGN</p>
             <div class="team-desc">
                 <input type="text" name="Team Name" id="blueTeamName" placeholder="BLUE TEAM NAME">
@@ -23,25 +24,25 @@
                     Upload Logo
                 </label>
                 <input type="text" name="Cam Link" id="team-cam-link-1" placeholder="CAMERA LINK">
-                <button>ADD SCORE</button>
-                <button>DEDUCT SCORE</button>
+                <button style="width: 31%;">ADD SCORE</button>
+                <button style="width: 31%;">DEDUCT SCORE</button>
             </div>
 
 
 
             <div class="camLinks">
                 <input type="text" id="cam-1" placeholder="CAMERA LINK">
-                <input type="text" id="cam-2" placeholder="CAMERA LINK"> 
+                <input type="text" id="cam-2" placeholder="CAMERA LINK">
                 <input type="text" id="cam-3" placeholder="CAMERA LINK">
-                <input type="text" id="cam-4" placeholder="CAMERA LINK"> 
-                <input type="text" id="cam-5" placeholder="CAMERA LINK"> 
+                <input type="text" id="cam-4" placeholder="CAMERA LINK">
+                <input type="text" id="cam-5" placeholder="CAMERA LINK">
             </div>
             <div class="names">
                 <input type="text" id="input-name-1" placeholder="PLAYER ONE">
-                <input type="text" id="input-name-2" placeholder="PLAYER TWO"> 
+                <input type="text" id="input-name-2" placeholder="PLAYER TWO">
                 <input type="text" id="input-name-3" placeholder="PLAYER THREE">
-                <input type="text" id="input-name-4" placeholder="PLAYER FOUR"> 
-                <input type="text" id="input-name-5" placeholder="PLAYER FIVE"> 
+                <input type="text" id="input-name-4" placeholder="PLAYER FOUR">
+                <input type="text" id="input-name-5" placeholder="PLAYER FIVE">
             </div>
             <br>
 
@@ -69,8 +70,8 @@
                     <div class="dropdown" id="dropdown-5"></div>
                 </div>
             </div>
-            
-            
+
+
             <div class="swapping-area" id="blue-swap">
                 <button id="swap-1">swap</button>
                 <button id="swap-2">swap</button>
@@ -103,43 +104,43 @@
                     <div class="dropdown" id="dropdown-ban-5"></div>
                 </div>
             </div>
-            
+
         </div>
-    
+
         <div class="red-side team-container">
             <br>
-             <p>PLAYER NAMES/IGN</p>
+            <p>PLAYER NAMES/IGN</p>
 
             <div class="team-desc">
                 <input type="text" name="Team Name" id="redTeamName" placeholder="RED TEAM NAME">
                 <label class="custom-file-upload red">
-                <input type="file" class="team-logo-upload" accept="image/*" data-team="red">
-                Upload Logo
+                    <input type="file" class="team-logo-upload" accept="image/*" data-team="red">
+                    Upload Logo
                 </label>
                 <input type="text" name="Cam Link" id="team-cam-link-2" placeholder="CAMERA LINK">
-                <button>ADD SCORE</button>
-                <button>DEDUCT SCORE</button>
-            </div> 
+                <button style="width: 31%;">ADD SCORE</button>
+                <button style="width: 31%;">DEDUCT SCORE</button>
+            </div>
 
             <div class="camLinks">
-                
-                 
+
+
                 <input type="text" id="cam-10" placeholder="CAMERA LINK">
-                <input type="text" id="cam-9" placeholder="CAMERA LINK"> 
+                <input type="text" id="cam-9" placeholder="CAMERA LINK">
                 <input type="text" id="cam-8" placeholder="CAMERA LINK">
                 <input type="text" id="cam-7" placeholder="CAMERA LINK">
-                <input type="text" id="cam-6" placeholder="CAMERA LINK"> 
+                <input type="text" id="cam-6" placeholder="CAMERA LINK">
             </div>
 
             <div class="names">
                 <input type="text" id="input-name-10" placeholder="PLAYER FIVE">
                 <input type="text" id="input-name-9" placeholder="PLAYER FOUR">
                 <input type="text" id="input-name-8" placeholder="PLAYER THREE">
-                <input type="text" id="input-name-7" placeholder="PLAYER TWO"> 
-                <input type="text" id="input-name-6" placeholder="PLAYER ONE"> 
-                 
+                <input type="text" id="input-name-7" placeholder="PLAYER TWO">
+                <input type="text" id="input-name-6" placeholder="PLAYER ONE">
+
             </div>
-            
+
             <br>
 
             <p>PLAYER PICKS</p>
@@ -166,8 +167,8 @@
                     <div class="dropdown" id="dropdown-6"></div>
                 </div>
             </div>
-            
-            
+
+
             <div class="swapping-area" id="red-swap">
                 <button id="swap-10">swap</button>
                 <button id="swap-9">swap</button>
@@ -200,7 +201,7 @@
                     <div class="dropdown" id="dropdown-ban-6"></div>
                 </div>
             </div>
-            
+
         </div>
     </div>
     <div class="second-container">
@@ -220,7 +221,7 @@
             <button id="clear-cam-links">CLEAR CAM LINK</button>
         </div>
         <div class="timer-control">
-            
+
             <p>MATCH INFO CONTROL</p>
             <input type="text" placeholder="GAME NUMBER" id="gameNumberInput">
             <input type="text" placeholder="MATCH NUMBER" id="matchNumberInput">
@@ -234,24 +235,25 @@
             </div>
             <br>
             <br>
-            <p>TIMER CONTROL</p>    
+            <p>TIMER CONTROL</p>
             <button id="startBtn">START</button>
             <button id="resetPhase">RESET</button>
             <button id="nextPhaseBtn">NEXT PHASE</button>
             <div class="phase-info" id="phaseInfo">
                 CURRENT PHASE: <span id="currentPhase">0</span>/14
             </div>
+
         </div>
     </div>
-    
-    
-<script type="module" src="js/control.js"></script>
-<script src="js/swap.js"></script>
-<script src="js/showLogo.js"></script>
-<script src="js/clear.js"></script>
-<script type="module" src="js/autocomplete.js"></script>
-<script src="js/timer.js"></script>   
-<script src="js/obsWebsocket/showDisplay.js"></script>
+
+
+    <script src="js/control.js"></script>
+    <script src="js/swap.js"></script>
+    <script src="js/showLogo.js"></script>
+    <script src="js/clear.js"></script>
+    <script type="module" src="js/autocomplete.js"></script>
+    <script src="js/timer.js"></script>
+    <script src="js/obsWebsocket/showDisplay.js"></script>
 </body>
 
 
