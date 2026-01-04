@@ -1,4 +1,5 @@
 import { heroes, updateBanPick, updateHeroPick } from "./hero.js";
+import { send } from "./websocketClient.js";
 
 function setupHeroDropdown(inputPrefix, dropdownPrefix, count, localStorageKeyPrefix, onSelect) {
   for (let i = 1; i <= count; i++) {
@@ -40,6 +41,13 @@ function setupHeroDropdown(inputPrefix, dropdownPrefix, count, localStorageKeyPr
           dropdown.innerHTML = "";
           dropdown.style.display = "none";
           localStorage.setItem(`${localStorageKeyPrefix}-${i}`, hero.name);
+
+          if (localStorageKeyPrefix === 'heroPick') {
+            send({ heroPick: { index: i, name: hero.name } });
+          } else if (localStorageKeyPrefix === 'banPick') {
+            send({ banPick: { index: i, name: hero.name } });
+          }
+
           onSelect(i, hero.name);
         });
 

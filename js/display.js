@@ -1,4 +1,5 @@
 import { heroes, updateBanPick, updateHeroPick, updateHeroPickSilent } from "./hero.js";
+import { onMessage } from "./websocketClient.js";
 
 const blueName = localStorage.getItem(`blue-team-name`);
 const redName = localStorage.getItem(`red-team-name`);
@@ -8,6 +9,114 @@ const resetText = (id, fallback) => {
   const el = document.getElementById(id);
   if (el) el.textContent = fallback;
 };
+
+function handleIncomingMessage(data) {
+  switch (data.type) {
+    case "switch":
+      const blue = document.getElementById("blue-team-name");
+      const red = document.getElementById("red-team-name");
+
+      if (blue) blue.textContent = data.blueTeamName || "Blue Team Name";
+      if (red) red.textContent = data.redTeamName || "Red Team Name";
+
+      for (let i = 1; i <= 10; i++) {
+        if (data.picks?.[`pick-${i}`] !== undefined) {
+          const hero = document.getElementById(`hero-name-${i}`);
+          if (hero) hero.textContent = data.picks[`pick-${i}`] || `Pick ${i}`;
+        }
+      }
+
+      for (let i = 1; i <= 10; i++) {
+        if (data.names?.[`input-name-${i}`] !== undefined) {
+          const name = document.getElementById(`name-${i}`);
+          if (name) name.textContent = data.names[`input-name-${i}`] || `Player ${i}`;
+        }
+      }
+      return;
+    case "reset":
+      resetText("blue-team-name", "Blue Team Name");
+      resetText("red-team-name", "Red Team Name");
+
+      for (let i = 1; i <= 4; i++) {
+        resetText(`team-logo-${i}`, ``);
+      }
+
+      clearNames();
+      clearPicks();
+      clearBans();
+      return;
+    case "clear-names":
+      clearNames();
+      break;
+    case "clear-picks":
+      clearPicks();
+      break;
+    case "clear-bans":
+      clearBans();
+      break;
+  }
+
+  if (data.blueTeamName !== undefined) {
+    const blueDiv = document.getElementById("blue-team-name");
+    if (blueDiv) blueDiv.textContent = data.blueTeamName || "Blue Team Name";
+  }
+
+  if (data.redTeamName !== undefined) {
+    const redDiv = document.getElementById("red-team-name");
+    if (redDiv) redDiv.textContent = data.redTeamName || "Red Team Name";
+  }
+
+  for (let i = 1; i <= 10; i++) {
+    if (data[`pick-${i}`] !== undefined) {
+      const heroDiv = document.getElementById(`hero-name-${i}`);
+      if (heroDiv) heroDiv.textContent = data[`pick-${i}`] || `Pick ${i}`;
+    }
+  }
+
+  for (let i = 1; i <= 10; i++) {
+    if (data[`input-name-${i}`] !== undefined) {
+      const nameDiv = document.getElementById(`name-${i}`);
+      if (nameDiv) nameDiv.textContent = data[`input-name-${i}`] || `Player ${i}`;
+    }
+  }
+
+
+  if (data.blueTeamName !== undefined) {
+    const blueDiv = document.getElementById("blue-team-name");
+    if (blueDiv) blueDiv.textContent = data.blueTeamName || "Blue Team Name";
+  }
+
+  if (data.redTeamName !== undefined) {
+    const redDiv = document.getElementById("red-team-name");
+    if (redDiv) redDiv.textContent = data.redTeamName || "Red Team Name";
+  }
+
+  for (let i = 1; i <= 10; i++) {
+    if (data[`pick-${i}`] !== undefined) {
+      const heroDiv = document.getElementById(`hero-name-${i}`);
+      if (heroDiv) heroDiv.textContent = data[`pick-${i}`] || `Pick ${i}`;
+    }
+  }
+
+  for (let i = 1; i <= 10; i++) {
+    if (data[`input-name-${i}`] !== undefined) {
+      const nameDiv = document.getElementById(`name-${i}`);
+      if (nameDiv) nameDiv.textContent = data[`input-name-${i}`] || `Player ${i}`;
+    }
+  }
+
+  // Handle hero picks via WebSocket
+  if (data.heroPick !== undefined) {
+    const { index, name } = data.heroPick;
+    updateHeroPick(index - 1, name, false);
+  }
+
+  // Handle bans via WebSocket
+  if (data.banPick !== undefined) {
+    const { index, name } = data.banPick;
+    updateBanPick(index - 1, name);
+  }
+}
 
 function initializeHeroNames() {
   for (let i = 1; i <= 10; i++) {
@@ -49,6 +158,7 @@ window.addEventListener('DOMContentLoaded', initializeSavedTeamNames);
 window.addEventListener('DOMContentLoaded', initializeNames);
 
 const channel = new BroadcastChannel("team_channel");
+onMessage(handleIncomingMessage);
 
 // Initial check on page load
 for (let i = 0; i < 10; i++) {
@@ -86,79 +196,7 @@ function clearBans() {
 
 channel.onmessage = (event) => {
   const data = event.data;
-
-  if (data.type === "switch") {
-    const blue = document.getElementById("blue-team-name");
-    const red = document.getElementById("red-team-name");
-
-    if (blue) blue.textContent = data.blueTeamName || "Blue Team Name";
-    if (red) red.textContent = data.redTeamName || "Red Team Name";
-
-    for (let i = 1; i <= 10; i++) {
-      if (data.picks?.[`pick-${i}`] !== undefined) {
-        const hero = document.getElementById(`hero-name-${i}`);
-        if (hero) hero.textContent = data.picks[`pick-${i}`] || `Pick ${i}`;
-      }
-    }
-
-    for (let i = 1; i <= 10; i++) {
-      if (data.names?.[`input-name-${i}`] !== undefined) {
-        const name = document.getElementById(`name-${i}`);
-        if (name) name.textContent = data.names[`input-name-${i}`] || `Player ${i}`;
-      }
-    }
-    return;
-  }
-
-  if (data.type === "reset") {
-    resetText("blue-team-name", "Blue Team Name");
-    resetText("red-team-name", "Red Team Name");
-
-    for (let i = 1; i <= 4; i++) {
-      resetText(`team-logo-${i}`, ``);
-    }
-
-    clearNames();
-    clearPicks();
-    clearBans();
-    return;
-  }
-
-  switch (data.type) {
-    case "clear-names":
-      clearNames();
-      break;
-    case "clear-picks":
-      clearPicks();
-      break;
-    case "clear-bans":
-      clearBans();
-      break;
-  }
-
-  if (data.blueTeamName !== undefined) {
-    const blueDiv = document.getElementById("blue-team-name");
-    if (blueDiv) blueDiv.textContent = data.blueTeamName || "Blue Team Name";
-  }
-
-  if (data.redTeamName !== undefined) {
-    const redDiv = document.getElementById("red-team-name");
-    if (redDiv) redDiv.textContent = data.redTeamName || "Red Team Name";
-  }
-
-  for (let i = 1; i <= 10; i++) {
-    if (data[`pick-${i}`] !== undefined) {
-      const heroDiv = document.getElementById(`hero-name-${i}`);
-      if (heroDiv) heroDiv.textContent = data[`pick-${i}`] || `Pick ${i}`;
-    }
-  }
-
-  for (let i = 1; i <= 10; i++) {
-    if (data[`input-name-${i}`] !== undefined) {
-      const nameDiv = document.getElementById(`name-${i}`);
-      if (nameDiv) nameDiv.textContent = data[`input-name-${i}`] || `Player ${i}`;
-    }
-  }
+  handleIncomingMessage(data);
 };
 
 window.addEventListener('storage', (e) => {

@@ -1,3 +1,5 @@
+import { send } from "./websocketClient.js";
+
 const page = document.body.getAttribute("data-page"); // to determine which page is display and controller
 const channel = new BroadcastChannel("team_channel");
 
@@ -88,6 +90,14 @@ if (switchBtn) {
       names: swappedNames
     });
 
+    send({
+      type: "switch",
+      blueTeamName: redTeamName,
+      redTeamName: blueTeamName,
+      picks: swappedPicks,
+      names: swappedNames
+    });
+
     for (let i = 1; i <= 10; i++) {
       const pick = swappedPicks[`pick-${i}`];
       const hero = document.getElementById(`hero-name-${i}`);
@@ -118,6 +128,7 @@ if (resetBtn) {
 
     localStorage.clear();
     channel.postMessage({ type: "reset" });
+    send({ type: "reset" });
 
     document.querySelectorAll(".hero-name").forEach(container => {
       container.innerHTML = "";
@@ -134,6 +145,7 @@ if (blueInput) {
   blueInput.addEventListener("input", () => {
     localStorage.setItem(`blue-team-name`, blueInput.value);
     channel.postMessage({ blueTeamName: blueInput.value });
+    send({ blueTeamName: blueInput.value });
   });
 }
 
@@ -143,6 +155,7 @@ if (redInput) {
   redInput.addEventListener("input", () => {
     localStorage.setItem(`red-team-name`, redInput.value);
     channel.postMessage({ redTeamName: redInput.value });
+    send({ redTeamName: redInput.value });
   });
 }
 
@@ -153,6 +166,12 @@ pickInputs.forEach((input, index) => {
     input.addEventListener('keydown', (e) => {
       if (e.key === "Enter") {
         localStorage.setItem(`heroPick-${index + 1}`, input.value.trim());
+        send({
+          heroPick: {
+            index: index + 1,
+            name: input.value.trim()
+          }
+        })
       }
     });
   }
@@ -165,6 +184,12 @@ banInputs.forEach((input, index) => {
     input.addEventListener('keydown', (e) => {
       if (e.key === "Enter") {
         localStorage.setItem(`banPick-${index + 1}`, input.value.trim());
+        send({
+          banPick: {
+            index: index + 1,
+            name: input.value.trim()
+          }
+        })
       }
     });
   }
@@ -176,6 +201,7 @@ nameInputs.forEach((input, index) => {
   if (input) {
     input.addEventListener("input", () => {
       channel.postMessage({ [`input-name-${index + 1}`]: input.value });
+      send({ [`input-name-${index + 1}`]: input.value });
       localStorage.setItem(`player-name-${index + 1}`, input.value.trim());
     });
   }
