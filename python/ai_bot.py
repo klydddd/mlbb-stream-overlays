@@ -17,8 +17,8 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 WS_URL = "ws://localhost:8080/ws"
 
 # Window title to track (partial match) - update this after running calibration.py
-TARGET_WINDOW_TITLE = "1920px-RankMLBBUpdateStep5.png.webp (1920×1440) - Brave"
-CROP_CONFIG = {'rel_x': 498, 'rel_y': 234, 'w': 130, 'h': 125}
+TARGET_WINDOW_TITLE = "akai.png"
+CROP_CONFIG = {'rel_x': 337, 'rel_y': 111, 'w': 300, 'h': 300}
 
 # Model input configuration
 MODEL_INPUT_SIZE = (224, 224)  # Standard input size, adjust if your model uses different dimensions

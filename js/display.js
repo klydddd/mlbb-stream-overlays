@@ -54,6 +54,39 @@ function handleIncomingMessage(data) {
     case "clear-bans":
       clearBans();
       break;
+    case "ai_prediction":
+      // Handle AI hero prediction from the Python multi-scanner bot
+      if (data.data && data.data.name) {
+        const heroName = data.data.name;
+        const slotType = data.data.slot_type; // 'ban' or 'pick'
+        const slotIndex = data.data.slot_index; // 1-10 for picks, 1-6 for bans
+        const slotName = data.data.slot; // e.g., 'pick-1', 'ban-3'
+
+        if (slotType === 'ban') {
+          // Bans: ban-1 to ban-6 map to indices 0-5 (display uses ban-1 to ban-10)
+          // ban-1,2,3 are blue side (indices 0,1,2)
+          // ban-4,5,6 are red side (indices 5,6,7)
+          const banIndexMap = {
+            1: 0, 2: 1, 3: 2,  // Blue bans
+            4: 5, 5: 6, 6: 7   // Red bans
+          };
+          const displayIndex = banIndexMap[slotIndex];
+          if (displayIndex !== undefined) {
+            updateBanPick(displayIndex, heroName);
+            console.log(`🤖 AI Ban: ${heroName} → ${slotName} (display index ${displayIndex})`);
+          }
+        } else if (slotType === 'pick') {
+          // Picks: pick-1 to pick-10 map directly to indices 0-9
+          // pick-1,2,3,4,5 are blue side (indices 0,1,2,3,4)
+          // pick-6,7,8,9,10 are red side (indices 5,6,7,8,9)
+          const displayIndex = slotIndex - 1; // Convert 1-based to 0-based
+          if (displayIndex >= 0 && displayIndex <= 9) {
+            updateHeroPick(displayIndex, heroName, false);
+            console.log(`🤖 AI Pick: ${heroName} → ${slotName} (display index ${displayIndex})`);
+          }
+        }
+      }
+      break;
   }
 
   if (data.blueTeamName !== undefined) {
