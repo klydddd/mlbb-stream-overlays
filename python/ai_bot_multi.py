@@ -13,12 +13,40 @@ import os
 # Get the directory where this script is located
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
+# ============================================================
+# GPU CONFIGURATION
+# Configure TensorFlow to use GPU if available
+# ============================================================
+print("🔍 Checking for GPU availability...")
+gpus = tf.config.list_physical_devices('GPU')
+if gpus:
+    try:
+        # Enable memory growth to prevent TensorFlow from allocating all GPU memory at once
+        for gpu in gpus:
+            tf.config.experimental.set_memory_growth(gpu, True)
+        
+        # Optional: Set memory limit (uncomment if you want to limit GPU memory usage)
+        # tf.config.set_logical_device_configuration(
+        #     gpus[0],
+        #     [tf.config.LogicalDeviceConfiguration(memory_limit=4096)]  # 4GB limit
+        # )
+        
+        logical_gpus = tf.config.list_logical_devices('GPU')
+        print(f"✅ GPU ENABLED: {len(gpus)} Physical GPU(s), {len(logical_gpus)} Logical GPU(s)")
+        for i, gpu in enumerate(gpus):
+            print(f"   GPU {i}: {gpu.name}")
+    except RuntimeError as e:
+        print(f"⚠️ GPU configuration error: {e}")
+        print("   Falling back to CPU")
+else:
+    print("⚠️ No GPU found. Using CPU (this will be slower)")
+    print("   To enable GPU support, install CUDA and cuDNN, then install tensorflow-gpu")
+
 # --- CONFIGURATION ---
 WS_URL = "ws://localhost:8080/ws"
 
 # Window title to track (partial match) - update this after running calibration.py
-TARGET_WINDOW_TITLE = "ban-ml-66732f20ed6415095e392742.jpg"
-
+TARGET_WINDOW_TITLE = "test.jpg"
 # ============================================================
 # MULTI-SCANNER CONFIGURATION
 # Define 16 scan regions - 6 bans + 10 picks
@@ -34,23 +62,25 @@ SCAN_HEIGHT = 100
 
 # SCANNER REGIONS - Update these coordinates for your specific capture
 # Format: slot_name: {'rel_x': X, 'rel_y': Y, 'w': WIDTH, 'h': HEIGHT}
+
+
 SCAN_REGIONS = {
-    'ban-1': {'rel_x': 99, 'rel_y': 79, 'w': 100, 'h': 100},
-    'ban-2': {'rel_x': 186, 'rel_y': 82, 'w': 100, 'h': 100},
-    'ban-3': {'rel_x': 269, 'rel_y': 85, 'w': 100, 'h': 100},
-    'ban-4': {'rel_x': 1739, 'rel_y': 77, 'w': 100, 'h': 100},
-    'ban-5': {'rel_x': 1646, 'rel_y': 79, 'w': 100, 'h': 100},
-    'ban-6': {'rel_x': 1556, 'rel_y': 81, 'w': 100, 'h': 100},
-    'pick-1': {'rel_x': 134, 'rel_y': 205, 'w': 100, 'h': 100},
-    'pick-2': {'rel_x': 143, 'rel_y': 337, 'w': 100, 'h': 100},
-    'pick-3': {'rel_x': 140, 'rel_y': 474, 'w': 100, 'h': 100},
-    'pick-4': {'rel_x': 138, 'rel_y': 601, 'w': 100, 'h': 100},
-    'pick-5': {'rel_x': 142, 'rel_y': 744, 'w': 100, 'h': 100},
-    'pick-6': {'rel_x': 1702, 'rel_y': 202, 'w': 100, 'h': 100},
-    'pick-7': {'rel_x': 1706, 'rel_y': 341, 'w': 100, 'h': 100},
-    'pick-8': {'rel_x': 1701, 'rel_y': 480, 'w': 100, 'h': 100},
-    'pick-9': {'rel_x': 1704, 'rel_y': 614, 'w': 100, 'h': 100},
-    'pick-10': {'rel_x': 1694, 'rel_y': 733, 'w': 100, 'h': 100},
+    'ban-1': {'rel_x': 570, 'rel_y': 68, 'w': 100, 'h': 100},
+    'ban-2': {'rel_x': 651, 'rel_y': 73, 'w': 100, 'h': 100},
+    'ban-3': {'rel_x': 726, 'rel_y': 72, 'w': 100, 'h': 100},
+    'ban-4': {'rel_x': 1297, 'rel_y': 62, 'w': 100, 'h': 100},
+    'ban-5': {'rel_x': 1227, 'rel_y': 62, 'w': 100, 'h': 100},
+    'ban-6': {'rel_x': 1141, 'rel_y': 63, 'w': 100, 'h': 100},
+    'pick-1': {'rel_x': 79, 'rel_y': 153, 'w': 100, 'h': 100},
+    'pick-2': {'rel_x': 77, 'rel_y': 284, 'w': 100, 'h': 100},
+    'pick-3': {'rel_x': 73, 'rel_y': 412, 'w': 100, 'h': 100},
+    'pick-4': {'rel_x': 79, 'rel_y': 532, 'w': 100, 'h': 100},
+    'pick-5': {'rel_x': 82, 'rel_y': 650, 'w': 100, 'h': 100},
+    'pick-6': {'rel_x': 1291, 'rel_y': 165, 'w': 100, 'h': 100},
+    'pick-7': {'rel_x': 1286, 'rel_y': 299, 'w': 100, 'h': 100},
+    'pick-8': {'rel_x': 1278, 'rel_y': 418, 'w': 100, 'h': 100},
+    'pick-9': {'rel_x': 1278, 'rel_y': 548, 'w': 100, 'h': 100},
+    'pick-10': {'rel_x': 1287, 'rel_y': 659, 'w': 100, 'h': 100},
 }
 
 # Model input configuration
@@ -61,7 +91,7 @@ MODEL_PATH = os.path.join(SCRIPT_DIR, "mlbb_hero_model_pro")
 LABELS_PATH = os.path.join(MODEL_PATH, "labels.txt")
 
 # Confidence threshold
-CONFIDENCE_THRESHOLD = 0.7
+CONFIDENCE_THRESHOLD = 0.6
 
 # --- STATE ---
 # Track last sent hero for each slot to avoid spamming
@@ -192,12 +222,18 @@ def predict_hero(frame):
     """Run inference on a frame and return the predicted hero name."""
     try:
         input_tensor = preprocess_frame(frame)
-        input_tf = tf.constant(input_tensor)
-        predictions = infer(input_tf)
-        output_key = list(predictions.keys())[0]
-        output = predictions[output_key].numpy()[0]
-        predicted_idx = np.argmax(output)
-        confidence = output[predicted_idx]
+        
+        # Explicitly try to use GPU if available, otherwise use CPU
+        gpus = tf.config.list_physical_devices('GPU')
+        device_name = '/GPU:0' if gpus else '/CPU:0'
+        
+        with tf.device(device_name):
+            input_tf = tf.constant(input_tensor)
+            predictions = infer(input_tf)
+            output_key = list(predictions.keys())[0]
+            output = predictions[output_key].numpy()[0]
+            predicted_idx = np.argmax(output)
+            confidence = output[predicted_idx]
         
         if confidence >= CONFIDENCE_THRESHOLD and predicted_idx < len(CLASSES):
             return CLASSES[predicted_idx], confidence
