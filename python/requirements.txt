@@ -1,0 +1,22 @@
+# WebSocket client for ai_bot.py
+websocket-client
+
+# Computer vision and image processing
+opencv-python
+numpy<2
+
+# Screen capture
+mss
+
+# Window management
+pygetwindow
+
+# Machine learning
+tensorflow==2.10.0
+
+# FastAPI server for server.py
+fastapi
+uvicorn[standard]
+
+# Additional utilities (if needed)
+python-multipart

@@ -13,12 +13,41 @@ import os
 # Get the directory where this script is located
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
+# ============================================================
+# GPU CONFIGURATION
+# Configure TensorFlow to use GPU if available
+# ============================================================
+print("🔍 Checking for GPU availability...")
+gpus = tf.config.list_physical_devices('GPU')
+if gpus:
+    try:
+        # Enable memory growth to prevent TensorFlow from allocating all GPU memory at once
+        for gpu in gpus:
+            tf.config.experimental.set_memory_growth(gpu, True)
+        
+        # Optional: Set memory limit (uncomment if you want to limit GPU memory usage)
+        # tf.config.set_logical_device_configuration(
+        #     gpus[0],
+        #     [tf.config.LogicalDeviceConfiguration(memory_limit=4096)]  # 4GB limit
+        # )
+        
+        logical_gpus = tf.config.list_logical_devices('GPU')
+        print(f"✅ GPU ENABLED: {len(gpus)} Physical GPU(s), {len(logical_gpus)} Logical GPU(s)")
+        for i, gpu in enumerate(gpus):
+            print(f"   GPU {i}: {gpu.name}")
+    except RuntimeError as e:
+        print(f"⚠️ GPU configuration error: {e}")
+        print("   Falling back to CPU")
+else:
+    print("⚠️ No GPU found. Using CPU (this will be slower)")
+    print("   To enable GPU support, install CUDA and cuDNN, then install tensorflow-gpu")
+
 # --- CONFIGURATION ---
 WS_URL = "ws://localhost:8080/ws"
 
 # Window title to track (partial match) - update this after running calibration.py
-TARGET_WINDOW_TITLE = "1920px-RankMLBBUpdateStep5.png.webp (1920×1440) - Brave"
-CROP_CONFIG = {'rel_x': 498, 'rel_y': 234, 'w': 130, 'h': 125}
+TARGET_WINDOW_TITLE = "akai.png"
+CROP_CONFIG = {'rel_x': 337, 'rel_y': 111, 'w': 300, 'h': 300}
 
 # Model input configuration
 MODEL_INPUT_SIZE = (224, 224)  # Standard input size, adjust if your model uses different dimensions
@@ -167,20 +196,25 @@ def predict_hero(frame):
         # Preprocess the frame
         input_tensor = preprocess_frame(frame)
 
-        # Convert to TensorFlow tensor
-        input_tf = tf.constant(input_tensor)
+        # Explicitly try to use GPU if available, otherwise use CPU
+        gpus = tf.config.list_physical_devices('GPU')
+        device_name = '/GPU:0' if gpus else '/CPU:0'
+        
+        with tf.device(device_name):
+            # Convert to TensorFlow tensor
+            input_tf = tf.constant(input_tensor)
 
-        # Run inference
-        predictions = infer(input_tf)
+            # Run inference
+            predictions = infer(input_tf)
 
-        # Get the output tensor (the key may vary depending on your model)
-        # Common keys: 'output_0', 'predictions', 'dense', etc.
-        output_key = list(predictions.keys())[0]
-        output = predictions[output_key].numpy()[0]
+            # Get the output tensor (the key may vary depending on your model)
+            # Common keys: 'output_0', 'predictions', 'dense', etc.
+            output_key = list(predictions.keys())[0]
+            output = predictions[output_key].numpy()[0]
 
-        # Get the predicted class and confidence
-        predicted_idx = np.argmax(output)
-        confidence = output[predicted_idx]
+            # Get the predicted class and confidence
+            predicted_idx = np.argmax(output)
+            confidence = output[predicted_idx]
 
         if confidence >= CONFIDENCE_THRESHOLD and predicted_idx < len(CLASSES):
             return CLASSES[predicted_idx], confidence
