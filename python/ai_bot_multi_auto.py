@@ -23,6 +23,26 @@ from collections import deque, Counter
 import pygetwindow as gw
 import os
 
+# Windows API for direct window capture (captures window content even when obscured)
+try:
+    import win32gui
+    import win32ui
+    import win32con
+    import ctypes
+    from ctypes import wintypes
+    
+    # PrintWindow function from user32.dll (not available in win32gui directly)
+    user32 = ctypes.windll.user32
+    PrintWindow = user32.PrintWindow
+    PrintWindow.argtypes = [wintypes.HWND, wintypes.HDC, wintypes.UINT]
+    PrintWindow.restype = wintypes.BOOL
+    
+    DIRECT_CAPTURE_AVAILABLE = True
+except ImportError:
+    print("⚠️ pywin32 not installed. Using screen capture (windows on top will be captured too)")
+    print("   Install with: pip install pywin32")
+    DIRECT_CAPTURE_AVAILABLE = False
+
 # Get the directory where this script is located
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -75,6 +95,7 @@ CONFIDENCE_THRESHOLD = 0.6
 # GLOBAL STATE
 # ============================================================
 TARGET_WINDOW_TITLE = None
+TARGET_WINDOW_HWND = None  # Store exact window handle for precise targeting
 SCAN_REGIONS = {}
 last_sent_heroes = {}
 prediction_histories = {}
@@ -110,12 +131,16 @@ def get_windows():
     return [w for w in windows if w.strip()]
 
 def select_window():
-    """Let user select which window to calibrate."""
-    windows = get_windows()
+    """Let user select which window to calibrate. Returns (title, hwnd) tuple."""
+    # Get all windows with their handles
+    all_windows = gw.getAllWindows()
+    windows_with_handles = [(w.title, w._hWnd) for w in all_windows if w.title.strip()]
+    window_titles = [w[0] for w in windows_with_handles]
+    
     print("\n" + "=" * 60)
     print("Available Windows:")
     print("=" * 60)
-    for i, w in enumerate(windows):
+    for i, w in enumerate(window_titles):
         print(f"  [{i}] {w}")
     print("=" * 60)
     
@@ -125,24 +150,84 @@ def select_window():
             
             if choice.isdigit():
                 idx = int(choice)
-                if 0 <= idx < len(windows):
-                    return windows[idx]
+                if 0 <= idx < len(windows_with_handles):
+                    title, hwnd = windows_with_handles[idx]
+                    return title, hwnd
             
-            matches = [w for w in windows if choice.lower() in w.lower()]
+            matches = [(t, h) for t, h in windows_with_handles if choice.lower() in t.lower()]
             if len(matches) == 1:
                 return matches[0]
             elif len(matches) > 1:
                 print(f"Multiple matches found:")
                 for m in matches:
-                    print(f"  - {m}")
+                    print(f"  - {m[0]}")
                 continue
             
             print("Invalid selection. Try again.")
         except (ValueError, IndexError):
             print("Invalid input. Try again.")
 
+def capture_window_direct(hwnd):
+    """Capture window content directly using Windows API.
+    This captures the actual window content, regardless of overlapping windows.
+    """
+    try:
+        # Get window dimensions
+        left, top, right, bottom = win32gui.GetWindowRect(hwnd)
+        width = right - left
+        height = bottom - top
+        
+        if width <= 0 or height <= 0:
+            return None, None
+        
+        # Get the window DC (Device Context)
+        hwnd_dc = win32gui.GetWindowDC(hwnd)
+        mfc_dc = win32ui.CreateDCFromHandle(hwnd_dc)
+        save_dc = mfc_dc.CreateCompatibleDC()
+        
+        # Create a bitmap to store the capture
+        bitmap = win32ui.CreateBitmap()
+        bitmap.CreateCompatibleBitmap(mfc_dc, width, height)
+        save_dc.SelectObject(bitmap)
+        
+        # Use PrintWindow to capture the window content (works even when obscured)
+        # Flag 2 = PW_RENDERFULLCONTENT for better compatibility with some apps
+        # Use ctypes to call PrintWindow since it's not in win32gui
+        result = PrintWindow(hwnd, save_dc.GetSafeHdc(), 2)
+        
+        if result == 0:
+            # Fallback to flag 0 if flag 2 fails
+            result = PrintWindow(hwnd, save_dc.GetSafeHdc(), 0)
+        
+        # Convert to numpy array
+        bmp_info = bitmap.GetInfo()
+        bmp_str = bitmap.GetBitmapBits(True)
+        screenshot = np.frombuffer(bmp_str, dtype=np.uint8)
+        screenshot = screenshot.reshape((bmp_info['bmHeight'], bmp_info['bmWidth'], 4))
+        screenshot = cv2.cvtColor(screenshot, cv2.COLOR_BGRA2BGR)
+        
+        # Cleanup
+        win32gui.DeleteObject(bitmap.GetHandle())
+        save_dc.DeleteDC()
+        mfc_dc.DeleteDC()
+        win32gui.ReleaseDC(hwnd, hwnd_dc)
+        
+        window_info = {
+            'title': win32gui.GetWindowText(hwnd),
+            'left': left,
+            'top': top,
+            'width': width,
+            'height': height
+        }
+        
+        return screenshot, window_info
+        
+    except Exception as e:
+        print(f"Error in direct window capture: {e}")
+        return None, None
+
 def capture_window(window_title):
-    """Capture the specified window."""
+    """Capture the specified window. Uses direct capture if available."""
     global window_info
     
     try:
@@ -154,6 +239,14 @@ def capture_window(window_title):
         if win.isMinimized:
             win.restore()
         
+        # Try direct capture first (captures window content regardless of overlapping windows)
+        if DIRECT_CAPTURE_AVAILABLE:
+            screenshot, win_info = capture_window_direct(win._hWnd)
+            if screenshot is not None:
+                window_info = win_info
+                return screenshot, window_info
+        
+        # Fallback to screen-based capture
         window_info = {
             'title': window_title,
             'left': win.left,
@@ -414,12 +507,38 @@ def send_prediction(slot_name, hero_name):
     except Exception as e:
         print(f"❌ Failed to send: {e}")
 
-def get_window_position():
-    """Get the target window's position."""
+def get_window_by_hwnd(hwnd):
+    """Get a window by its exact handle (HWND)."""
     try:
+        all_windows = gw.getAllWindows()
+        for w in all_windows:
+            if w._hWnd == hwnd:
+                return w
+        return None
+    except Exception:
+        return None
+
+def get_window_position():
+    """Get the target window's position using exact window handle."""
+    try:
+        # First, try to find window by exact handle (most reliable)
+        if TARGET_WINDOW_HWND is not None:
+            win = get_window_by_hwnd(TARGET_WINDOW_HWND)
+            if win and not win.isMinimized:
+                return {'left': win.left, 'top': win.top}
+        
+        # Fallback to title-based search with exact match verification
         wins = gw.getWindowsWithTitle(TARGET_WINDOW_TITLE)
         if not wins:
             return None
+        
+        # Find exact title match first
+        for win in wins:
+            if win.title == TARGET_WINDOW_TITLE:  # Exact match
+                if not win.isMinimized:
+                    return {'left': win.left, 'top': win.top}
+        
+        # If no exact match, use first result but warn user
         win = wins[0]
         if win.isMinimized:
             return None
@@ -668,10 +787,17 @@ def recognition_loop(infer, classes):
     
     calibration_complete = True
     
-    with mss.mss() as sct:
-        while True:
+    while True:
+        # Capture the entire window once using direct capture (Windows API)
+        # This captures the window content regardless of overlapping windows
+        window_screenshot = None
+        
+        if DIRECT_CAPTURE_AVAILABLE and TARGET_WINDOW_HWND is not None:
+            window_screenshot, win_info = capture_window_direct(TARGET_WINDOW_HWND)
+        
+        if window_screenshot is None:
+            # Fallback: check if window exists and wait
             window_pos = get_window_position()
-            
             if not window_pos:
                 print(f"⏳ Waiting for '{TARGET_WINDOW_TITLE}' window...")
                 for history in prediction_histories.values():
@@ -680,96 +806,140 @@ def recognition_loop(infer, classes):
                 time.sleep(2)
                 continue
             
-            frames = {}
-            predictions = {}
-            confidences = {}
-            
-            # Scan all regions
-            for slot_name, region_config in SCAN_REGIONS.items():
+            # Fallback to mss screen capture if direct capture failed
+            with mss.mss() as sct:
                 try:
-                    monitor = get_region_monitor(window_pos, region_config)
-                    frame = np.array(sct.grab(monitor))
-                    frames[slot_name] = frame
-                    
-                    # Only run predictions if not paused
-                    if not paused:
-                        hero_name, confidence = predict_hero(frame, infer, classes)
-                        
-                        # Always store the prediction and confidence for display
-                        predictions[slot_name] = hero_name
-                        confidences[slot_name] = confidence
-                        
-                        # Only send if above threshold and stable
-                        if hero_name and confidence >= CONFIDENCE_THRESHOLD:
-                            prediction_histories[slot_name].append(hero_name)
-                            stable_hero = get_stable_prediction(slot_name)
-                            
-                            if stable_hero:
-                                send_prediction(slot_name, stable_hero)
-                    else:
-                        # When paused, show last known predictions
-                        predictions[slot_name] = last_sent_heroes.get(slot_name)
-                        confidences[slot_name] = 0.0
-                        
+                    # Get window info for screen capture
+                    if TARGET_WINDOW_HWND is not None:
+                        win = get_window_by_hwnd(TARGET_WINDOW_HWND)
+                        if win:
+                            monitor = {
+                                "left": win.left,
+                                "top": win.top,
+                                "width": win.width,
+                                "height": win.height
+                            }
+                            window_screenshot = np.array(sct.grab(monitor))
+                            window_screenshot = cv2.cvtColor(window_screenshot, cv2.COLOR_BGRA2BGR)
                 except Exception as e:
-                    print(f"⚠️ Error scanning {slot_name}: {e}")
+                    print(f"⚠️ Fallback capture failed: {e}")
+                    time.sleep(1)
+                    continue
+        
+        if window_screenshot is None:
+            time.sleep(1)
+            continue
+        
+        frames = {}
+        predictions = {}
+        confidences = {}
+        
+        # Extract regions from the captured window screenshot
+        for slot_name, region_config in SCAN_REGIONS.items():
+            try:
+                # Extract the region from the window screenshot
+                rel_x = region_config['rel_x']
+                rel_y = region_config['rel_y']
+                w = region_config['w']
+                h = region_config['h']
+                
+                # Ensure we don't exceed image bounds
+                img_h, img_w = window_screenshot.shape[:2]
+                end_x = min(rel_x + w, img_w)
+                end_y = min(rel_y + h, img_h)
+                start_x = max(0, rel_x)
+                start_y = max(0, rel_y)
+                
+                if start_x >= end_x or start_y >= end_y:
                     frames[slot_name] = None
                     predictions[slot_name] = None
                     confidences[slot_name] = 0.0
-            
-            # Show combined preview
-            preview = create_multi_preview(frames, predictions, confidences, is_paused=paused)
-            cv2.imshow("AI Multi-Scanner (P=pause, E=edit, Q=quit)", preview)
-            
-            # Use waitKeyEx to get full keycode including modifiers
-            key_full = cv2.waitKeyEx(1)
-            key = key_full & 0xFF
-            
-            # Always process Q, P, E regardless of edit mode
-            if key == ord('q') or key == ord('Q'):
-                cv2.destroyAllWindows()
-                print("\n👋 Shutting down...")
-                should_exit = True
-                return  # Exit the recognition loop
-            elif key == ord('p') or key == ord('P'):
-                paused = not paused
-                status = "⏸️ PAUSED" if paused else "▶️ RESUMED"
-                print(status)
-            elif key == ord('e') or key == ord('E'):
-                edit_mode = not edit_mode
-                if edit_mode:
-                    print("\n✏️ EDIT MODE ON")
-                    print("   Shift+1-6: Adjust ban-1 to ban-6")
-                    print("   1-0: Adjust pick-1 to pick-10")
+                    continue
+                
+                frame = window_screenshot[start_y:end_y, start_x:end_x].copy()
+                # Convert BGR to BGRA to match previous format expected by predict_hero
+                frame = cv2.cvtColor(frame, cv2.COLOR_BGR2BGRA)
+                frames[slot_name] = frame
+                
+                # Only run predictions if not paused
+                if not paused:
+                    hero_name, confidence = predict_hero(frame, infer, classes)
+                    
+                    # Always store the prediction and confidence for display
+                    predictions[slot_name] = hero_name
+                    confidences[slot_name] = confidence
+                    
+                    # Only send if above threshold and stable
+                    if hero_name and confidence >= CONFIDENCE_THRESHOLD:
+                        prediction_histories[slot_name].append(hero_name)
+                        stable_hero = get_stable_prediction(slot_name)
+                        
+                        if stable_hero:
+                            send_prediction(slot_name, stable_hero)
                 else:
-                    print("✏️ EDIT MODE OFF")
-            elif edit_mode:
-                # Shift+1-6 for bans (produces ! @ # $ % ^)
-                ban_keys = {'!': 1, '@': 2, '#': 3, '$': 4, '%': 5, '^': 6}
-                if key > 0 and chr(key) in ban_keys:
-                    slot_num = ban_keys[chr(key)]
-                    slot_name = f'ban-{slot_num}'
-                    if slot_name in SCAN_REGIONS:
-                        recalibrate_slot(slot_name, TARGET_WINDOW_TITLE)
-                # Number keys 1-9 for picks 1-9
-                elif key >= ord('1') and key <= ord('9'):
-                    pick_num = key - ord('0')
-                    slot_name = f'pick-{pick_num}'
-                    if slot_name in SCAN_REGIONS:
-                        recalibrate_slot(slot_name, TARGET_WINDOW_TITLE)
-                # 0 for pick-10
-                elif key == ord('0'):
-                    slot_name = 'pick-10'
-                    if slot_name in SCAN_REGIONS:
-                        recalibrate_slot(slot_name, TARGET_WINDOW_TITLE)
-            
-            time.sleep(0.2)
+                    # When paused, show last known predictions
+                    predictions[slot_name] = last_sent_heroes.get(slot_name)
+                    confidences[slot_name] = 0.0
+                    
+            except Exception as e:
+                print(f"⚠️ Error scanning {slot_name}: {e}")
+                frames[slot_name] = None
+                predictions[slot_name] = None
+                confidences[slot_name] = 0.0
+        
+        # Show combined preview
+        preview = create_multi_preview(frames, predictions, confidences, is_paused=paused)
+        cv2.imshow("AI Multi-Scanner (P=pause, E=edit, Q=quit)", preview)
+        
+        # Use waitKeyEx to get full keycode including modifiers
+        key_full = cv2.waitKeyEx(1)
+        key = key_full & 0xFF
+        
+        # Always process Q, P, E regardless of edit mode
+        if key == ord('q') or key == ord('Q'):
+            cv2.destroyAllWindows()
+            print("\n👋 Shutting down...")
+            should_exit = True
+            return  # Exit the recognition loop
+        elif key == ord('p') or key == ord('P'):
+            paused = not paused
+            status = "⏸️ PAUSED" if paused else "▶️ RESUMED"
+            print(status)
+        elif key == ord('e') or key == ord('E'):
+            edit_mode = not edit_mode
+            if edit_mode:
+                print("\n✏️ EDIT MODE ON")
+                print("   Shift+1-6: Adjust ban-1 to ban-6")
+                print("   1-0: Adjust pick-1 to pick-10")
+            else:
+                print("✏️ EDIT MODE OFF")
+        elif edit_mode:
+            # Shift+1-6 for bans (produces ! @ # $ % ^)
+            ban_keys = {'!': 1, '@': 2, '#': 3, '$': 4, '%': 5, '^': 6}
+            if key > 0 and chr(key) in ban_keys:
+                slot_num = ban_keys[chr(key)]
+                slot_name = f'ban-{slot_num}'
+                if slot_name in SCAN_REGIONS:
+                    recalibrate_slot(slot_name, TARGET_WINDOW_TITLE)
+            # Number keys 1-9 for picks 1-9
+            elif key >= ord('1') and key <= ord('9'):
+                pick_num = key - ord('0')
+                slot_name = f'pick-{pick_num}'
+                if slot_name in SCAN_REGIONS:
+                    recalibrate_slot(slot_name, TARGET_WINDOW_TITLE)
+            # 0 for pick-10
+            elif key == ord('0'):
+                slot_name = 'pick-10'
+                if slot_name in SCAN_REGIONS:
+                    recalibrate_slot(slot_name, TARGET_WINDOW_TITLE)
+        
+        time.sleep(0.2)
 
 # ============================================================
 # MAIN WORKFLOW
 # ============================================================
 def main():
-    global TARGET_WINDOW_TITLE, SCAN_REGIONS, last_sent_heroes, prediction_histories
+    global TARGET_WINDOW_TITLE, TARGET_WINDOW_HWND, SCAN_REGIONS, last_sent_heroes, prediction_histories
     
     print("=" * 60)
     print("🤖 MLBB AI Bot with Integrated Calibration")
@@ -783,8 +953,8 @@ def main():
     print("No manual config editing needed!")
     print("=" * 60)
     
-    # Step 1: Select window
-    TARGET_WINDOW_TITLE = select_window()
+    # Step 1: Select window (now returns both title and handle)
+    TARGET_WINDOW_TITLE, TARGET_WINDOW_HWND = select_window()
     print(f"\n✅ Selected window: {TARGET_WINDOW_TITLE}")
     
     # Step 2: Run calibration
