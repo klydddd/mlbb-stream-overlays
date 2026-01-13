@@ -20,3 +20,4 @@ uvicorn[standard]
 
 # Additional utilities (if needed)
 python-multipart
+pywin32

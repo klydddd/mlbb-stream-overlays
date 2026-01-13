@@ -79,8 +79,8 @@ BAN_SCAN_HEIGHT = 50
 
 # Define the slots in order
 SLOTS = [
-    'ban-1', 'ban-2', 'ban-3',  # Blue bans
-    'ban-4', 'ban-5', 'ban-6',  # Red bans
+    'ban-1', 'ban-2', 'ban-3', 'ban-4', 'ban-5', # Blue bans
+    'ban-6', 'ban-7', 'ban-8', 'ban-9', 'ban-10', # Red bans
     'pick-1', 'pick-2', 'pick-3', 'pick-4', 'pick-5',  # Blue picks
     'pick-6', 'pick-7', 'pick-8', 'pick-9', 'pick-10'  # Red picks
 ]
@@ -89,7 +89,7 @@ SLOTS = [
 MODEL_INPUT_SIZE = (224, 224)
 MODEL_PATH = os.path.join(SCRIPT_DIR, "mlbb_hero_model_pro")
 LABELS_PATH = os.path.join(MODEL_PATH, "labels.txt")
-CONFIDENCE_THRESHOLD = 0.6
+CONFIDENCE_THRESHOLD = 0.85
 
 # ============================================================
 # GLOBAL STATE
@@ -481,6 +481,10 @@ def send_prediction(slot_name, hero_name):
     """Send a hero prediction for a specific slot to the WebSocket server."""
     global ws
     
+    # Skip sending if the detected class is "Blank"
+    if hero_name == "Blank":
+        return
+    
     if hero_name == last_sent_heroes.get(slot_name):
         return
     
@@ -604,7 +608,7 @@ def get_stable_prediction(slot_name):
 def create_multi_preview(frames_dict, predictions_dict, confidences_dict, is_paused=False):
     """Create a combined preview showing all scan regions."""
     num_cols = 4
-    num_rows = 4
+    num_rows = 5
     cell_width = 150
     cell_height = 120
     
@@ -612,7 +616,8 @@ def create_multi_preview(frames_dict, predictions_dict, confidences_dict, is_pau
     
     slots_order = [
         'ban-1', 'ban-2', 'ban-3', 'ban-4',
-        'ban-5', 'ban-6', 'pick-1', 'pick-2',
+        'ban-5', 'ban-6', 'ban-7', 'ban-8',
+        'ban-9', 'ban-10', 'pick-1', 'pick-2',
         'pick-3', 'pick-4', 'pick-5', 'pick-6',
         'pick-7', 'pick-8', 'pick-9', 'pick-10'
     ]
