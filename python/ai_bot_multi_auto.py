@@ -914,13 +914,13 @@ def recognition_loop(infer, classes):
             edit_mode = not edit_mode
             if edit_mode:
                 print("\n✏️ EDIT MODE ON")
-                print("   Shift+1-6: Adjust ban-1 to ban-6")
+                print("   Shift+1-0: Adjust ban-1 to ban-10")
                 print("   1-0: Adjust pick-1 to pick-10")
             else:
                 print("✏️ EDIT MODE OFF")
         elif edit_mode:
             # Shift+1-6 for bans (produces ! @ # $ % ^)
-            ban_keys = {'!': 1, '@': 2, '#': 3, '$': 4, '%': 5, '^': 6}
+            ban_keys = {'!': 1, '@': 2, '#': 3, '$': 4, '%': 5, '^': 6, '&': 7, '*': 8, '(': 9, ')': 10}
             if key > 0 and chr(key) in ban_keys:
                 slot_num = ban_keys[chr(key)]
                 slot_name = f'ban-{slot_num}'
