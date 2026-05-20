@@ -599,26 +599,24 @@ p {
     z-index: 1;
 }
 
-#team-logo-2,
-#team-logo-4 {
+#logo-name-bg {
     height: 100%;
     width: 100%;
     position: absolute;
     z-index: -1;
     opacity: 1;
-    /* padding: 0 30px;
-    margin: 0 30px; */
-    object-fit: contain;
-    /* bottom: -1px; */
     filter: brightness(0.4);
+    left: 0;
+    top: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-#team-logo-2 {
-    left: -100px;
-}
-
-#team-logo-4 {
-    right: -100px;
+#logo-name-bg img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
 }
 
 .countdown {

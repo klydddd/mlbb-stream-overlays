@@ -40,6 +40,7 @@ function handleIncomingMessage(data) {
       for (let i = 1; i <= 4; i++) {
         resetText(`team-logo-${i}`, ``);
       }
+      document.querySelectorAll("#logo-name-bg").forEach(el => el.textContent = "");
 
       clearNames();
       clearPicks();
