@@ -19,17 +19,25 @@ function handleIncomingMessage(data) {
       if (blue) blue.textContent = data.blueTeamName || "Blue Team Name";
       if (red) red.textContent = data.redTeamName || "Red Team Name";
 
-      for (let i = 1; i <= 10; i++) {
-        if (data.picks?.[`pick-${i}`] !== undefined) {
-          const hero = document.getElementById(`hero-name-${i}`);
-          if (hero) hero.textContent = data.picks[`pick-${i}`] || `Pick ${i}`;
-        }
-      }
-
+      // 1. Swap player names
       for (let i = 1; i <= 10; i++) {
         if (data.names?.[`input-name-${i}`] !== undefined) {
           const name = document.getElementById(`name-${i}`);
           if (name) name.textContent = data.names[`input-name-${i}`] || `Player ${i}`;
+        }
+      }
+
+      // 2. Swap hero picks (and render portraits silently)
+      for (let i = 1; i <= 10; i++) {
+        if (data.picks?.[`pick-${i}`] !== undefined) {
+          updateHeroPickSilent(i - 1, data.picks[`pick-${i}`]);
+        }
+      }
+
+      // 3. Swap bans (and render grayscale ban portraits)
+      for (let i = 1; i <= 10; i++) {
+        if (data.bans?.[`ban-${i}`] !== undefined) {
+          updateBanPick(i - 1, data.bans[`ban-${i}`]);
         }
       }
       return;

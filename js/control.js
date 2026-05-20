@@ -32,84 +32,160 @@ document.addEventListener('click', (e) => {
 // Switch Function Logic
 if (switchBtn) {
   switchBtn.addEventListener("click", () => {
+    // 1. Team Names
     const blueTeamInput = document.getElementById("blueTeamName");
     const redTeamInput = document.getElementById("redTeamName");
-
     const blueTeamName = blueTeamInput?.value ?? "";
     const redTeamName = redTeamInput?.value ?? "";
 
-    const picks = {};
-    const names = {};
+    // 2. Team Logos
+    const logoBlue = localStorage.getItem("logo-blue");
+    const logoRed = localStorage.getItem("logo-red");
 
-    for (let i = 1; i <= 5; i++) {
-      const pickBlue = document.getElementById(`pick-${i}`);
-      const pickRed = document.getElementById(`pick-${i + 5}`);
-      const nameBlue = document.getElementById(`input-name-${i}`);
-      const nameRed = document.getElementById(`input-name-${i + 5}`);
+    // 3. Team Cam Links
+    const teamCam1Input = document.getElementById("team-cam-link-1");
+    const teamCam2Input = document.getElementById("team-cam-link-2");
+    const teamCam1 = teamCam1Input?.value ?? "";
+    const teamCam2 = teamCam2Input?.value ?? "";
 
-      picks[`pick-${i}`] = pickBlue?.value ?? "";
-      picks[`pick-${i + 5}`] = pickRed?.value ?? "";
-      names[`input-name-${i}`] = nameBlue?.value ?? "";
-      names[`input-name-${i + 5}`] = nameRed?.value ?? "";
+    // 4. Individual Player Cam Links
+    const cams = {};
+    for (let i = 1; i <= 10; i++) {
+      const camInput = document.getElementById(`cam-${i}`);
+      cams[`cam-${i}`] = camInput?.value ?? "";
     }
 
+    // 5. Player Names
+    const names = {};
+    for (let i = 1; i <= 10; i++) {
+      const nameInput = document.getElementById(`input-name-${i}`);
+      names[`input-name-${i}`] = nameInput?.value ?? "";
+    }
+
+    // 6. Player Picks
+    const picks = {};
+    for (let i = 1; i <= 10; i++) {
+      const pickInput = document.getElementById(`pick-${i}`);
+      picks[`pick-${i}`] = pickInput?.value ?? "";
+    }
+
+    // 7. Player Bans
+    const bans = {};
+    for (let i = 1; i <= 10; i++) {
+      const banInput = document.getElementById(`ban-${i}`);
+      bans[`ban-${i}`] = banInput?.value ?? "";
+    }
+
+    // --- SWAP & SAVE TO LOCALSTORAGE / UPDATE CONTROLLER UI ---
+
+    // 1. Swap Team Names
+    if (blueTeamInput && redTeamInput) {
+      blueTeamInput.value = redTeamName;
+      redTeamInput.value = blueTeamName;
+      localStorage.setItem("blue-team-name", redTeamName);
+      localStorage.setItem("red-team-name", blueTeamName);
+    }
+
+    // 2. Swap Team Logos
+    if (logoRed) {
+      localStorage.setItem("logo-blue", logoRed);
+    } else {
+      localStorage.removeItem("logo-blue");
+    }
+    if (logoBlue) {
+      localStorage.setItem("logo-red", logoBlue);
+    } else {
+      localStorage.removeItem("logo-red");
+    }
+
+    // 3. Swap Team Cam Links
+    if (teamCam1Input && teamCam2Input) {
+      teamCam1Input.value = teamCam2;
+      teamCam2Input.value = teamCam1;
+      localStorage.setItem("team-cam-link-1", teamCam2);
+      localStorage.setItem("team-cam-link-2", teamCam1);
+    }
+
+    // 4. Swap Individual Player Cam Links
     for (let i = 1; i <= 5; i++) {
-      const pickBlue = document.getElementById(`pick-${i}`);
-      const pickRed = document.getElementById(`pick-${i + 5}`);
+      const camBlue = document.getElementById(`cam-${i}`);
+      const camRed = document.getElementById(`cam-${i + 5}`);
+      if (camBlue && camRed) {
+        camBlue.value = cams[`cam-${i + 5}`];
+        camRed.value = cams[`cam-${i}`];
+        localStorage.setItem(`camera-link-${i}`, cams[`cam-${i + 5}`]);
+        localStorage.setItem(`camera-link-${i + 5}`, cams[`cam-${i}`]);
+      }
+    }
+
+    // 5. Swap Player Names
+    for (let i = 1; i <= 5; i++) {
       const nameBlue = document.getElementById(`input-name-${i}`);
       const nameRed = document.getElementById(`input-name-${i + 5}`);
-
-      if (pickBlue && pickRed) {
-        pickBlue.value = picks[`pick-${i + 5}`];
-        localStorage.setItem(`heroPick-${i}`, picks[`pick-${i + 5}`]);
-        pickRed.value = picks[`pick-${i}`];
-        localStorage.setItem(`heroPick-${i + 5}`, picks[`pick-${i}`]);
-      }
-
       if (nameBlue && nameRed) {
         nameBlue.value = names[`input-name-${i + 5}`];
         nameRed.value = names[`input-name-${i}`];
+        localStorage.setItem(`player-name-${i}`, names[`input-name-${i + 5}`]);
+        localStorage.setItem(`player-name-${i + 5}`, names[`input-name-${i}`]);
       }
     }
 
+    // 6. Swap Player Picks
+    for (let i = 1; i <= 5; i++) {
+      const pickBlue = document.getElementById(`pick-${i}`);
+      const pickRed = document.getElementById(`pick-${i + 5}`);
+      if (pickBlue && pickRed) {
+        pickBlue.value = picks[`pick-${i + 5}`];
+        pickRed.value = picks[`pick-${i}`];
+        localStorage.setItem(`heroPick-${i}`, picks[`pick-${i + 5}`]);
+        localStorage.setItem(`heroPick-${i + 5}`, picks[`pick-${i}`]);
+      }
+    }
+
+    // 7. Swap Player Bans
+    for (let i = 1; i <= 5; i++) {
+      const banBlue = document.getElementById(`ban-${i}`);
+      const banRed = document.getElementById(`ban-${i + 5}`);
+      if (banBlue && banRed) {
+        banBlue.value = bans[`ban-${i + 5}`];
+        banRed.value = bans[`ban-${i}`];
+        localStorage.setItem(`banPick-${i}`, bans[`ban-${i + 5}`]);
+        localStorage.setItem(`banPick-${i + 5}`, bans[`ban-${i}`]);
+      }
+    }
+
+    // --- PREPARE SWAPPED DATA FOR BROADCAST & REMOTE SYNC ---
     const swappedPicks = {};
     const swappedNames = {};
+    const swappedBans = {};
 
     for (let i = 1; i <= 10; i++) {
       const pickInput = document.getElementById(`pick-${i}`);
       const nameInput = document.getElementById(`input-name-${i}`);
+      const banInput = document.getElementById(`ban-${i}`);
       if (pickInput) swappedPicks[`pick-${i}`] = pickInput.value;
       if (nameInput) swappedNames[`input-name-${i}`] = nameInput.value;
+      if (banInput) swappedBans[`ban-${i}`] = banInput.value;
     }
 
-    channel.postMessage({
+    const switchPayload = {
       type: "switch",
       blueTeamName: redTeamName,
       redTeamName: blueTeamName,
       picks: swappedPicks,
-      names: swappedNames
-    });
+      names: swappedNames,
+      bans: swappedBans
+    };
 
-    send({
-      type: "switch",
-      blueTeamName: redTeamName,
-      redTeamName: blueTeamName,
-      picks: swappedPicks,
-      names: swappedNames
-    });
+    // Broadcast team switch
+    channel.postMessage(switchPayload);
+    send(switchPayload);
 
-    for (let i = 1; i <= 10; i++) {
-      const pick = swappedPicks[`pick-${i}`];
-      const hero = document.getElementById(`hero-name-${i}`);
-      if (hero) {
-        hero.textContent = pick || `Pick ${i}`;
-      }
-    }
-
-    if (blueTeamInput && redTeamInput) {
-      blueTeamInput.value = redTeamName;
-      redTeamInput.value = blueTeamName;
-    }
+    // Broadcast logo updates to sync display logo changes
+    channel.postMessage({ type: "logo-update", team: "blue", data: logoRed });
+    channel.postMessage({ type: "logo-update", team: "red", data: logoBlue });
+    send({ type: "logo-update", team: "blue", data: logoRed });
+    send({ type: "logo-update", team: "red", data: logoBlue });
   });
 }
 
@@ -226,3 +302,36 @@ teamCamInputs.forEach((input, index) => {
     });
   }
 });
+
+// Load saved values on startup
+function initController() {
+  const blueInput = document.getElementById("blueTeamName");
+  const redInput = document.getElementById("redTeamName");
+  if (blueInput) blueInput.value = localStorage.getItem("blue-team-name") || "";
+  if (redInput) redInput.value = localStorage.getItem("red-team-name") || "";
+
+  const teamCam1 = document.getElementById("team-cam-link-1");
+  const teamCam2 = document.getElementById("team-cam-link-2");
+  if (teamCam1) teamCam1.value = localStorage.getItem("team-cam-link-1") || "";
+  if (teamCam2) teamCam2.value = localStorage.getItem("team-cam-link-2") || "";
+
+  for (let i = 1; i <= 10; i++) {
+    const pickInput = document.getElementById(`pick-${i}`);
+    if (pickInput) pickInput.value = localStorage.getItem(`heroPick-${i}`) || "";
+
+    const nameInput = document.getElementById(`input-name-${i}`);
+    if (nameInput) nameInput.value = localStorage.getItem(`player-name-${i}`) || "";
+
+    const camInput = document.getElementById(`cam-${i}`);
+    if (camInput) camInput.value = localStorage.getItem(`camera-link-${i}`) || "";
+
+    const banInput = document.getElementById(`ban-${i}`);
+    if (banInput) banInput.value = localStorage.getItem(`banPick-${i}`) || "";
+  }
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initController);
+} else {
+  initController();
+}
