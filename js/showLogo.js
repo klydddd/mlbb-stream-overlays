@@ -85,6 +85,16 @@ function analyzeImage(base64Data, callback) {
     };
 }
 
+// Helper to darken an RGB color string by a given factor (e.g. 0.4)
+function darkenColor(rgbString, factor = 0.4) {
+    const match = rgbString.match(/\d+/g);
+    if (!match || match.length < 3) return rgbString;
+    const r = Math.round(parseInt(match[0]) * factor);
+    const g = Math.round(parseInt(match[1]) * factor);
+    const b = Math.round(parseInt(match[2]) * factor);
+    return `rgb(${r}, ${g}, ${b})`;
+}
+
 // Helper to set image child in containers (both foreground and background logos)
 function updateDisplayLogo(team, base64Data) {
     if (team === "blue") {
@@ -96,7 +106,7 @@ function updateDisplayLogo(team, base64Data) {
     }
 }
 
-function setLogoContainerByQuery(query, base64Data, processColor = false) {
+function setLogoContainerByQuery(query, base64Data, isForeground = false) {
     const container = document.querySelector(query);
     if (!container) return;
 
@@ -109,7 +119,7 @@ function setLogoContainerByQuery(query, base64Data, processColor = false) {
     container.style.alignItems = "center";
     container.style.overflow = "hidden";
 
-    if (processColor) {
+    if (isForeground) {
         container.style.padding = "5px";
         container.style.boxSizing = "border-box";
     } else {
@@ -120,24 +130,11 @@ function setLogoContainerByQuery(query, base64Data, processColor = false) {
         const img = document.createElement("img");
         img.src = base64Data;
 
-        if (processColor) {
+        if (isForeground) {
             // Foreground logo: scale based on container width (width: 100%; height: auto)
             img.style.width = "100%";
             img.style.height = "auto";
             img.style.display = "block";
-
-            // Asynchronously analyze transparency and extract dominant color
-            analyzeImage(base64Data, (result) => {
-                // Safeguard: Check if this image is still current before applying background
-                const currentImg = container.querySelector("img");
-                if (currentImg && currentImg.src === base64Data) {
-                    if (result.hasTransparency && result.dominantColor) {
-                        container.style.backgroundColor = result.dominantColor;
-                    } else {
-                        container.style.backgroundColor = "transparent";
-                    }
-                }
-            });
         } else {
             // Background logo: scale to fill/fit container dimensions
             img.style.width = "100%";
@@ -146,11 +143,29 @@ function setLogoContainerByQuery(query, base64Data, processColor = false) {
         }
 
         container.appendChild(img);
+
+        // Always analyze transparency and extract dominant color
+        analyzeImage(base64Data, (result) => {
+            // Safeguard: Check if this image is still current before applying background
+            const currentImg = container.querySelector("img");
+            if (currentImg && currentImg.src === base64Data) {
+                if (result.hasTransparency && result.dominantColor) {
+                    if (isForeground) {
+                        // Use a darkened version of the dominant color for the foreground logo to emphasize it
+                        container.style.backgroundColor = darkenColor(result.dominantColor, 0.4);
+                    } else {
+                        container.style.backgroundColor = result.dominantColor;
+                    }
+                } else {
+                    container.style.backgroundColor = "transparent";
+                }
+            }
+        });
     }
 }
 
-function setLogoContainer(id, base64Data, processColor = false) {
-    setLogoContainerByQuery("#" + id, base64Data, processColor);
+function setLogoContainer(id, base64Data, isForeground = false) {
+    setLogoContainerByQuery("#" + id, base64Data, isForeground);
 }
 
 function clearDisplayLogos() {
