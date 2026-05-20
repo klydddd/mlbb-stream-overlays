@@ -130,27 +130,35 @@ if (switchBtn) {
       }
     }
 
-    // 6. Swap Player Picks
-    for (let i = 1; i <= 5; i++) {
-      const pickBlue = document.getElementById(`pick-${i}`);
-      const pickRed = document.getElementById(`pick-${i + 5}`);
+    // 6. Swap Player Picks (IDs follow draft order, not positional)
+    const bluePickIds = [1, 4, 5, 8, 9];
+    const redPickIds  = [2, 3, 6, 7, 10];
+    for (let idx = 0; idx < 5; idx++) {
+      const bId = bluePickIds[idx];
+      const rId = redPickIds[idx];
+      const pickBlue = document.getElementById(`pick-${bId}`);
+      const pickRed = document.getElementById(`pick-${rId}`);
       if (pickBlue && pickRed) {
-        pickBlue.value = picks[`pick-${i + 5}`];
-        pickRed.value = picks[`pick-${i}`];
-        localStorage.setItem(`heroPick-${i}`, picks[`pick-${i + 5}`]);
-        localStorage.setItem(`heroPick-${i + 5}`, picks[`pick-${i}`]);
+        pickBlue.value = picks[`pick-${rId}`];
+        pickRed.value = picks[`pick-${bId}`];
+        localStorage.setItem(`heroPick-${bId}`, picks[`pick-${rId}`]);
+        localStorage.setItem(`heroPick-${rId}`, picks[`pick-${bId}`]);
       }
     }
 
-    // 7. Swap Player Bans
-    for (let i = 1; i <= 5; i++) {
-      const banBlue = document.getElementById(`ban-${i}`);
-      const banRed = document.getElementById(`ban-${i + 5}`);
+    // 7. Swap Player Bans (IDs follow draft order, not positional)
+    const blueBanIds = [1, 3, 5, 8, 10];
+    const redBanIds  = [2, 4, 6, 7, 9];
+    for (let idx = 0; idx < 5; idx++) {
+      const bId = blueBanIds[idx];
+      const rId = redBanIds[idx];
+      const banBlue = document.getElementById(`ban-${bId}`);
+      const banRed = document.getElementById(`ban-${rId}`);
       if (banBlue && banRed) {
-        banBlue.value = bans[`ban-${i + 5}`];
-        banRed.value = bans[`ban-${i}`];
-        localStorage.setItem(`banPick-${i}`, bans[`ban-${i + 5}`]);
-        localStorage.setItem(`banPick-${i + 5}`, bans[`ban-${i}`]);
+        banBlue.value = bans[`ban-${rId}`];
+        banRed.value = bans[`ban-${bId}`];
+        localStorage.setItem(`banPick-${bId}`, bans[`ban-${rId}`]);
+        localStorage.setItem(`banPick-${rId}`, bans[`ban-${bId}`]);
       }
     }
 

@@ -295,3 +295,20 @@ button:active {
     display: block;
 }
 
+/* Auto-Advance: pulse glow on Next Phase button when phase inputs are complete */
+.auto-advance-ready {
+    animation: autoAdvancePulse 1.2s ease-in-out infinite;
+    outline: 2px solid rgba(0, 220, 255, 0.8);
+    outline-offset: 2px;
+}
+
+@keyframes autoAdvancePulse {
+    0%, 100% {
+        box-shadow: 0 0 8px rgba(0, 220, 255, 0.4);
+        transform: scale(1);
+    }
+    50% {
+        box-shadow: 0 0 22px rgba(0, 220, 255, 0.9), 0 0 40px rgba(0, 220, 255, 0.3);
+        transform: scale(1.06);
+    }
+}

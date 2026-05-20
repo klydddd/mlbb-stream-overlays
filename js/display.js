@@ -267,7 +267,7 @@ window.addEventListener('storage', (e) => {
 
   if (isHeroPick) {
     const index = parseInt(e.key.split('-')[1]) - 1;
-    const isFinalPhase = localStorage.getItem('phase-number') === '14';
+    const isFinalPhase = localStorage.getItem('phase-number') === '18';
 
     if (isFinalPhase) {
       updateHeroPickSilent(index, e.newValue);

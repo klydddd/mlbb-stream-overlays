@@ -170,7 +170,7 @@ export function updateHeroPick(index, heroName, silent = false) {
     return;
   }
 
-  const isBlueTeam = heroSlot >= 1 && heroSlot <= 5;
+  const isBlueTeam = [1, 4, 5, 8, 9].includes(heroSlot);
   const flashGlowClass = isBlueTeam ? "blue-select" : "red-select";
 
   if (!silent) {
@@ -255,7 +255,7 @@ export function updateHeroPickSilent(index, heroName) {
     return;
   }
 
-  const isBlueTeam = heroSlot >= 1 && heroSlot <= 5;
+  const isBlueTeam = [1, 4, 5, 8, 9].includes(heroSlot);
   const glowClasses = isBlueTeam
     ? ["glow-blue-1", "glow-blue-2", "glow-blue-3"]
     : ["glow-red-1", "glow-red-2", "glow-red-3"];
