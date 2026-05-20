@@ -63,6 +63,12 @@ function handleIncomingMessage(data) {
     case "clear-bans":
       clearBans();
       break;
+    case "clear-scores":
+      clearScores();
+      break;
+    case "clear-cam-links":
+      // Nothing to clear on display side for cam links
+      break;
     case "ai_prediction":
       // Handle AI hero prediction from the Python multi-scanner bot
       if (data.data && data.data.name) {
@@ -234,6 +240,13 @@ function clearBans() {
     const heroContainer = document.getElementById(`ban-${i}`);
     if (heroContainer) heroContainer.innerHTML = "";
   }
+}
+
+function clearScores() {
+  document.querySelectorAll(".blue-score .score, .red-score .score").forEach(el => {
+    el.className = "score";
+    el.innerHTML = "";
+  });
 }
 
 channel.onmessage = (event) => {

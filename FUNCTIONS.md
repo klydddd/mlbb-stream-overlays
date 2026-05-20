@@ -59,12 +59,12 @@ Below is an audit of every button and input element defined in [controller.html]
 | **Draft Control**   | `RESET DRAFT` Button | `#reset` | `js/control.js` | 🟢 **Working** | Clears inputs, local storage, and sends reset command via BroadcastChannel & WebSocket. |
 | **Draft Control**   | `SWITCH TEAMS` Button | `#switch` | `js/control.js` | 🟢 **Working** | Swaps all inputs, team names, logos, camera links, picks, and bans, writes them to localStorage, and syncs across BroadcastChannel and WebSocket. |
 | **Draft Control**   | `SHOW DISPLAY` Button | `#show-display-button` | `js/obsWebsocket/showDisplay.js` | 🟢 **Working** | Creates a browser source in OBS using WebSocket connection. |
-| **Team Control**    | `CLEAR NAMES` Button | `#clear-names` | `js/clear.js` | 🟡 **Partial** | Clears names locally and via `BroadcastChannel`. **Missing:** Doesn't send WebSocket command (won't clear on remote displays). |
-| **Team Control**    | `CLEAR PICKS` Button | `#clear-picks` | `js/clear.js` | 🟡 **Partial** | Clears picks locally and via `BroadcastChannel`. **Missing:** Doesn't send WebSocket command (won't clear on remote displays). |
-| **Team Control**    | `CLEAR BANS` Button | `#clear-bans` | `js/clear.js` | 🟡 **Partial** | Clears bans locally and via `BroadcastChannel`. **Missing:** Doesn't send WebSocket command (won't clear on remote displays). |
-| **Team Control**    | `CLEAR SCORES` Button | `#clear-scores` | *None* | 🔴 **Unimplemented** | Click does nothing. No event listener is bound in `js/clear.js`. |
-| **Team Control**    | `CLEAR LOGO` Button | `#clear-logos` | *None* | 🔴 **Unimplemented** | Click does nothing. No event listener is bound in `js/clear.js`. |
-| **Team Control**    | `CLEAR CAM LINK` Button| `#clear-cam-links` | `js/clear.js` | 🟡 **Partial** | Clears `#cam-1` to `10` locally. **Missing:** Doesn't clear team camera links, and doesn't sync changes. |
+| **Team Control**    | `CLEAR NAMES` Button | `#clear-names` | `js/clear.js` | 🟢 **Working** | Clears names locally, via `BroadcastChannel`, and via WebSocket for remote displays. |
+| **Team Control**    | `CLEAR PICKS` Button | `#clear-picks` | `js/clear.js` | 🟢 **Working** | Clears picks locally, via `BroadcastChannel`, and via WebSocket for remote displays. |
+| **Team Control**    | `CLEAR BANS` Button | `#clear-bans` | `js/clear.js` | 🟢 **Working** | Clears bans locally, via `BroadcastChannel`, and via WebSocket for remote displays. |
+| **Team Control**    | `CLEAR SCORES` Button | `#clear-scores` | `js/clear.js` | 🟢 **Working** | Clears scores from localStorage and syncs via `BroadcastChannel` and WebSocket. |
+| **Team Control**    | `CLEAR LOGO` Button | `#clear-logos` | `js/showLogo.js` | 🟢 **Working** | Clears logos from localStorage and syncs via `BroadcastChannel` and WebSocket. |
+| **Team Control**    | `CLEAR CAM LINK` Button| `#clear-cam-links` | `js/clear.js` | 🟢 **Working** | Clears individual cam links (`#cam-1` to `10`) and team cam links, syncs via `BroadcastChannel` and WebSocket. |
 | **Match Info**      | `GAME NUMBER` Input | `#gameNumberInput` | `js/control.js` (Query only)| 🔴 **Unimplemented** | Value is never listened to or transmitted. The display permanently displays "GAME 0". |
 | **Match Info**      | `MATCH NUMBER` Input | `#matchNumberInput`| `js/control.js` (Query only)| 🔴 **Unimplemented** | Value is never listened to or transmitted. The display permanently displays "MATCH 0". |
 | **Match Info**      | `Select Match` Dropdown| `#customMenu` | `js/control.js` | 🟡 **Buggy** | Saves round name to `localStorage`. **Bugs:** (1) Doesn't send WebSocket/BroadcastChannel updates. (2) Display does not initialize the round name from storage on load. |
