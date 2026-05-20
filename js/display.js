@@ -128,36 +128,26 @@ function handleIncomingMessage(data) {
     }
   }
 
-
-  if (data.blueTeamName !== undefined) {
-    const blueDiv = document.getElementById("blue-team-name");
-    if (blueDiv) blueDiv.textContent = data.blueTeamName || "Blue Team Name";
+  if (data.gameNumber !== undefined) {
+    const gn = document.getElementById("gameNumber");
+    if (gn) gn.textContent = data.gameNumber;
   }
 
-  if (data.redTeamName !== undefined) {
-    const redDiv = document.getElementById("red-team-name");
-    if (redDiv) redDiv.textContent = data.redTeamName || "Red Team Name";
+  if (data.matchNumber !== undefined) {
+    const mn = document.getElementById("matchNumber");
+    if (mn) mn.textContent = data.matchNumber;
   }
 
-  for (let i = 1; i <= 10; i++) {
-    if (data[`pick-${i}`] !== undefined) {
-      const heroDiv = document.getElementById(`hero-name-${i}`);
-      if (heroDiv) heroDiv.textContent = data[`pick-${i}`] || `Pick ${i}`;
-    }
-  }
-
-  for (let i = 1; i <= 10; i++) {
-    if (data[`input-name-${i}`] !== undefined) {
-      const nameDiv = document.getElementById(`name-${i}`);
-      if (nameDiv) nameDiv.textContent = data[`input-name-${i}`] || `Player ${i}`;
-    }
+  if (data.roundName !== undefined) {
+    const rn = document.getElementById("roundName");
+    if (rn) rn.textContent = data.roundName;
   }
 
   // Handle hero picks via WebSocket
-  if (data.heroPick !== undefined) {
-    const { index, name } = data.heroPick;
-    updateHeroPick(index - 1, name, false);
-  }
+if (data.heroPick !== undefined) {
+  const { index, name } = data.heroPick;
+  updateHeroPick(index - 1, name, false);
+}
 
   // Handle bans via WebSocket
   if (data.banPick !== undefined) {
@@ -201,9 +191,24 @@ function initializeNames() {
   }
 }
 
+function initializeMatchInfo() {
+  const gn = document.getElementById("gameNumber");
+  const mn = document.getElementById("matchNumber");
+  const rn = document.getElementById("roundName");
+
+  const savedGn = localStorage.getItem("game-number");
+  const savedMn = localStorage.getItem("match-number");
+  const savedRn = localStorage.getItem("round-name");
+
+  if (gn && savedGn) gn.textContent = savedGn;
+  if (mn && savedMn) mn.textContent = savedMn;
+  if (rn && savedRn) rn.textContent = savedRn;
+}
+
 window.addEventListener('DOMContentLoaded', initializeHeroNames);
 window.addEventListener('DOMContentLoaded', initializeSavedTeamNames);
 window.addEventListener('DOMContentLoaded', initializeNames);
+window.addEventListener('DOMContentLoaded', initializeMatchInfo);
 
 const channel = new BroadcastChannel("team_channel");
 onMessage(handleIncomingMessage);
@@ -278,5 +283,15 @@ window.addEventListener('storage', (e) => {
 
   if (isRoundName) {
     roundName.textContent = localStorage.getItem('round-name');
+  }
+
+  if (e.key === 'game-number') {
+    const gn = document.getElementById("gameNumber");
+    if (gn) gn.textContent = e.newValue;
+  }
+
+  if (e.key === 'match-number') {
+    const mn = document.getElementById("matchNumber");
+    if (mn) mn.textContent = e.newValue;
   }
 });

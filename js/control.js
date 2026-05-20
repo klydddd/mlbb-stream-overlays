@@ -17,9 +17,12 @@ toggle.addEventListener('click', () => {
 
 options.forEach(option => {
   option.addEventListener('click', () => {
-    toggle.textContent = option.textContent;
+    const selectedRound = option.textContent;
+    toggle.textContent = selectedRound;
     menu.classList.remove('active');
-    localStorage.setItem('round-name', option.textContent);
+    localStorage.setItem('round-name', selectedRound);
+    channel.postMessage({ roundName: selectedRound });
+    send({ roundName: selectedRound });
   });
 });
 
@@ -311,6 +314,23 @@ teamCamInputs.forEach((input, index) => {
   }
 });
 
+// Match Info Inputs
+if (gameNumberInput) {
+  gameNumberInput.addEventListener("input", () => {
+    localStorage.setItem("game-number", gameNumberInput.value);
+    channel.postMessage({ gameNumber: gameNumberInput.value });
+    send({ gameNumber: gameNumberInput.value });
+  });
+}
+
+if (matchNumberInput) {
+  matchNumberInput.addEventListener("input", () => {
+    localStorage.setItem("match-number", matchNumberInput.value);
+    channel.postMessage({ matchNumber: matchNumberInput.value });
+    send({ matchNumber: matchNumberInput.value });
+  });
+}
+
 // Load saved values on startup
 function initController() {
   const blueInput = document.getElementById("blueTeamName");
@@ -335,6 +355,13 @@ function initController() {
 
     const banInput = document.getElementById(`ban-${i}`);
     if (banInput) banInput.value = localStorage.getItem(`banPick-${i}`) || "";
+  }
+
+  if (gameNumberInput) gameNumberInput.value = localStorage.getItem("game-number") || "";
+  if (matchNumberInput) matchNumberInput.value = localStorage.getItem("match-number") || "";
+  if (toggle) {
+    const savedRound = localStorage.getItem("round-name");
+    if (savedRound) toggle.textContent = savedRound;
   }
 }
 
