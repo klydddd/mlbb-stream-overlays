@@ -22,6 +22,8 @@ import tensorflow as tf
 from collections import deque, Counter
 import pygetwindow as gw
 import os
+import random
+import string
 
 # Windows API for direct window capture (captures window content even when obscured)
 try:
@@ -39,7 +41,7 @@ try:
     
     DIRECT_CAPTURE_AVAILABLE = True
 except ImportError:
-    print("⚠️ pywin32 not installed. Using screen capture (windows on top will be captured too)")
+    print(" pywin32 not installed. Using screen capture (windows on top will be captured too)")
     print("   Install with: pip install pywin32")
     DIRECT_CAPTURE_AVAILABLE = False
 
@@ -49,26 +51,34 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 # ============================================================
 # GPU CONFIGURATION
 # ============================================================
-print("🔍 Checking for GPU availability...")
+print(" Checking for GPU availability...")
 gpus = tf.config.list_physical_devices('GPU')
 if gpus:
     try:
         for gpu in gpus:
             tf.config.experimental.set_memory_growth(gpu, True)
         logical_gpus = tf.config.list_logical_devices('GPU')
-        print(f"✅ GPU ENABLED: {len(gpus)} Physical GPU(s), {len(logical_gpus)} Logical GPU(s)")
+        print(f" GPU ENABLED: {len(gpus)} Physical GPU(s), {len(logical_gpus)} Logical GPU(s)")
         for i, gpu in enumerate(gpus):
             print(f"   GPU {i}: {gpu.name}")
     except RuntimeError as e:
-        print(f"⚠️ GPU configuration error: {e}")
+        print(f" GPU configuration error: {e}")
         print("   Falling back to CPU")
 else:
-    print("⚠️ No GPU found. Using CPU (this will be slower)")
+    print(" No GPU found. Using CPU (this will be slower)")
 
 # ============================================================
 # CONFIGURATION
 # ============================================================
-WS_URL = "ws://localhost:8080/ws"
+BASE_WS_URL = os.environ.get("WS_URL", "ws://localhost:8080/ws")
+print("\n" + "="*60)
+ROOM_CODE = input("Enter the Room Code from your controller URL (or press Enter for random): ").strip()
+if not ROOM_CODE:
+    ROOM_CODE = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
+    print(f"Generated random Room Code: {ROOM_CODE}")
+    print(f"IMPORTANT: Add ?room={ROOM_CODE} to your controller URL to connect!")
+print("="*60 + "\n")
+WS_URL = f"{BASE_WS_URL}/{ROOM_CODE}"
 
 # Calibration Configuration
 SCAN_WIDTH = 100
@@ -408,22 +418,22 @@ def run_calibration(window_title):
                 'h': box_h
             }
             
-            print(f"✅ {slot_name}: pos=({rel_x}, {rel_y}) size={box_w}x{box_h}")
+            print(f" {slot_name}: pos=({rel_x}, {rel_y}) size={box_w}x{box_h}")
             current_slot_index += 1
             click_point = None
         
         # Handle keys - support both uppercase and lowercase
         if key == ord('s') or key == ord('S'):  # Skip
-            print(f"⏭️ Skipped: {slot_name}")
+            print(f" Skipped: {slot_name}")
             current_slot_index += 1
         elif key == ord('r') or key == ord('R'):  # Restart
-            print("🔄 Restarting calibration...")
+            print(" Restarting calibration...")
             calibrated_regions.clear()
             current_slot_index = 0
             current_ban_size = (BAN_SCAN_WIDTH, BAN_SCAN_HEIGHT)
             current_pick_size = (SCAN_WIDTH, SCAN_HEIGHT)
         elif key == ord('q') or key == ord('Q'):  # Quit
-            print("\n❌ Calibration cancelled. Exiting app...")
+            print("\n Calibration cancelled. Exiting app...")
             cv2.destroyAllWindows()
             return None, None
     
@@ -438,13 +448,13 @@ def load_classes():
     try:
         with open(LABELS_PATH, 'r', encoding='utf-8') as f:
             classes = [line.strip() for line in f if line.strip()]
-        print(f"✅ Loaded {len(classes)} hero classes from labels.txt")
+        print(f" Loaded {len(classes)} hero classes from labels.txt")
         return classes
     except FileNotFoundError:
-        print(f"❌ labels.txt not found at: {LABELS_PATH}")
+        print(f" labels.txt not found at: {LABELS_PATH}")
         return []
     except Exception as e:
-        print(f"❌ Error loading labels: {e}")
+        print(f" Error loading labels: {e}")
         return []
 
 def load_model():
@@ -453,29 +463,29 @@ def load_model():
     try:
         model = tf.saved_model.load(MODEL_PATH)
         infer = model.signatures["serving_default"]
-        print("✅ Model Loaded Successfully!")
+        print(" Model Loaded Successfully!")
         return model, infer
     except Exception as e:
-        print(f"❌ Failed to load model: {e}")
+        print(f" Failed to load model: {e}")
         exit(1)
 
 def on_open(ws_conn):
-    print(f"✅ AI Bot Connected to {WS_URL}")
+    print(f" AI Bot Connected to {WS_URL}")
 
 def on_message(ws_conn, message):
     try:
         data = json.loads(message)
-        print(f"📨 Received: {data.get('type', 'unknown')}")
+        print(f" Received: {data.get('type', 'unknown')}")
     except json.JSONDecodeError:
         pass
 
 def on_error(ws_conn, error):
     if error:
-        print(f"❌ WebSocket Error: {error}")
+        print(f" WebSocket Error: {error}")
 
 def on_close(ws_conn, close_status_code, close_msg):
-    print(f"⚠️ Disconnected (Code: {close_status_code})")
-    print("🔄 Will attempt to reconnect...")
+    print(f" Disconnected (Code: {close_status_code})")
+    print(" Will attempt to reconnect...")
 
 def send_prediction(slot_name, hero_name):
     """Send a hero prediction for a specific slot to the WebSocket server."""
@@ -506,10 +516,10 @@ def send_prediction(slot_name, hero_name):
     
     try:
         ws.send(json.dumps(payload))
-        print(f"🚀 [{slot_name}] Sent: {hero_name}")
+        print(f" [{slot_name}] Sent: {hero_name}")
         last_sent_heroes[slot_name] = hero_name
     except Exception as e:
-        print(f"❌ Failed to send: {e}")
+        print(f" Failed to send: {e}")
 
 def get_window_by_hwnd(hwnd):
     """Get a window by its exact handle (HWND)."""
@@ -548,7 +558,7 @@ def get_window_position():
             return None
         return {'left': win.left, 'top': win.top}
     except Exception as e:
-        print(f"⚠️ Error getting window: {e}")
+        print(f" Error getting window: {e}")
         return None
 
 def get_region_monitor(window_pos, region_config):
@@ -589,7 +599,7 @@ def predict_hero(frame, infer, classes):
             return classes[predicted_idx], confidence
         return None, 0.0
     except Exception as e:
-        print(f"⚠️ Prediction error: {e}")
+        print(f" Prediction error: {e}")
         return None, 0.0
 
 def get_stable_prediction(slot_name):
@@ -691,7 +701,7 @@ def recalibrate_slot(slot_name, window_title):
         box_w = SCAN_REGIONS[slot_name]['w']
         box_h = SCAN_REGIONS[slot_name]['h']
     
-    print(f"\n📍 Recalibrating: {slot_name}")
+    print(f"\n Recalibrating: {slot_name}")
     print("   Click to set position | Scroll to resize | ESC to cancel")
     
     click_point = None
@@ -760,13 +770,13 @@ def recalibrate_slot(slot_name, window_title):
                 'h': box_h
             }
             
-            print(f"✅ {slot_name} updated: pos=({rel_x}, {rel_y}) size={box_w}x{box_h}")
+            print(f" {slot_name} updated: pos=({rel_x}, {rel_y}) size={box_w}x{box_h}")
             click_point = None
             cv2.destroyWindow("Recalibrate Region")
             return True
         
         if key == 27:  # ESC
-            print("❌ Cancelled")
+            print(" Cancelled")
             cv2.destroyWindow("Recalibrate Region")
             return False
     
@@ -777,15 +787,15 @@ def recognition_loop(infer, classes):
     global calibration_complete, paused, should_exit, edit_mode, edit_slot
     
     print("\n" + "=" * 60)
-    print("🎮 Starting AI Bot Recognition Loop")
+    print(" Starting AI Bot Recognition Loop")
     print("=" * 60)
-    print(f"📡 Scanning {len(SCAN_REGIONS)} regions simultaneously")
-    print("📺 Live preview window controls:")
+    print(f" Scanning {len(SCAN_REGIONS)} regions simultaneously")
+    print(" Live preview window controls:")
     print("   P - Pause/Resume recognition")
     print("   E - Edit mode (adjust regions)")
     print("   Q - Quit the entire app")
     print("=" * 60)
-    print("\n📝 Edit mode keys:")
+    print("\n Edit mode keys:")
     print("   1-6: Select ban-1 to ban-6")
     print("   F1-F10: Select pick-1 to pick-10")
     print("=" * 60)
@@ -804,7 +814,7 @@ def recognition_loop(infer, classes):
             # Fallback: check if window exists and wait
             window_pos = get_window_position()
             if not window_pos:
-                print(f"⏳ Waiting for '{TARGET_WINDOW_TITLE}' window...")
+                print(f" Waiting for '{TARGET_WINDOW_TITLE}' window...")
                 for history in prediction_histories.values():
                     history.clear()
                 cv2.destroyAllWindows()
@@ -827,7 +837,7 @@ def recognition_loop(infer, classes):
                             window_screenshot = np.array(sct.grab(monitor))
                             window_screenshot = cv2.cvtColor(window_screenshot, cv2.COLOR_BGRA2BGR)
                 except Exception as e:
-                    print(f"⚠️ Fallback capture failed: {e}")
+                    print(f" Fallback capture failed: {e}")
                     time.sleep(1)
                     continue
         
@@ -887,7 +897,7 @@ def recognition_loop(infer, classes):
                     confidences[slot_name] = 0.0
                     
             except Exception as e:
-                print(f"⚠️ Error scanning {slot_name}: {e}")
+                print(f" Error scanning {slot_name}: {e}")
                 frames[slot_name] = None
                 predictions[slot_name] = None
                 confidences[slot_name] = 0.0
@@ -903,21 +913,21 @@ def recognition_loop(infer, classes):
         # Always process Q, P, E regardless of edit mode
         if key == ord('q') or key == ord('Q'):
             cv2.destroyAllWindows()
-            print("\n👋 Shutting down...")
+            print("\n Shutting down...")
             should_exit = True
             return  # Exit the recognition loop
         elif key == ord('p') or key == ord('P'):
             paused = not paused
-            status = "⏸️ PAUSED" if paused else "▶️ RESUMED"
+            status = " PAUSED" if paused else " RESUMED"
             print(status)
         elif key == ord('e') or key == ord('E'):
             edit_mode = not edit_mode
             if edit_mode:
-                print("\n✏️ EDIT MODE ON")
+                print("\n EDIT MODE ON")
                 print("   Shift+1-0: Adjust ban-1 to ban-10")
                 print("   1-0: Adjust pick-1 to pick-10")
             else:
-                print("✏️ EDIT MODE OFF")
+                print(" EDIT MODE OFF")
         elif edit_mode:
             # Shift+1-6 for bans (produces ! @ # $ % ^)
             ban_keys = {'!': 1, '@': 2, '#': 3, '$': 4, '%': 5, '^': 6, '&': 7, '*': 8, '(': 9, ')': 10}
@@ -947,7 +957,7 @@ def main():
     global TARGET_WINDOW_TITLE, TARGET_WINDOW_HWND, SCAN_REGIONS, last_sent_heroes, prediction_histories
     
     print("=" * 60)
-    print("🤖 MLBB AI Bot with Integrated Calibration")
+    print(" MLBB AI Bot with Integrated Calibration")
     print("=" * 60)
     print()
     print("This tool will guide you through:")
@@ -960,48 +970,48 @@ def main():
     
     # Step 1: Select window (now returns both title and handle)
     TARGET_WINDOW_TITLE, TARGET_WINDOW_HWND = select_window()
-    print(f"\n✅ Selected window: {TARGET_WINDOW_TITLE}")
+    print(f"\n Selected window: {TARGET_WINDOW_TITLE}")
     
     # Step 2: Run calibration
-    print("\n🎯 Starting calibration...")
+    print("\n Starting calibration...")
     regions, win_info = run_calibration(TARGET_WINDOW_TITLE)
     
     # Check if user quit during calibration
     if regions is None or win_info is None:
-        print("👋 Exiting...")
+        print(" Exiting...")
         return
     
     if not regions:
-        print("❌ No regions calibrated. Exiting.")
+        print(" No regions calibrated. Exiting.")
         return
     
     if len(regions) < 16:
-        print(f"⚠️ Warning: Only {len(regions)} out of 16 regions calibrated.")
+        print(f" Warning: Only {len(regions)} out of 16 regions calibrated.")
         print("Some slots will not be scanned.")
     
     SCAN_REGIONS = regions
-    print(f"\n✅ Calibration complete! Configured {len(SCAN_REGIONS)} regions")
+    print(f"\n Calibration complete! Configured {len(SCAN_REGIONS)} regions")
     
     # Initialize tracking for each slot
     last_sent_heroes = {slot: None for slot in SCAN_REGIONS.keys()}
     prediction_histories = {slot: deque(maxlen=5) for slot in SCAN_REGIONS.keys()}
     
     # Step 3: Load AI model and classes
-    print("\n🤖 Loading AI model...")
+    print("\n Loading AI model...")
     classes = load_classes()
     if not classes:
-        print("❌ Failed to load hero classes. Exiting.")
+        print(" Failed to load hero classes. Exiting.")
         return
     
     model, infer = load_model()
     
     # Step 4: Start AI bot
-    print("\n🚀 Starting AI Bot...")
+    print("\n Starting AI Bot...")
     print("=" * 60)
-    print(f"📡 WebSocket: {WS_URL}")
-    print(f"🎯 Window: '{TARGET_WINDOW_TITLE}'")
-    print(f"📦 Classes: {len(classes)} heroes")
-    print(f"🔍 Scanners: {len(SCAN_REGIONS)} regions")
+    print(f" WebSocket: {WS_URL}")
+    print(f" Window: '{TARGET_WINDOW_TITLE}'")
+    print(f" Classes: {len(classes)} heroes")
+    print(f" Scanners: {len(SCAN_REGIONS)} regions")
     print("=" * 60)
     
     # Start recognition thread
@@ -1031,20 +1041,20 @@ def main():
             if should_exit:
                 break
                 
-            print("🔄 Reconnecting in 3 seconds...")
+            print(" Reconnecting in 3 seconds...")
             time.sleep(3)
         except KeyboardInterrupt:
-            print("\n👋 Shutting down...")
+            print("\n Shutting down...")
             break
         except Exception as e:
             if should_exit:
                 break
-            print(f"❌ Connection error: {e}")
+            print(f" Connection error: {e}")
             time.sleep(5)
     
     # Cleanup
     cv2.destroyAllWindows()
-    print("✅ App terminated.")
+    print(" App terminated.")
 
 if __name__ == "__main__":
     main()

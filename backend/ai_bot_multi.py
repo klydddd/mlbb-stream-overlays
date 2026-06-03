@@ -6,9 +6,11 @@ import cv2
 import numpy as np
 import mss
 import tensorflow as tf
-from collections import deque
+from collections import deque, Counter
 import pygetwindow as gw
 import os
+import random
+import string
 
 # Get the directory where this script is located
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -17,7 +19,7 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 # GPU CONFIGURATION
 # Configure TensorFlow to use GPU if available
 # ============================================================
-print("🔍 Checking for GPU availability...")
+print(" Checking for GPU availability...")
 gpus = tf.config.list_physical_devices('GPU')
 if gpus:
     try:
@@ -32,18 +34,26 @@ if gpus:
         # )
         
         logical_gpus = tf.config.list_logical_devices('GPU')
-        print(f"✅ GPU ENABLED: {len(gpus)} Physical GPU(s), {len(logical_gpus)} Logical GPU(s)")
+        print(f" GPU ENABLED: {len(gpus)} Physical GPU(s), {len(logical_gpus)} Logical GPU(s)")
         for i, gpu in enumerate(gpus):
             print(f"   GPU {i}: {gpu.name}")
     except RuntimeError as e:
-        print(f"⚠️ GPU configuration error: {e}")
+        print(f" GPU configuration error: {e}")
         print("   Falling back to CPU")
 else:
-    print("⚠️ No GPU found. Using CPU (this will be slower)")
+    print(" No GPU found. Using CPU (this will be slower)")
     print("   To enable GPU support, install CUDA and cuDNN, then install tensorflow-gpu")
 
 # --- CONFIGURATION ---
-WS_URL = "ws://localhost:8080/ws"
+BASE_WS_URL = os.environ.get("WS_URL", "ws://localhost:8080/ws")
+print("\n" + "="*60)
+ROOM_CODE = input("Enter the Room Code from your controller URL (or press Enter for random): ").strip()
+if not ROOM_CODE:
+    ROOM_CODE = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
+    print(f"Generated random Room Code: {ROOM_CODE}")
+    print(f"IMPORTANT: Add ?room={ROOM_CODE} to your controller URL to connect!")
+print("="*60 + "\n")
+WS_URL = f"{BASE_WS_URL}/{ROOM_CODE}"
 
 # Window title to track (partial match) - update this after running calibration.py
 TARGET_WINDOW_TITLE = "test.jpg"
@@ -106,13 +116,13 @@ def load_classes():
     try:
         with open(LABELS_PATH, 'r', encoding='utf-8') as f:
             classes = [line.strip() for line in f if line.strip()]
-        print(f"✅ Loaded {len(classes)} hero classes from labels.txt")
+        print(f" Loaded {len(classes)} hero classes from labels.txt")
         return classes
     except FileNotFoundError:
-        print(f"❌ labels.txt not found at: {LABELS_PATH}")
+        print(f" labels.txt not found at: {LABELS_PATH}")
         return []
     except Exception as e:
-        print(f"❌ Error loading labels: {e}")
+        print(f" Error loading labels: {e}")
         return []
 
 
@@ -123,32 +133,32 @@ print(f"Loading Model from: {MODEL_PATH}")
 try:
     model = tf.saved_model.load(MODEL_PATH)
     infer = model.signatures["serving_default"]
-    print("✅ Model Loaded Successfully!")
+    print(" Model Loaded Successfully!")
 except Exception as e:
-    print(f"❌ Failed to load model: {e}")
+    print(f" Failed to load model: {e}")
     exit(1)
 
 
 def on_open(ws_conn):
-    print(f"✅ AI Bot Connected to {WS_URL}")
+    print(f" AI Bot Connected to {WS_URL}")
 
 
 def on_message(ws_conn, message):
     try:
         data = json.loads(message)
-        print(f"📨 Received: {data.get('type', 'unknown')}")
+        print(f" Received: {data.get('type', 'unknown')}")
     except json.JSONDecodeError:
         pass
 
 
 def on_error(ws_conn, error):
     if error:
-        print(f"❌ WebSocket Error: {error}")
+        print(f" WebSocket Error: {error}")
 
 
 def on_close(ws_conn, close_status_code, close_msg):
-    print(f"⚠️ Disconnected (Code: {close_status_code})")
-    print("🔄 Will attempt to reconnect...")
+    print(f" Disconnected (Code: {close_status_code})")
+    print(" Will attempt to reconnect...")
 
 
 def send_prediction(slot_name, hero_name):
@@ -178,10 +188,10 @@ def send_prediction(slot_name, hero_name):
     
     try:
         ws.send(json.dumps(payload))
-        print(f"🚀 [{slot_name}] Sent: {hero_name}")
+        print(f" [{slot_name}] Sent: {hero_name}")
         last_sent_heroes[slot_name] = hero_name
     except Exception as e:
-        print(f"❌ Failed to send: {e}")
+        print(f" Failed to send: {e}")
 
 
 def get_window_position():
@@ -195,7 +205,7 @@ def get_window_position():
             return None
         return {'left': win.left, 'top': win.top}
     except Exception as e:
-        print(f"⚠️ Error getting window: {e}")
+        print(f" Error getting window: {e}")
         return None
 
 
@@ -239,7 +249,7 @@ def predict_hero(frame):
             return CLASSES[predicted_idx], confidence
         return None, confidence
     except Exception as e:
-        print(f"⚠️ Prediction error: {e}")
+        print(f" Prediction error: {e}")
         return None, 0.0
 
 
@@ -311,16 +321,16 @@ def create_multi_preview(frames_dict, predictions_dict):
 
 def recognition_loop():
     """Main loop for multi-region scanning."""
-    print("🎮 Starting multi-scanner recognition loop...")
-    print(f"📡 Scanning {len(SCAN_REGIONS)} regions simultaneously")
-    print("📺 Live preview window opening... (Press 'Q' to close)")
+    print(" Starting multi-scanner recognition loop...")
+    print(f" Scanning {len(SCAN_REGIONS)} regions simultaneously")
+    print(" Live preview window opening... (Press 'Q' to close)")
     
     with mss.mss() as sct:
         while True:
             window_pos = get_window_position()
             
             if not window_pos:
-                print(f"⏳ Waiting for '{TARGET_WINDOW_TITLE}' window...")
+                print(f" Waiting for '{TARGET_WINDOW_TITLE}' window...")
                 # Clear all histories when window is lost
                 for history in prediction_histories.values():
                     history.clear()
@@ -352,7 +362,7 @@ def recognition_loop():
                         predictions[slot_name] = None
                         
                 except Exception as e:
-                    print(f"⚠️ Error scanning {slot_name}: {e}")
+                    print(f" Error scanning {slot_name}: {e}")
                     frames[slot_name] = None
                     predictions[slot_name] = None
             
@@ -363,7 +373,7 @@ def recognition_loop():
             key = cv2.waitKey(1) & 0xFF
             if key == ord('q'):
                 cv2.destroyAllWindows()
-                print("📺 Preview closed")
+                print(" Preview closed")
             
             # Small delay
             time.sleep(0.2)
@@ -371,15 +381,15 @@ def recognition_loop():
 
 if __name__ == "__main__":
     print("=" * 60)
-    print("🤖 MLBB AI Hero Recognition Bot - MULTI-SCANNER MODE")
+    print(" MLBB AI Hero Recognition Bot - MULTI-SCANNER MODE")
     print("=" * 60)
-    print(f"📡 WebSocket: {WS_URL}")
-    print(f"🎯 Window: '{TARGET_WINDOW_TITLE}'")
-    print(f"📦 Classes: {len(CLASSES)} heroes")
-    print(f"🔍 Scanners: {len(SCAN_REGIONS)} regions")
+    print(f" WebSocket: {WS_URL}")
+    print(f" Window: '{TARGET_WINDOW_TITLE}'")
+    print(f" Classes: {len(CLASSES)} heroes")
+    print(f" Scanners: {len(SCAN_REGIONS)} regions")
     print("=" * 60)
     print()
-    print("⚠️  IMPORTANT: Update SCAN_REGIONS coordinates for your setup!")
+    print("  IMPORTANT: Update SCAN_REGIONS coordinates for your setup!")
     print("    Run calibration.py to find the correct coordinates.")
     print()
     
@@ -400,11 +410,11 @@ if __name__ == "__main__":
                 on_close=on_close
             )
             ws.run_forever(ping_interval=30, ping_timeout=10)
-            print("🔄 Reconnecting in 3 seconds...")
+            print(" Reconnecting in 3 seconds...")
             time.sleep(3)
         except KeyboardInterrupt:
-            print("\n👋 Shutting down...")
+            print("\n Shutting down...")
             break
         except Exception as e:
-            print(f"❌ Connection error: {e}")
+            print(f" Connection error: {e}")
             time.sleep(5)

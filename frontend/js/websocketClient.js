@@ -1,20 +1,45 @@
 // websocketClient.js
+
+function generateRoomCode(length = 8) {
+    const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+    for (let i = 0; i < length; i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
+}
+
+function getRoomCode() {
+    const urlParams = new URLSearchParams(window.location.search);
+    let room = urlParams.get('room');
+    
+    if (!room) {
+        room = generateRoomCode();
+        // Update the URL without reloading the page
+        const newUrl = new URL(window.location);
+        newUrl.searchParams.set('room', room);
+        window.history.replaceState({}, '', newUrl);
+        console.log("Created new private room:", room);
+    }
+    return room;
+}
+
 const getWebSocketUrl = () => {
     const hostname = window.location.hostname;
     const protocol = window.location.protocol;
+    const roomCode = getRoomCode();
 
-    // Don't attempt WebSocket on production (Vercel) - no WS server there
-    if (hostname.includes('vercel.app') || hostname.includes('.vercel.app')) {
-        return null;  // Signal that WebSocket is not available
-    }
-
-    // When on localhost, use ws://
+    // If testing locally (frontend via Live Server, Backend on 8080)
+    // or if the backend itself is accessed at localhost:8080
     if (hostname === 'localhost' || hostname === '127.0.0.1') {
-        return 'ws://localhost:8080/ws';
+        return `ws://localhost:8080/ws/${roomCode}`;
     }
 
-    // For other local network IPs, use ws://
-    return `ws://${hostname}:8080/ws`;
+    // For hosted environments (All-in-One Approach)
+    const wsProtocol = protocol === 'https:' ? 'wss:' : 'ws:';
+    
+    // Connect to the same host that served the page
+    return `${wsProtocol}//${window.location.host}/ws/${roomCode}`;
 };
 
 const WS_URL = getWebSocketUrl();
@@ -24,12 +49,6 @@ let messageHandlers = [];
 let isConnected = false;
 
 function connect() {
-    // Skip WebSocket if URL is null (e.g., on Vercel)
-    if (!WS_URL) {
-        console.log("WebSocket disabled for this environment (using localStorage only)");
-        return;
-    }
-
     try {
         console.log("Connecting to", WS_URL);
         socket = new WebSocket(WS_URL);
@@ -63,9 +82,7 @@ function connect() {
 }
 
 function send(message) {
-    // Silently skip if WebSocket is not available
-    if (!WS_URL || !socket || socket.readyState !== WebSocket.OPEN) {
-        // WebSocket not available, but that's okay - localStorage will handle it
+    if (!socket || socket.readyState !== WebSocket.OPEN) {
         return false;
     }
     socket.send(JSON.stringify(message));
@@ -80,7 +97,7 @@ function getConnectionStatus() {
     return isConnected;
 }
 
-// auto-connect (will skip if WS_URL is null)
+// auto-connect
 connect();
 
 export {

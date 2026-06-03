@@ -88,7 +88,7 @@ function handleIncomingMessage(data) {
           const displayIndex = banIndexMap[slotIndex];
           if (displayIndex !== undefined) {
             updateBanPick(displayIndex, heroName);
-            console.log(`🤖 AI Ban: ${heroName} → ${slotName} (display index ${displayIndex})`);
+            console.log(` AI Ban: ${heroName} → ${slotName} (display index ${displayIndex})`);
           }
         } else if (slotType === 'pick') {
           // Picks: pick-1 to pick-10 map directly to indices 0-9
@@ -97,7 +97,7 @@ function handleIncomingMessage(data) {
           const displayIndex = slotIndex - 1; // Convert 1-based to 0-based
           if (displayIndex >= 0 && displayIndex <= 9) {
             updateHeroPick(displayIndex, heroName, false);
-            console.log(`🤖 AI Pick: ${heroName} → ${slotName} (display index ${displayIndex})`);
+            console.log(` AI Pick: ${heroName} → ${slotName} (display index ${displayIndex})`);
           }
         }
       }

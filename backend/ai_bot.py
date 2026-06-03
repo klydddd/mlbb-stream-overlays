@@ -9,6 +9,8 @@ import tensorflow as tf
 from collections import deque
 import pygetwindow as gw
 import os
+import random
+import string
 
 # Get the directory where this script is located
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -17,7 +19,7 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 # GPU CONFIGURATION
 # Configure TensorFlow to use GPU if available
 # ============================================================
-print("🔍 Checking for GPU availability...")
+print(" Checking for GPU availability...")
 gpus = tf.config.list_physical_devices('GPU')
 if gpus:
     try:
@@ -32,18 +34,26 @@ if gpus:
         # )
         
         logical_gpus = tf.config.list_logical_devices('GPU')
-        print(f"✅ GPU ENABLED: {len(gpus)} Physical GPU(s), {len(logical_gpus)} Logical GPU(s)")
+        print(f" GPU ENABLED: {len(gpus)} Physical GPU(s), {len(logical_gpus)} Logical GPU(s)")
         for i, gpu in enumerate(gpus):
             print(f"   GPU {i}: {gpu.name}")
     except RuntimeError as e:
-        print(f"⚠️ GPU configuration error: {e}")
+        print(f" GPU configuration error: {e}")
         print("   Falling back to CPU")
 else:
-    print("⚠️ No GPU found. Using CPU (this will be slower)")
+    print(" No GPU found. Using CPU (this will be slower)")
     print("   To enable GPU support, install CUDA and cuDNN, then install tensorflow-gpu")
 
 # --- CONFIGURATION ---
-WS_URL = "ws://localhost:8080/ws"
+BASE_WS_URL = os.environ.get("WS_URL", "ws://localhost:8080/ws")
+print("\n" + "="*60)
+ROOM_CODE = input("Enter the Room Code from your controller URL (or press Enter for random): ").strip()
+if not ROOM_CODE:
+    ROOM_CODE = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
+    print(f"Generated random Room Code: {ROOM_CODE}")
+    print(f"IMPORTANT: Add ?room={ROOM_CODE} to your controller URL to connect!")
+print("="*60 + "\n")
+WS_URL = f"{BASE_WS_URL}/{ROOM_CODE}"
 
 # Window title to track (partial match) - update this after running calibration.py
 TARGET_WINDOW_TITLE = "akai.png"
@@ -62,13 +72,13 @@ def load_classes():
     try:
         with open(LABELS_PATH, 'r', encoding='utf-8') as f:
             classes = [line.strip() for line in f if line.strip()]
-        print(f"✅ Loaded {len(classes)} hero classes from labels.txt")
+        print(f" Loaded {len(classes)} hero classes from labels.txt")
         return classes
     except FileNotFoundError:
-        print(f"❌ labels.txt not found at: {LABELS_PATH}")
+        print(f" labels.txt not found at: {LABELS_PATH}")
         return []
     except Exception as e:
-        print(f"❌ Error loading labels: {e}")
+        print(f" Error loading labels: {e}")
         return []
 
 CLASSES = load_classes()
@@ -87,36 +97,36 @@ try:
     model = tf.saved_model.load(MODEL_PATH)
     # Get the inference function
     infer = model.signatures["serving_default"]
-    print("✅ Model Loaded Successfully!")
+    print(" Model Loaded Successfully!")
 except Exception as e:
-    print(f"❌ Failed to load model: {e}")
+    print(f" Failed to load model: {e}")
     print("Make sure the model exists at: python/mlbb_hero_model_pro/")
     exit(1)
 
 
 def on_open(ws_conn):
-    print(f"✅ AI Bot Connected to {WS_URL}")
+    print(f" AI Bot Connected to {WS_URL}")
 
 
 def on_message(ws_conn, message):
     """Handle incoming messages from the server."""
     try:
         data = json.loads(message)
-        print(f"📨 Received: {data.get('type', 'unknown')}")
+        print(f" Received: {data.get('type', 'unknown')}")
     except json.JSONDecodeError:
         pass  # Ignore non-JSON messages
 
 
 def on_error(ws_conn, error):
     if error:
-        print(f"❌ WebSocket Error: {error}")
+        print(f" WebSocket Error: {error}")
     else:
-        print("❌ WebSocket connection lost")
+        print(" WebSocket connection lost")
 
 
 def on_close(ws_conn, close_status_code, close_msg):
-    print(f"⚠️ Disconnected (Code: {close_status_code}, Msg: {close_msg})")
-    print("🔄 Will attempt to reconnect...")
+    print(f" Disconnected (Code: {close_status_code}, Msg: {close_msg})")
+    print(" Will attempt to reconnect...")
 
 
 def send_prediction(hero_name):
@@ -128,7 +138,7 @@ def send_prediction(hero_name):
         return
 
     if ws is None:
-        print("⚠️ WebSocket not connected, cannot send prediction")
+        print(" WebSocket not connected, cannot send prediction")
         return
 
     payload = {
@@ -139,10 +149,10 @@ def send_prediction(hero_name):
     }
     try:
         ws.send(json.dumps(payload))
-        print(f"🚀 Sent Prediction: {hero_name}")
+        print(f" Sent Prediction: {hero_name}")
         last_sent_hero = hero_name
     except Exception as e:
-        print(f"❌ Failed to send prediction: {e}")
+        print(f" Failed to send prediction: {e}")
 
 
 def get_dynamic_monitor():
@@ -164,7 +174,7 @@ def get_dynamic_monitor():
             "height": CROP_CONFIG['h']
         }
     except Exception as e:
-        print(f"⚠️ Error getting window: {e}")
+        print(f" Error getting window: {e}")
         return None
 
 
@@ -222,7 +232,7 @@ def predict_hero(frame):
             return None, confidence
 
     except Exception as e:
-        print(f"⚠️ Prediction error: {e}")
+        print(f" Prediction error: {e}")
         return None, 0.0
 
 
@@ -321,8 +331,8 @@ def recognition_loop():
     """Main loop for capturing screen and running predictions."""
     global prediction_history
 
-    print("🎮 Starting recognition loop...")
-    print("📺 Live preview window opening... (Press 'Q' in the preview window to close it)")
+    print(" Starting recognition loop...")
+    print(" Live preview window opening... (Press 'Q' in the preview window to close it)")
 
     with mss.mss() as sct:
         while True:
@@ -352,11 +362,11 @@ def recognition_loop():
                             send_prediction(stable_hero)
 
                         # Debug output - show what's being detected
-                        print(f"🔍 Detected: {hero_name} ({confidence:.2%}) | Stable: {stable_hero or 'waiting...'}")
+                        print(f" Detected: {hero_name} ({confidence:.2%}) | Stable: {stable_hero or 'waiting...'}")
                     else:
                         # Low confidence or no detection
                         if confidence > 0:
-                            print(f"Detected: None ❓ Low confidence: {confidence:.2%} (threshold: {CONFIDENCE_THRESHOLD:.0%}) ")
+                            print(f"Detected: None  Low confidence: {confidence:.2%} (threshold: {CONFIDENCE_THRESHOLD:.0%}) ")
 
                     # 4. Show live preview window
                     preview = draw_preview(frame, hero_name, confidence, stable_hero)
@@ -366,13 +376,13 @@ def recognition_loop():
                     key = cv2.waitKey(1) & 0xFF
                     if key == ord('q'):
                         cv2.destroyAllWindows()
-                        print("📺 Preview window closed")
+                        print(" Preview window closed")
 
                 except Exception as e:
-                    print(f"⚠️ Capture/Processing error: {e}")
+                    print(f" Capture/Processing error: {e}")
 
             else:
-                print(f"⏳ Waiting for '{TARGET_WINDOW_TITLE}' window...")
+                print(f" Waiting for '{TARGET_WINDOW_TITLE}' window...")
                 prediction_history.clear()  # Clear history when window is lost
                 cv2.destroyAllWindows()  # Close preview when window is lost
                 time.sleep(2)  # Don't spam CPU if window is closed
@@ -384,13 +394,13 @@ def recognition_loop():
 
 if __name__ == "__main__":
     print("=" * 50)
-    print("🤖 MLBB AI Hero Recognition Bot")
+    print(" MLBB AI Hero Recognition Bot")
     print("=" * 50)
-    print(f"📡 Connecting to: {WS_URL}")
-    print(f"🎯 Tracking window: '{TARGET_WINDOW_TITLE}'")
-    print(f"📦 Loaded {len(CLASSES)} hero classes")
+    print(f" Connecting to: {WS_URL}")
+    print(f" Tracking window: '{TARGET_WINDOW_TITLE}'")
+    print(f" Loaded {len(CLASSES)} hero classes")
     print("=" * 50)
-    print("\n💡 TIP: Run calibration.py first to configure TARGET_WINDOW_TITLE and CROP_CONFIG\n")
+    print("\n TIP: Run calibration.py first to configure TARGET_WINDOW_TITLE and CROP_CONFIG\n")
 
     # Start the recognition in a background thread
     t = threading.Thread(target=recognition_loop, daemon=True)
@@ -413,13 +423,13 @@ if __name__ == "__main__":
             ws.run_forever(ping_interval=30, ping_timeout=10)
             
             # If we get here, connection was lost - wait and retry
-            print("🔄 Reconnecting in 3 seconds...")
+            print(" Reconnecting in 3 seconds...")
             time.sleep(3)
             
         except KeyboardInterrupt:
-            print("\n👋 Shutting down...")
+            print("\n Shutting down...")
             break
         except Exception as e:
-            print(f"❌ Connection error: {e}")
-            print("🔄 Retrying in 5 seconds...")
+            print(f" Connection error: {e}")
+            print(" Retrying in 5 seconds...")
             time.sleep(5)

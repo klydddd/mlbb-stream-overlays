@@ -208,16 +208,16 @@ def run_calibration(window_title):
                 'h': SCAN_HEIGHT
             }
             
-            print(f"✅ {slot_name}: ({rel_x}, {rel_y})")
+            print(f" {slot_name}: ({rel_x}, {rel_y})")
             current_slot_index += 1
             click_point = None
         
         # Handle keys
         if key == ord('s'):  # Skip
-            print(f"⏭️ Skipped: {slot_name}")
+            print(f" Skipped: {slot_name}")
             current_slot_index += 1
         elif key == ord('r'):  # Restart
-            print("🔄 Restarting calibration...")
+            print(" Restarting calibration...")
             calibrated_regions.clear()
             current_slot_index = 0
         elif key == ord('q'):  # Quit
@@ -252,7 +252,7 @@ def generate_config(regions, window_info):
 
 def main():
     print("=" * 60)
-    print("🎮 MLBB Multi-Scanner Calibration Tool")
+    print(" MLBB Multi-Scanner Calibration Tool")
     print("=" * 60)
     print()
     print("This tool helps you define the 16 scan regions")
@@ -261,7 +261,7 @@ def main():
     
     # Select window
     window_title = select_window()
-    print(f"\n✅ Selected window: {window_title}")
+    print(f"\n Selected window: {window_title}")
     
     # Run calibration
     regions, window_info = run_calibration(window_title)
@@ -273,9 +273,9 @@ def main():
         # Save to file
         with open("calibration_multi_config.txt", "w") as f:
             f.write(config)
-        print("💾 Config also saved to: calibration_multi_config.txt")
+        print(" Config also saved to: calibration_multi_config.txt")
     else:
-        print("❌ Calibration incomplete or cancelled.")
+        print(" Calibration incomplete or cancelled.")
 
 if __name__ == "__main__":
     main()

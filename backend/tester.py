@@ -10,14 +10,14 @@ IMG_SIZE = (224, 224)
 
 def load_labels():
     if not os.path.exists(LABELS_PATH):
-        print(f"❌ Error: {LABELS_PATH} not found.")
+        print(f" Error: {LABELS_PATH} not found.")
         return []
     with open(LABELS_PATH, "r") as f:
         return [line.strip() for line in f.readlines()]
 
 
 def predict_loop(model, class_names, mode="keras"):
-    print(f"\n✅ Model loaded in [{mode.upper()}] mode.")
+    print(f"\n Model loaded in [{mode.upper()}] mode.")
     print("Ready to test!")
 
     while True:
@@ -29,7 +29,7 @@ def predict_loop(model, class_names, mode="keras"):
             break
 
         if not os.path.exists(img_path):
-            print("❌ Error: File not found.")
+            print(" Error: File not found.")
             continue
 
         try:
@@ -67,13 +67,13 @@ def predict_loop(model, class_names, mode="keras"):
             confidence = 100 * np.max(score_array)
 
             if confidence < 75:
-                print(f"⚠️ RESULT: {predicted_class_name} (Low Confidence: {confidence:.2f}%)")
+                print(f" RESULT: {predicted_class_name} (Low Confidence: {confidence:.2f}%)")
             else:
-                print(f"✅ RESULT: {predicted_class_name}")
-                print(f"📊 Confidence: {confidence:.2f}%")
+                print(f" RESULT: {predicted_class_name}")
+                print(f" Confidence: {confidence:.2f}%")
 
         except Exception as e:
-            print(f"❌ Error processing image: {e}")
+            print(f" Error processing image: {e}")
             print("Debug hint: If using SavedModel, check input tensor shapes.")
 
 
@@ -91,8 +91,8 @@ if __name__ == "__main__":
         predict_loop(model, class_names, mode="keras")
 
     except Exception as e_keras:
-        print(f"⚠️ Keras load failed: {e_keras}")
-        print("🔄 Attempting to load as Low-Level SavedModel...")
+        print(f" Keras load failed: {e_keras}")
+        print(" Attempting to load as Low-Level SavedModel...")
 
         try:
             # 2. Try Low-Level Loading (The Robust Way)
@@ -100,5 +100,5 @@ if __name__ == "__main__":
             predict_loop(model, class_names, mode="saved_model")
 
         except Exception as e_saved:
-            print("\n❌ CRITICAL FAILURE: Could not load model in any format.")
+            print("\n CRITICAL FAILURE: Could not load model in any format.")
             print(f"Error: {e_saved}")

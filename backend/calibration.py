@@ -53,15 +53,15 @@ def main():
     target_title = input("\nEnter a part of your emulator window title (e.g. 'MuMu'): ").strip()
     
     if not target_title:
-        print("❌ No window title entered!")
+        print(" No window title entered!")
         return
     
     win = get_window_region(target_title)
     if not win:
-        print("❌ Window not found! Make sure it is open.")
+        print(" Window not found! Make sure it is open.")
         return
 
-    print(f"✅ Locked onto: {win.title}")
+    print(f" Locked onto: {win.title}")
     print(f"   Window Position: ({win.left}, {win.top})")
     print(f"   Window Size: {win.width} x {win.height}")
     
@@ -93,12 +93,12 @@ def main():
             current_win = get_window_region(target_title)
             
             if current_win is None:
-                print("⚠️ Window lost! Waiting for it to reappear...")
+                print(" Window lost! Waiting for it to reappear...")
                 cv2.waitKey(500)
                 continue
             
             if current_win.isMinimized:
-                print("⚠️ Window is minimized. Please restore it.")
+                print(" Window is minimized. Please restore it.")
                 cv2.waitKey(500)
                 continue
             
@@ -144,7 +144,7 @@ def main():
                 cv2.imshow("AI Vision Calibration - Press Q to Save, ESC to Cancel", img)
                 
             except Exception as e:
-                print(f"⚠️ Capture error: {e}")
+                print(f" Capture error: {e}")
                 print(f"   Monitor config: {monitor}")
                 cv2.waitKey(500)
                 continue
@@ -189,17 +189,17 @@ def main():
             # Save and quit
             elif key == ord('q'):
                 print("\n" + "=" * 50)
-                print("💾 COPY THIS CONFIGURATION TO AI_BOT.PY")
+                print(" COPY THIS CONFIGURATION TO AI_BOT.PY")
                 print("=" * 50)
                 print(f'TARGET_WINDOW_TITLE = "{target_title}"')
                 print(f"CROP_CONFIG = {{'rel_x': {rel_x}, 'rel_y': {rel_y}, 'w': {w}, 'h': {h}}}")
                 print("=" * 50)
-                print("\n✅ Calibration saved!")
+                print("\n Calibration saved!")
                 break
             
             # Cancel
             elif key == 27:  # ESC key
-                print("\n❌ Calibration cancelled.")
+                print("\n Calibration cancelled.")
                 break
 
     cv2.destroyAllWindows()
