@@ -28,7 +28,7 @@ cd mlbb-stream-overlays
 ### 2. Set Up Python Environment
 
 ```bash
-cd python
+cd backend
 python -m venv .venv
 .venv\Scripts\activate      # Windows
 # source .venv/bin/activate  # Linux/Mac
@@ -48,7 +48,7 @@ python gpu_check.py
 ### Step 1: Start the WebSocket Server
 
 ```bash
-cd python/server
+cd backend/server
 uvicorn server:app --port 8080 --host 0.0.0.0
 ```
 
@@ -59,7 +59,7 @@ Keep this terminal open.
 Open a new terminal:
 
 ```bash
-cd python
+cd backend
 .venv\Scripts\activate
 python ai_bot_multi_auto.py
 ```
@@ -102,13 +102,20 @@ The script will:
 ## File Structure
 
 ```
-python/
+backend/
   ai_bot_multi_auto.py    # Combined calibration + AI bot (recommended)
   ai_bot_multi.py         # AI bot only (requires manual config)
   calibration_multi.py    # Calibration tool only
   server/server.py        # WebSocket server
   mlbb_hero_model_pro/    # TensorFlow model for hero recognition
   requirements.txt        # Python dependencies
+frontend/
+  Assets/                 # Media assets (voicelines, images)
+  css/                    # Stylesheets
+  js/                     # JavaScript logic
+  controller.html         # Controller interface
+  display.html            # Main draft display
+  gameDisplay.html        # Game overlay display
 ```
 
 ## Tech Stack
