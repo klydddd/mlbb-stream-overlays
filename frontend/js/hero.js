@@ -56,6 +56,7 @@ export const heroes = [
   { name: 'Hayabusa', img: 'Assets/HeroPick/hayabusa.png', voice: 'Assets/Voicelines/hayabusa.ogg' },
   { name: 'Helcurt', img: 'Assets/HeroPick/helcurt.png', voice: 'Assets/Voicelines/helcurt.ogg' },
   { name: 'Hilda', img: 'Assets/HeroPick/hilda.png', voice: 'Assets/Voicelines/hilda.ogg' },
+  { name: 'Hirara', img: 'Assets/HeroPick/hirara.png', voice: 'Assets/Voicelines/hirara.ogg' },
   { name: 'Hylos', img: 'Assets/HeroPick/hylos.png', voice: 'Assets/Voicelines/hylos.ogg' },
   { name: 'Irithel', img: 'Assets/HeroPick/irithel.png', voice: 'Assets/Voicelines/irithel.ogg' },
   { name: 'Ixia', img: 'Assets/HeroPick/ixia.png', voice: 'Assets/Voicelines/ixia.ogg' },
