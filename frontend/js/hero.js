@@ -84,6 +84,7 @@ export const heroes = [
   { name: 'Lunox', img: 'Assets/HeroPick/lunox.png', voice: 'Assets/Voicelines/lunox.ogg' },
   { name: 'Luo Yi', img: 'Assets/HeroPick/luo_yi.png', voice: 'Assets/Voicelines/luoyi.ogg' },
   { name: 'Lylia', img: 'Assets/HeroPick/lylia.png', voice: 'Assets/Voicelines/lylia.ogg' },
+  { name: 'Marcel', img: 'Assets/HeroPick/marcel.png', voice: 'Assets/Voicelines/marcel.ogg' },
   { name: 'Martis', img: 'Assets/HeroPick/martis.png', voice: 'Assets/Voicelines/martis.ogg' },
   { name: 'Masha', img: 'Assets/HeroPick/masha.png', voice: 'Assets/Voicelines/masha.ogg' },
   { name: 'Mathilda', img: 'Assets/HeroPick/mathilda.png', voice: 'Assets/Voicelines/mathilda.ogg' },
