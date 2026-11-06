@@ -796,3 +796,141 @@ p {
     width: 40px;
     height: 50%;
 }
+/* ---------- sponsor slideshow under DRAFTING (js/sponsorSlideshow.js) ---------- */
+.center-sponsors {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.center-sponsors[hidden] {
+    display: none;
+}
+
+.center-sponsors .sponsor-slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding-bottom: 10px;
+    box-sizing: border-box;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+}
+
+.center-sponsors .sponsor-slide.active {
+    opacity: 1;
+}
+
+.center-sponsors .sponsor-label {
+    color: rgb(0, 16, 31);
+    font-size: 0.75rem;
+    font-weight: 900;
+    letter-spacing: 0.14em;
+    line-height: 1;
+}
+
+.center-sponsors .sponsor-label:empty {
+    display: none;
+}
+
+.center-sponsors .sponsor-slide img {
+    max-width: 85%;
+    height: 72px;
+    object-fit: contain;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .center-sponsors .sponsor-slide {
+        transition: none;
+    }
+}
+
+/* ---------- center column layout ----------
+   GAME / MATCH / ROUND sits in the ban row's center box; the pick column below
+   starts with the timer, and the sponsor slideshow takes the rest. */
+.ban-section > .gap {
+    justify-content: center;
+}
+
+.ban-section .match-info {
+    margin-top: 0;
+    line-height: 1.25;
+}
+
+.pick-section:not(.pick-section-background) > .gap {
+    justify-content: flex-start;
+}
+
+.pick-section:not(.pick-section-background) > .gap .timer-container {
+    flex: none;
+    height: 70px; /* just fits the 56px digits and arrows */
+    margin-top: 0;
+}
+
+.pick-section:not(.pick-section-background) > .gap .phaseDiv {
+    flex: none;
+    height: 22px !important; /* overrides the inline 60px */
+}
+
+.pick-section:not(.pick-section-background) > .gap .container {
+    flex: 1;
+    min-height: 0;
+    height: auto;
+}
+
+/* bigger sponsor slideshow in the freed-up space, set apart from DRAFTING by a short rule */
+.center-sponsors {
+    margin: 10px 0 0;
+    width: 100%;
+    height: calc(100% - 10px); /* margin included, so it doesn't spill past the column */
+    box-sizing: border-box;
+}
+
+/* short divider line between DRAFTING and the sponsors */
+.center-sponsors::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 15%;
+    right: 15%;
+    border-top: 2px solid rgba(0, 16, 31, 0.12);
+}
+
+.center-sponsors .sponsor-slide {
+    gap: 10px;
+    padding: 16px 24px 18px; /* breathing room from the divider, column edges and score bars */
+}
+
+.center-sponsors .sponsor-label {
+    font-size: 1rem;
+}
+
+/* logos fill all the space left inside the padding, under the label:
+   1 logo uses the whole row, 2 logos split it side by side */
+.center-sponsors .sponsor-logos {
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+}
+
+.center-sponsors .sponsor-logos img {
+    flex: 1 1 0;
+    min-width: 0;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+/* keep the timer digits' line box inside the shorter 70px timer row */
+.pick-section:not(.pick-section-background) > .gap .timer {
+    line-height: 1;
+}

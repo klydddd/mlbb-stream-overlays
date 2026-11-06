@@ -274,6 +274,7 @@ function playOutro(done) {
     // [selector, translate to, start ms, duration ms]
     [".ban-section .ban-container", "0 -110%", 0, 400],
     [".ban-section .team-name", "0 -110%", 150, 400],
+    [".ban-section .match-info", "0 -110%", 150, 400],
     // hero picks and the role icons behind them move in lockstep (same DOM order)
     [".pick-section:not(.pick-section-background) .player-pick", "0 110%", 200, 450],
     [".pick-section-background .media-container", "0 110%", 200, 450],

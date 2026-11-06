@@ -948,3 +948,106 @@ body.ui-ingame .second-container {
     color: #fbbf24;
     letter-spacing: 0.06em;
 }
+
+/* ---------- caster cams panel (js/casterCams.js) ---------- */
+.second-container .panel-casters {
+    flex-basis: 520px;
+}
+
+.second-container .panel-casters .panel-body {
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.caster-layout-row,
+.caster-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.second-container .panel-casters .toggle-btn {
+    height: 30px;
+    width: 110px;
+    background: #3a3f44;
+    border: 1px solid #50575e;
+    box-shadow: none;
+}
+
+.second-container .panel-casters .toggle-btn[aria-pressed="true"] {
+    background: #16a34a;
+    border-color: #4ade80;
+    box-shadow: 0 0 0 2px #4ade80;
+    font-weight: 700;
+}
+
+.caster-hint {
+    color: #9aa4ae;
+    letter-spacing: 0.06em;
+}
+
+.caster-tag {
+    width: 64px;
+    flex: none;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+}
+
+.caster-row input {
+    height: 30px;
+    padding: 0 8px;
+    box-sizing: border-box;
+}
+
+.caster-row input[type="text"] {
+    width: 150px;
+    flex: none;
+}
+
+.caster-row input.caster-link {
+    flex: 1;
+    min-width: 0;
+    text-align: left;
+    text-transform: none;
+}
+
+.caster-row input.invalid {
+    border-color: #ef4444;
+    box-shadow: 0 0 0 1px #ef4444;
+}
+
+/* ---------- PASTE buttons (js/pasteButtons.js) ---------- */
+button.paste-btn {
+    flex: none;
+    height: 30px;
+    min-width: 0;
+    width: auto;
+    padding: 0 10px;
+    background: #3a3f44;
+    border: 1px solid #50575e;
+    box-shadow: none;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+}
+
+.ingame-container button.paste-btn {
+    height: 34px;
+    min-width: 0;
+}
+
+button.paste-btn.paste-blocked {
+    background: #92400e;
+    border-color: #fbbf24;
+}
+
+/* sponsor panel: draft display version toggle */
+.ingame-container .sponsor-row .toggle-btn {
+    width: auto;
+    padding: 0 14px;
+}
+
+.sponsor-row.muted {
+    opacity: 0.45;
+}

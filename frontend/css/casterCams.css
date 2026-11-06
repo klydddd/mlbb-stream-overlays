@@ -1,0 +1,170 @@
+/* Top area of display.html: everything above the draft overlay (ban 70 + pick 310 +
+   names 35 = 415px tall). Holds the optional sponsor strip (js/sponsorStrip.js) and,
+   below it, the caster cams (js/casterCamsDisplay.js). */
+.top-area {
+    --strip-h: 0px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: calc(100vh - 415px);
+    display: flex;
+    flex-direction: column;
+    pointer-events: none;
+    z-index: 5;
+}
+
+.top-area.has-strip {
+    --strip-h: 128px;
+}
+
+/* ---------- sponsor strip ---------- */
+.top-sponsors {
+    flex: none;
+    height: var(--strip-h);
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    background: aliceblue;
+    border-bottom: 4px solid;
+    border-image: linear-gradient(90deg, #87b9f5 50%, #f5a92b 50%) 1;
+    box-sizing: border-box;
+}
+
+.top-sponsors[hidden],
+.sponsor-group[hidden] {
+    display: none !important;
+}
+
+/* the strip is only used when the controller picks TOP STRIP */
+body:not([data-sponsor-style="top"]) .top-sponsors,
+body[data-sponsor-style="top"] .center-sponsors {
+    display: none !important;
+}
+
+.sponsor-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 0 44px;
+}
+
+.sponsor-group + .sponsor-group:not([hidden]) {
+    border-left: 2px solid rgba(0, 16, 31, 0.12);
+}
+
+.sponsor-group-label {
+    color: rgb(0, 16, 31);
+    font-size: 0.95rem;
+    font-weight: 900;
+    letter-spacing: 0.14em;
+    line-height: 1;
+}
+
+.sponsor-group-logos {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.sponsor-group-logos img {
+    height: 76px;
+    max-width: 300px;
+    object-fit: contain;
+}
+
+/* ---------- caster cams ---------- */
+.caster-cams {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 28px;
+    padding: 24px;
+    box-sizing: border-box;
+}
+
+.caster-cams[hidden],
+.caster-cam[hidden] {
+    display: none !important;
+}
+
+.caster-cam {
+    /* 16:9 frame + 46px name bar must fit the space left under the strip (minus 48px padding) */
+    --cam-w: min(960px, calc((100vh - 415px - var(--strip-h) - 48px - 46px) * 16 / 9));
+    display: flex;
+    flex-direction: column;
+    width: var(--cam-w);
+    animation: caster-cam-in 0.4s ease-out;
+}
+
+/* two casters: side by side, each up to 860px wide */
+.caster-cams[data-count="2"] .caster-cam {
+    --cam-w: min(860px, calc((100vw - 48px - 28px) / 2), calc((100vh - 415px - var(--strip-h) - 48px - 46px) * 16 / 9));
+}
+
+.caster-cam-frame {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: rgb(33, 33, 33);
+    border-top: 4px solid #87b9f5;
+    overflow: hidden;
+}
+
+.caster-cams[data-count="2"] .caster-cam:nth-child(2) .caster-cam-frame {
+    border-top-color: #f5a92b;
+}
+
+.caster-cam-frame iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+}
+
+/* no link yet: placeholder text in the empty frame */
+.caster-cam.no-feed .caster-cam-frame::after {
+    content: "NO CAMERA LINK";
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.35);
+    font-family: "Anton", sans-serif;
+    font-size: 28px;
+    letter-spacing: 0.08em;
+}
+
+.caster-cam-name {
+    height: 46px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    background: aliceblue;
+    color: rgb(0, 16, 31);
+    font-family: "Anton", sans-serif;
+    font-size: 26px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+@keyframes caster-cam-in {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .caster-cam {
+        animation: none;
+    }
+}

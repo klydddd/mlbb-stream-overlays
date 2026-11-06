@@ -262,10 +262,26 @@ body {
     display: none;
 }
 
-.sponsor-slide img {
-    max-width: 340px;
+/* 1 logo up to the full 340px; 2 logos share the row side by side */
+.sponsor-logos {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    width: 340px;
+    height: 56px;
+}
+
+.sponsor-logos img {
+    flex: 0 1 auto;
+    min-width: 0;
+    max-width: 100%;
     height: 56px;
     object-fit: contain;
+}
+
+.sponsor-logos[data-count="2"] img {
+    max-width: calc((100% - 16px) / 2);
 }
 
 @media (prefers-reduced-motion: reduce) {

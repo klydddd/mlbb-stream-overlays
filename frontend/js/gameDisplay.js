@@ -2,6 +2,7 @@
 // localStorage (restore on load + `storage` events), BroadcastChannel "team_channel",
 // and the WebSocket room. Control side lives in js/ingame.js + js/control.js.
 import { onMessage } from "./websocketClient.js";
+import { mountSponsorSlideshow } from "./sponsorSlideshow.js?v=3";
 
 const MAX_WINS = 3;
 const MAP_LABELS = {
@@ -83,65 +84,6 @@ function setMapType(slug) {
   else img.removeAttribute("src");
 }
 
-// ---------- Sponsor slideshow ----------
-
-const SPONSOR_LABELS = {
-  partner: "IN PARTNERSHIP WITH",
-  presented: "PRESENTED BY",
-  sponsored: "SPONSORED BY",
-};
-const sponsorSlides = [...document.querySelectorAll(".sponsor-slide")];
-let sponsorList = [];   // flat [{ label, src }], in category order
-let sponsorIndex = 0;
-let sponsorFront = 0;   // which of the two slide elements is showing
-let sponsorTimer = null;
-let sponsorSeconds = 5;
-
-function showSponsor(i) {
-  const item = sponsorList[i];
-  // fill the hidden slide, then crossfade to it
-  const next = sponsorSlides[1 - sponsorFront];
-  next.querySelector(".sponsor-label").textContent = item.label;
-  next.querySelector("img").src = item.src;
-  next.classList.add("active");
-  sponsorSlides[sponsorFront].classList.remove("active");
-  sponsorFront = 1 - sponsorFront;
-}
-
-function setSponsors(groups, seconds) {
-  sponsorList = [];
-  Object.keys(SPONSOR_LABELS).forEach((g) => {
-    (Array.isArray(groups?.[g]) ? groups[g] : []).forEach((src) => {
-      sponsorList.push({ label: SPONSOR_LABELS[g], src });
-    });
-  });
-  const s = parseFloat(seconds);
-  if (s >= 1) sponsorSeconds = s;
-
-  clearInterval(sponsorTimer);
-  $("sponsors").hidden = !sponsorList.length;
-  if (!sponsorList.length) {
-    sponsorSlides.forEach((el) => el.classList.remove("active"));
-    return;
-  }
-  sponsorIndex = Math.min(sponsorIndex, sponsorList.length - 1);
-  showSponsor(sponsorIndex);
-  if (sponsorList.length > 1) {
-    sponsorTimer = setInterval(() => {
-      sponsorIndex = (sponsorIndex + 1) % sponsorList.length;
-      showSponsor(sponsorIndex);
-    }, sponsorSeconds * 1000);
-  }
-}
-
-function loadSponsorsFromStorage() {
-  let groups = {};
-  try {
-    groups = JSON.parse(localStorage.getItem("sponsors") || "{}") || {};
-  } catch (e) { /* ignore */ }
-  setSponsors(groups, localStorage.getItem("sponsor-interval"));
-}
-
 function resetAll() {
   setTeamName("blue", "");
   setTeamName("red", "");
@@ -149,7 +91,6 @@ function resetAll() {
   setScore("red", 0);
   setCasters("");
   setMapType("");
-  setSponsors({});
 }
 
 // ---------- Restore from localStorage ----------
@@ -162,7 +103,6 @@ function loadFromStorage() {
   setScore("red", ls("red-score"));
   setCasters(ls("casters"));
   setMapType(ls("map-type"));
-  loadSponsorsFromStorage();
 }
 
 // ---------- Messages (BroadcastChannel + WebSocket) ----------
@@ -191,9 +131,6 @@ function handleMessage(data) {
     case "map-type":
       setMapType(data.value);
       return;
-    case "sponsors":
-      setSponsors(data.sponsors, data.interval);
-      return;
   }
 
   // older untyped messages from control.js
@@ -213,12 +150,11 @@ function handleStorage(e) {
     case "red-score": return setScore("red", v);
     case "casters": return setCasters(v);
     case "map-type": return setMapType(v);
-    case "sponsors":
-    case "sponsor-interval": return loadSponsorsFromStorage();
   }
 }
 
 loadFromStorage();
+mountSponsorSlideshow($("sponsors")); // handles its own storage/messages
 
 const channel = new BroadcastChannel("team_channel");
 channel.onmessage = (event) => handleMessage(event.data);

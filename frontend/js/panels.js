@@ -38,7 +38,8 @@
     if (photos.length) {
       return [panel.querySelectorAll(".photo-upload.has-photo").length, photos.length];
     }
-    const fields = [...panel.querySelectorAll('.panel-body input[type="text"]')];
+    const fields = [...panel.querySelectorAll('.panel-body input[type="text"], .panel-body input[type="url"]')]
+      .filter((f) => !f.closest("[hidden]"));
     if (!fields.length) return null;
     return [fields.filter((f) => f.value.trim() !== "").length, fields.length];
   }

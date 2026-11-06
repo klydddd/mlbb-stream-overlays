@@ -1,14 +1,16 @@
 // Sponsor logo slideshow controls (controller.html, INGAME mode).
 // Shown in the top-right white area of gameDisplay.html.
 //
-// localStorage: "sponsors"          JSON { partner: [dataUrl], presented: [...], sponsored: [...] }
+// localStorage: "sponsors"          JSON { partner: [dataUrl], presented: [...], sponsored: [...], monitor: [...] }
 //               "sponsor-interval"  seconds per logo
-// Message:      { type: "sponsors", sponsors, interval }  (BroadcastChannel + WebSocket)
+//               "sponsor-draft-style"  "center" | "top": which version display.html uses
+// Messages:     { type: "sponsors", sponsors, interval }, { type: "sponsor-draft-style", value }
+//               (BroadcastChannel + WebSocket)
 import { send } from "./websocketClient.js";
 
 const channel = new BroadcastChannel("team_channel");
 
-export const SPONSOR_GROUPS = ["partner", "presented", "sponsored"];
+export const SPONSOR_GROUPS = ["partner", "presented", "sponsored", "monitor"];
 const DEFAULT_INTERVAL = 5;
 // Logos are downscaled before storing: the overlay slot is ~370x55, and
 // localStorage only holds ~5MB shared with team logos and player photos.
@@ -129,6 +131,32 @@ if (intervalInput) {
   });
 }
 
+// ---------- draft display version: center slideshow or top strip ----------
+
+function getStyle() {
+  return localStorage.getItem("sponsor-draft-style") === "top" ? "top" : "center";
+}
+
+function renderStyle() {
+  const style = getStyle();
+  document.querySelectorAll("[data-sponsor-style]").forEach((btn) => {
+    btn.setAttribute("aria-pressed", String(btn.dataset.sponsorStyle === style));
+  });
+  // seconds-per-logo only matters for the slideshow
+  intervalInput?.closest(".sponsor-row")?.classList.toggle("muted", style === "top");
+}
+
+document.querySelectorAll("[data-sponsor-style]").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const value = btn.dataset.sponsorStyle;
+    localStorage.setItem("sponsor-draft-style", value);
+    const msg = { type: "sponsor-draft-style", value };
+    channel.postMessage(msg);
+    send(msg);
+    renderStyle();
+  });
+});
+
 document.getElementById("clear-sponsors")?.addEventListener("click", () => {
   const empty = {};
   SPONSOR_GROUPS.forEach((g) => { empty[g] = []; });
@@ -138,12 +166,15 @@ document.getElementById("clear-sponsors")?.addEventListener("click", () => {
 // RESET DRAFT wipes localStorage (control.js runs first)
 document.getElementById("reset")?.addEventListener("click", () => {
   render();
+  renderStyle();
   if (intervalInput) intervalInput.value = getInterval();
 });
 
 window.addEventListener("storage", (e) => {
   if (e.key === null || e.key === "sponsors") render();
   if ((e.key === null || e.key === "sponsor-interval") && intervalInput) intervalInput.value = getInterval();
+  if (e.key === null || e.key === "sponsor-draft-style") renderStyle();
 });
 
 render();
+renderStyle();
