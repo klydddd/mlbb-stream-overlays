@@ -9,13 +9,47 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Anton&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="css/display.css?v=2">
-    <link id="themeStyelesheet" rel="stylesheet" href="css/default.css">
+    <link rel="stylesheet" href="css/display.css?v=12">
+    <link id="themeStyelesheet" rel="stylesheet" href="css/default.css?v=2">
+    <link rel="stylesheet" href="css/casterCams.css?v=5">
     <link rel="icon" href="Assets/favico/favicon_io/android-chrome-512x512.png">
     <title>Display</title>
 </head>
 
 <body data-page="index">
+
+    <!-- top area above the draft overlay: sponsor strip (js/sponsorStrip.js), caster cams below
+         (js/casterCamsDisplay.js). The controller picks the strip or the center slideshow. -->
+    <div class="top-area" id="top-area">
+    <div class="top-sponsors" id="top-sponsors" hidden>
+        <div class="sponsor-group" data-group="partner" hidden>
+            <span class="sponsor-group-label">IN PARTNERSHIP WITH</span>
+            <div class="sponsor-group-logos"></div>
+        </div>
+        <div class="sponsor-group" data-group="presented" hidden>
+            <span class="sponsor-group-label">PRESENTED BY</span>
+            <div class="sponsor-group-logos"></div>
+        </div>
+        <div class="sponsor-group" data-group="sponsored" hidden>
+            <span class="sponsor-group-label">SPONSORED BY</span>
+            <div class="sponsor-group-logos"></div>
+        </div>
+        <div class="sponsor-group" data-group="monitor" hidden>
+            <span class="sponsor-group-label">OFFICIAL MONITOR</span>
+            <div class="sponsor-group-logos"></div>
+        </div>
+    </div>
+    <div class="caster-cams" id="caster-cams" hidden>
+        <div class="caster-cam" hidden>
+            <div class="caster-cam-frame"><iframe title="Caster 1 camera" allow="autoplay; fullscreen" scrolling="no"></iframe></div>
+            <div class="caster-cam-name">CASTER</div>
+        </div>
+        <div class="caster-cam" hidden>
+            <div class="caster-cam-frame"><iframe title="Caster 2 camera" allow="autoplay; fullscreen" scrolling="no"></iframe></div>
+            <div class="caster-cam-name">CASTER</div>
+        </div>
+    </div>
+    </div>
 
     <div class="ban-section">
 
@@ -32,7 +66,11 @@
             <div id="ban-10" class="ban-container ban-10"></div>
         </div>
         <div class="gap">
-
+            <div class="match-info">
+                GAME <span id="gameNumber">0</span> MATCH <span id="matchNumber">0</span>
+                <br>
+                <span id="roundName">PLAYOFFS</span>
+            </div>
         </div>
         <div class="red-ban ban">
             <div class="team-name" data-team="red">
@@ -82,11 +120,6 @@
             </div>
         </div>
         <div class="gap">
-            <div class="match-info">
-                GAME <span id="gameNumber">0</span> MATCH <span id="matchNumber">0</span>
-                <br>
-                <span id="roundName">PLAYOFFS</span>
-            </div>
             <div class="timer-container">
                 <div id="triangle-left"></div>
                 <div class="timer" id="timerDisplay">50</div>
@@ -95,7 +128,12 @@
             <div class="phaseDiv" style="width: 100%; height: 60px; text-align: center;">
                 <span id="pickOrBan" style="font-weight: 900;">DRAFTING</span>
             </div>
+            <!-- sponsor slideshow (js/sponsorSlideshow.js), same logos as the in-game overlay -->
             <div class="container">
+                <div class="center-sponsors" id="center-sponsors" hidden>
+                    <div class="sponsor-slide"><span class="sponsor-label"></span><div class="sponsor-logos"></div></div>
+                    <div class="sponsor-slide"><span class="sponsor-label"></span><div class="sponsor-logos"></div></div>
+                </div>
             </div>
 
         </div>
@@ -214,7 +252,14 @@
     </div>
 
 
-    <script type="module" src="js/display.js?v=6"></script>
+    <script type="module" src="js/display.js?v=8"></script>
+    <script type="module" src="js/casterCamsDisplay.js?v=1"></script>
+    <script type="module">
+        import { mountSponsorSlideshow } from "./js/sponsorSlideshow.js?v=3";
+        mountSponsorSlideshow(document.getElementById("center-sponsors"));
+    </script>
+    <script type="module" src="js/sponsorStrip.js?v=1"></script>
+    <script type="module" src="js/draftSponsors.js?v=1"></script>
     <script src="js/swap.js"></script>
     <script type="module" src="js/showLogo.js"></script>
     <script src="js/displayTimer.js"></script>

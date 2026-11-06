@@ -27,7 +27,9 @@ For frontend-only work, open `http://localhost:8080/controller.html` and `http:/
 
 ### Page pairs
 - `controller.html` (operator UI) drives `display.html` (the draft overlay captured by OBS). These two are the core of the app.
-- `gameController.html` / `gameDisplay.html` are for in-game overlays and are mostly unimplemented.
+- The controller's CASTER CAMS panel (`js/casterCams.js`, shown in SETUP and LIVE) sets 0/1/2 caster cams (vdo.ninja iframes plus names) that `display.html` shows above the draft overlay (`js/casterCamsDisplay.js`, `css/casterCams.css`), under a sponsor strip (`js/draftSponsors.js`) that uses the same `sponsors` data as the in-game slideshow. The keys are `caster-layout`, `caster-name-N` and `caster-link-N`, and the message is `{type: "caster-cams"}`. Caster names are also written into the INGAME casters field.
+- Sponsor logos (controller SPONSOR SLIDESHOW panel, `js/sponsors.js`) show on both overlays. `gameDisplay.html` and the center column of `display.html` use the shared `js/sponsorSlideshow.js`. `display.html` can show a top strip instead (`js/sponsorStrip.js`, styled in `css/casterCams.css`); the controller's DRAFT DISPLAY toggle picks one, stored as `sponsor-draft-style` (`center` | `top`).
+- `gameDisplay.html` (`js/gameDisplay.js`, `css/gameDisplay.css`) is the in-game overlay: a fixed 1920x1080 stage scaled to fit, showing the scoreboard (team names, score + 3 series pips), minimap frame, casters, map type (icon from `Assets/gameProper/maps/<slug>.png`) and a sponsor logo slideshow in the top-right (`js/sponsors.js` on the controller; localStorage `sponsors` JSON + `sponsor-interval`, message `{type: "sponsors"}`). It is driven by the controller's INGAME mode (`js/ingame.js`). The cam, turtle/lord/replay/item-check messages (`ingame-cam`, `ingame-event`) are sent but not rendered yet. The center logo loads from `Assets/gameProper/league-logo.png` and hides itself if missing. `gameController.html` is unused.
 - `index.html` is a landing page.
 
 ### Three sync channels

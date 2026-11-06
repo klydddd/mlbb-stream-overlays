@@ -480,6 +480,9 @@ function handleMessage(data) {
     case "clear-scores":
       clearScores();
       return;
+    case "score-update":
+      if (data.team === "blue" || data.team === "red") setScore(data.team, data.value);
+      return;
     case "logo-update":
       setLogo(data.team, data.data);
       return;

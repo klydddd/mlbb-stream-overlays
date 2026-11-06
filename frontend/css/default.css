@@ -40,6 +40,16 @@
 
 .score {
     background-color: rgba(24, 24, 24, 0.229);
+    transition: background-color 0.3s;
+}
+
+/* a won game in the series (js/display.js setScore) */
+.blue-score .score.won {
+    background-color: #87b9f5;
+}
+
+.red-score .score.won {
+    background-color: #f5a92b;
 }
 
 .match-info {

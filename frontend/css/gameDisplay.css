@@ -1,0 +1,371 @@
+/* In-game overlay (gameDisplay.html). Everything is laid out on a fixed 1920x1080
+   stage in px; js/gameDisplay.js scales the stage to fit the window. */
+:root {
+    --blue: #84b9fc;
+    --blue-light: #b4d3fa;
+    --red: #f5ab27;
+    --red-light: #f9c870;
+    --purple: #792faf;
+    --white: #ffffff;
+    --ink: #111111;
+    --font: "Anton", "Impact", "Arial Narrow", sans-serif;
+    /* the design uses Anton squeezed horizontally to ~82% width */
+    --condense: 0.82;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: transparent;
+}
+
+[hidden] {
+    display: none !important;
+}
+
+.stage {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1920px;
+    height: 1080px;
+    transform-origin: 0 0;
+    font-family: var(--font);
+    color: var(--white);
+    text-transform: uppercase;
+}
+
+.ic {
+    display: block;
+    color: var(--white);
+}
+
+/* ---------- minimap frame ---------- */
+.minimap-frame {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 340px;
+    height: 339px;
+    border: 6px solid var(--white);
+}
+
+/* ---------- scoreboard ---------- */
+.scoreboard {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 1920px;
+    height: 87px;
+}
+
+.sb-band {
+    position: absolute;
+    left: 337px;
+    right: 0;
+    top: 0;
+    height: 100%;
+    background: var(--white);
+}
+
+.sb-side {
+    --team: var(--blue);
+    --team-light: var(--blue-light);
+    position: absolute;
+    top: 0;
+    width: 529px;
+    height: 100%;
+    background:
+        radial-gradient(ellipse 30% 55% at 50% 0, var(--team-light), transparent 100%),
+        var(--team);
+}
+
+.sb-side.blue {
+    left: 386px;
+    clip-path: polygon(0 0, 502px 0, 100% 100%, 27px 100%);
+}
+
+.sb-side.red {
+    --team: var(--red);
+    --team-light: var(--red-light);
+    left: 1005px;
+    clip-path: polygon(27px 0, 100% 0, 502px 100%, 0 100%);
+}
+
+/* stat icons: blue measures from the left, red mirrors from the right */
+.sb-icons .ic {
+    position: absolute;
+    top: 6px;
+    width: 22px;
+    height: 22px;
+}
+
+.blue .sb-icons .ic:nth-child(1) { left: 151px; }
+.blue .sb-icons .ic:nth-child(2) { left: 223px; }
+.blue .sb-icons .ic:nth-child(3) { left: 296px; }
+.blue .sb-icons .ic:nth-child(4) { left: 364px; }
+.red .sb-icons .ic:nth-child(4) { right: 152px; }
+.red .sb-icons .ic:nth-child(3) { right: 218px; }
+.red .sb-icons .ic:nth-child(2) { right: 289px; }
+.red .sb-icons .ic:nth-child(1) { right: 356px; }
+
+/* speckled white plate holding the team name and series pips */
+.sb-plate {
+    position: absolute;
+    top: 35px;
+    width: 316px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    background-color: var(--white);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='60'%3E%3Cfilter id='n' x='0' y='0'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='3' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .52 0 0 0 0 .56 14 0 0 0 -9.4'/%3E%3C/filter%3E%3Crect width='320' height='60' filter='url(%23n)'/%3E%3C/svg%3E");
+    box-shadow: inset 0 6px 6px -4px rgba(0, 0, 0, 0.3);
+}
+
+.blue .sb-name { transform-origin: left center; }
+.red .sb-name { transform-origin: right center; }
+
+.blue .sb-plate {
+    left: 134px;
+    padding-left: 20px;
+    clip-path: polygon(0 0, 301px 0, 100% 100%, 17px 100%);
+}
+
+.red .sb-plate {
+    right: 134px;
+    justify-content: flex-end;
+    padding-right: 20px;
+    clip-path: polygon(15px 0, 100% 0, 299px 100%, 0 100%);
+}
+
+.sb-name {
+    /* js/gameDisplay.js fitName() sets the squeeze and font size so the whole
+       name always fits before the pips on one line */
+    flex: none;
+    white-space: nowrap;
+    transform: scaleX(var(--condense));
+    color: var(--team);
+    font-size: 39px; /* Anton cap height 0.867em -> 34px caps */
+    line-height: 1;
+}
+
+.sb-pips {
+    position: absolute;
+    top: 24px;
+    display: flex;
+    gap: 6px;
+}
+
+.blue .sb-pips { left: 131px; }
+.red .sb-pips { right: 131px; }
+
+.sb-pips i {
+    display: block;
+    width: 52px;
+    height: 8px;
+    background: var(--team);
+    opacity: 0.28;
+    transition: opacity 0.3s;
+}
+
+.blue .sb-pips i { transform: skewX(20deg); }
+.red .sb-pips i { transform: skewX(-20deg); }
+
+.sb-pips i.won {
+    opacity: 1;
+}
+
+.sb-score {
+    position: absolute;
+    top: 0;
+    width: 70px;
+    text-align: center;
+    font-size: 74px;
+    line-height: 87px;
+    font-variant-numeric: tabular-nums;
+}
+
+.blue .sb-score { left: 442px; }
+.red .sb-score { right: 442px; }
+
+.sb-center {
+    position: absolute;
+    left: 900px;
+    top: 0;
+    width: 120px;
+    height: 87px;
+}
+
+.sb-timer {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 7px;
+    text-align: center;
+    color: var(--ink);
+    font-size: 17.5px;
+    line-height: 1;
+    letter-spacing: 0.02em;
+}
+
+.sb-logo {
+    position: absolute;
+    left: 50%;
+    top: 31px;
+    width: 64px;
+    height: 50px;
+    object-fit: contain;
+    transform: translateX(-50%);
+}
+
+/* ---------- sponsor slideshow ---------- */
+.sponsors {
+    position: absolute;
+    left: 1548px;
+    top: 0;
+    width: 360px;
+    height: 87px;
+}
+
+.sponsor-slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+}
+
+.sponsor-slide.active {
+    opacity: 1;
+}
+
+.sponsor-slide .sponsor-label {
+    color: var(--purple);
+    font-size: 14px;
+    line-height: 1;
+    letter-spacing: 0.12em;
+}
+
+.sponsor-slide .sponsor-label:empty {
+    display: none;
+}
+
+/* 1 logo up to the full 340px; 2 logos share the row side by side */
+.sponsor-logos {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    width: 340px;
+    height: 56px;
+}
+
+.sponsor-logos img {
+    flex: 0 1 auto;
+    min-width: 0;
+    max-width: 100%;
+    height: 56px;
+    object-fit: contain;
+}
+
+.sponsor-logos[data-count="2"] img {
+    max-width: calc((100% - 16px) / 2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .sponsor-slide {
+        transition: none;
+    }
+}
+
+/* ---------- casters ---------- */
+.casters {
+    /* flush under the scoreboard band, left edge on the orange slant's bottom corner */
+    position: absolute;
+    left: 1507px;
+    top: 87px;
+    width: 413px;
+    height: 41px;
+    display: flex;
+    align-items: center;
+    background: var(--purple);
+}
+
+.casters .mic {
+    flex: none;
+    width: 19px;
+    height: 29px;
+    margin: 0 39px 0 42px;
+}
+
+#casters-text {
+    flex: none;
+    /* bar 405 - mic block (42 + 19 + 39) - 10 right padding */
+    width: calc((413px - 100px - 10px) / var(--condense));
+    transform: scaleX(var(--condense));
+    transform-origin: left center;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-size: 28px;
+    line-height: 1;
+}
+
+/* ---------- map type ---------- */
+.map-type {
+    position: absolute;
+    left: 1507px;
+    top: 136px;
+    width: 413px;
+    height: 83px;
+    display: flex;
+    align-items: center;
+    background: var(--white);
+}
+
+.map-type-icon {
+    /* square: as tall as the panel. Holds the map icon (js/gameDisplay.js) */
+    flex: none;
+    width: 83px;
+    height: 83px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background:
+        linear-gradient(90deg, rgba(255, 255, 255, 0.45), transparent 5px),
+        var(--purple);
+}
+
+.map-type-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+#map-type-text {
+    flex: none;
+    /* spans the white area after the icon with 10px each side; text centered in it */
+    width: calc((413px - 83px - 20px) / var(--condense));
+    margin-left: 10px;
+    text-align: center;
+    transform: scaleX(var(--condense));
+    transform-origin: left center;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    color: var(--purple);
+    font-size: 39px;
+    line-height: 1;
+}

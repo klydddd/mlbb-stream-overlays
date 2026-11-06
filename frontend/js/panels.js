@@ -1,17 +1,20 @@
 // Controller layout helpers (UI only — nothing here is synced to the display).
 // - Click a panel header to fold/unfold it. Blue and red copies of a panel fold together.
-// - SETUP / LIVE toggle: LIVE hides every panel with data-group="setup".
+// - SETUP / LIVE / INGAME toggle: LIVE hides every panel with data-group="setup";
+//   INGAME shows only the data-group="ingame" panels (js/ingame.js), which the other modes hide.
 // - Folded panels show a "filled / total" chip so you can see they're done.
 // - Per-player photo sliders (injected by playerPhotos.js) go behind a "fine-tune" disclosure.
 // State is kept in localStorage under "controller-ui".
 (function () {
   const STORAGE_KEY = "controller-ui";
+  const MODES = ["setup", "live", "ingame"];
+  const NOTES = { live: "LIVE MODE: SETUP SECTIONS HIDDEN", ingame: "INGAME MODE: DRAFT SECTIONS HIDDEN" };
 
   function loadState() {
     try {
       const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
       if (saved && typeof saved === "object") {
-        return { mode: saved.mode === "live" ? "live" : "setup", folded: new Set(saved.folded || []) };
+        return { mode: MODES.includes(saved.mode) ? saved.mode : "setup", folded: new Set(saved.folded || []) };
       }
     } catch (e) { /* ignore */ }
     return { mode: "setup", folded: new Set() };
@@ -35,7 +38,8 @@
     if (photos.length) {
       return [panel.querySelectorAll(".photo-upload.has-photo").length, photos.length];
     }
-    const fields = [...panel.querySelectorAll('.panel-body input[type="text"]')];
+    const fields = [...panel.querySelectorAll('.panel-body input[type="text"], .panel-body input[type="url"]')]
+      .filter((f) => !f.closest("[hidden]"));
     if (!fields.length) return null;
     return [fields.filter((f) => f.value.trim() !== "").length, fields.length];
   }
@@ -61,17 +65,20 @@
 
   function render() {
     const live = state.mode === "live";
+    const ingame = state.mode === "ingame";
     document.body.classList.toggle("ui-live", live);
+    document.body.classList.toggle("ui-ingame", ingame);
 
     document.querySelectorAll("[data-ui-mode]").forEach((btn) => {
       btn.setAttribute("aria-pressed", String(btn.dataset.uiMode === state.mode));
     });
 
     const note = document.getElementById("ui-note");
-    if (note) note.textContent = live ? "LIVE MODE: SETUP SECTIONS HIDDEN" : "";
+    if (note) note.textContent = NOTES[state.mode] || "";
 
     panels().forEach((panel) => {
-      panel.hidden = live && panel.dataset.group === "setup";
+      const group = panel.dataset.group;
+      panel.hidden = ingame ? group !== "ingame" : group === "ingame" || (live && group === "setup");
       const folded = state.folded.has(panel.dataset.panel);
       panel.classList.toggle("folded", folded);
       const head = panel.querySelector(".panel-head");
@@ -110,7 +117,7 @@
       }
       const modeBtn = e.target.closest("[data-ui-mode]");
       if (modeBtn) {
-        state.mode = modeBtn.dataset.uiMode;
+        if (MODES.includes(modeBtn.dataset.uiMode)) state.mode = modeBtn.dataset.uiMode;
         render();
       }
     });
