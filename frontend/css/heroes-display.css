@@ -578,3 +578,55 @@ body {
         box-shadow: inset 0 0 0px rgba(245, 169, 43, 0.9);
     }
 }
+
+/* ---------- Intro (plays on load, e.g. after the draft overlay's outro) ----------
+   No opacity on purpose: OBS browser sources show semi-transparent pixels over the
+   transparent page as grey, so everything slides in from off-screen or wipes open. */
+
+.corner {
+    animation: hd-in-top 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) 0.1s both;
+}
+
+.team-plate.blue {
+    animation: hd-in-left 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) 0.15s both;
+}
+
+.team-plate.red {
+    animation: hd-in-right 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) 0.15s both;
+}
+
+.ribbon {
+    animation: hd-in-wipe 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) 0.4s both;
+}
+
+.card {
+    animation: hd-in-rise 0.65s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    animation-delay: calc(0.45s + var(--i, 0) * 90ms);
+}
+
+@keyframes hd-in-top {
+    from { translate: 0 -90px; }
+    to { translate: 0 0; }
+}
+
+@keyframes hd-in-left {
+    from { translate: -1100px 0; }
+    to { translate: 0 0; }
+}
+
+@keyframes hd-in-right {
+    from { translate: 1100px 0; }
+    to { translate: 0 0; }
+}
+
+/* ribbon opens from its center */
+@keyframes hd-in-wipe {
+    from { clip-path: inset(0 50% 0 50%); }
+    to { clip-path: inset(0 0 0 0); }
+}
+
+/* cards start fully below the 1080px frame */
+@keyframes hd-in-rise {
+    from { translate: 0 120%; }
+    to { translate: 0 0; }
+}

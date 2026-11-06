@@ -224,6 +224,14 @@ window.addEventListener("draft-display-switch", (e) => {
   send(msg);
 });
 
+// Manual override buttons (same messages the timer sends)
+document.getElementById("show-heroes-display")?.addEventListener("click", () => {
+  window.dispatchEvent(new CustomEvent("draft-display-switch", { detail: { target: "heroes" } }));
+});
+document.getElementById("show-draft-display")?.addEventListener("click", () => {
+  window.dispatchEvent(new CustomEvent("draft-display-switch", { detail: { target: "draft" } }));
+});
+
 // Reset button logic
 const resetBtn = document.getElementById("reset");
 

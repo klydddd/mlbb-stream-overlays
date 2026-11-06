@@ -45,6 +45,10 @@ function buildCards() {
     LAYOUT[side].forEach(({ pick, player, role }) => {
       const card = document.createElement("div");
       card.className = "card";
+      // Intro stagger order: outer edges first, converging on the center
+      // (both teams animate at the same time, mirrored).
+      const pos = LAYOUT[side].findIndex((c) => c.pick === pick); // 0..4, left to right
+      card.style.setProperty("--i", side === "blue" ? pos : 4 - pos);
       card.innerHTML = `
         <div class="card-placeholder" style="background-image:url('${ROLE_IMG[role]}')"></div>
         <div class="card-art"></div>

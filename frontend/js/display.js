@@ -42,8 +42,10 @@ function handleIncomingMessage(data) {
       }
       return;
     case "show-heroes-display":
-      // Last phase countdown finished: switch to the lineup screen (same room)
-      window.location.href = "heroes-display.html" + window.location.search;
+      // Last phase countdown finished: play the outro, then switch to the lineup screen (same room)
+      playOutro(() => {
+        window.location.href = "heroes-display.html" + window.location.search;
+      });
       return;
     case "reset":
       resetText("blue-team-name", "Blue Team Name");
@@ -226,6 +228,72 @@ for (let i = 0; i < 10; i++) {
 for (let i = 0; i < 10; i++) {
   const name = localStorage.getItem(`banPick-${i + 1}`);
   if (name) updateBanPick(i, name);
+}
+
+// ---------- Outro (before switching to heroes-display.html) ----------
+// No opacity fades on purpose: OBS browser sources composite semi-transparent
+// pixels onto a transparent background, which shows light panels as grey and lets
+// the dark role icons behind the hero portraits bleed through mid-fade.
+// Instead every element slides fully out of its (clipped) section, and the
+// remaining panels are wiped away with clip-path. Uses the Web Animations API so
+// it doesn't fight the existing glow / shake / float CSS animations.
+let outroPlaying = false;
+
+function playOutro(done) {
+  if (outroPlaying) return; // message can arrive via both BroadcastChannel and WebSocket
+  outroPlaying = true;
+
+  const EASE_OUT = "cubic-bezier(0.55, 0, 0.75, 0.2)";
+  const STEP = 45; // ms between elements in a group
+  let end = 0;
+
+  const run = (el, keyframes, delay, duration) => {
+    el.animate(keyframes, { duration, delay, easing: EASE_OUT, fill: "forwards" });
+    end = Math.max(end, delay + duration);
+  };
+
+  // Clip each section to its own box so sliding items vanish at the edge.
+  // (The name bar gets 20px extra below: names already sit ~15px under it.)
+  const CLIP = {
+    ".ban-section": ["inset(0 0 0 0)", "inset(0 0 100% 0)"],               // wipe up
+    ".pick-section": ["inset(0 0 0 0)", "inset(100% 0 0 0)"],             // wipe down
+    ".name-section": ["inset(0 0 -20px 0)", "inset(100% 0 -20px 0)"],      // wipe down
+    ".progress-container": ["inset(0 0 0 0)", "inset(100% 0 0 0)"],
+  };
+  Object.entries(CLIP).forEach(([sel, [from]]) => {
+    document.querySelectorAll(sel).forEach((el) => (el.style.clipPath = from));
+  });
+
+  // 1. Slide items out of their sections (fully, so nothing is left half-visible)
+  const slides = [
+    // [selector, translate to, start ms, duration ms]
+    [".ban-section .ban-container", "0 -110%", 0, 400],
+    [".ban-section .team-name", "0 -110%", 150, 400],
+    // hero picks and the role icons behind them move in lockstep (same DOM order)
+    [".pick-section:not(.pick-section-background) .player-pick", "0 110%", 200, 450],
+    [".pick-section-background .media-container", "0 110%", 200, 450],
+    [".name-section .name", "0 220%", 300, 400],
+    [".name-section .gap > *", "0 220%", 300, 400],
+  ];
+  slides.forEach(([selector, to, start, duration]) => {
+    document.querySelectorAll(selector).forEach((el, i) => {
+      run(el, [{ translate: "0 0" }, { translate: to }], start + i * STEP, duration);
+    });
+  });
+
+  // 2. Timer / match info column collapses upward
+  document.querySelectorAll(".pick-section:not(.pick-section-background) > .gap").forEach((el) => {
+    run(el, [{ clipPath: "inset(0 0 0 0)" }, { clipPath: "inset(0 0 100% 0)" }], 250, 450);
+  });
+
+  // 3. Wipe away the remaining panels / bars
+  Object.entries(CLIP).forEach(([sel, [from, to]]) => {
+    document.querySelectorAll(sel).forEach((el) => {
+      run(el, [{ clipPath: from }, { clipPath: to }], 750, 350);
+    });
+  });
+
+  setTimeout(done, end + 80);
 }
 
 function clearNames() {
