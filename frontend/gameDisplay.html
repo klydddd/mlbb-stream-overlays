@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/gameDisplay.css?v=7">
+    <link rel="stylesheet" href="css/gameDisplay.css?v=10">
     <title>Game Overlay</title>
 </head>
 
@@ -17,19 +17,21 @@
 <body>
     <div class="stage" id="stage">
 
-        <!-- white frame around the in-game minimap -->
-        <div class="minimap-frame"></div>
-
         <!-- top scoreboard -->
         <div class="scoreboard">
             <div class="sb-band"></div>
 
             <div class="sb-side blue">
+                <!-- team logo from the controller (localStorage logo-blue / {type: "logo-update"}) -->
+                <div class="sb-team-logo"><img id="blue-logo" alt="" hidden></div>
                 <div class="sb-icons">
-                    <svg class="ic"><use href="#ic-turtle" /></svg>
                     <svg class="ic"><use href="#ic-lord" /></svg>
                     <svg class="ic"><use href="#ic-tower" /></svg>
                     <svg class="ic"><use href="#ic-gold" /></svg>
+                </div>
+                <!-- filled by backend/ingame_stats_bot.py ({type: "ingame-stats"}) -->
+                <div class="sb-stats">
+                    <span data-stat="lord"></span><span data-stat="tower"></span><span data-stat="gold"></span>
                 </div>
                 <div class="sb-plate">
                     <span class="sb-name" id="blue-name">TEAM</span>
@@ -44,11 +46,14 @@
             </div>
 
             <div class="sb-side red">
+                <div class="sb-team-logo"><img id="red-logo" alt="" hidden></div>
                 <div class="sb-icons">
                     <svg class="ic"><use href="#ic-gold" /></svg>
                     <svg class="ic"><use href="#ic-tower" /></svg>
                     <svg class="ic"><use href="#ic-lord" /></svg>
-                    <svg class="ic"><use href="#ic-turtle" /></svg>
+                </div>
+                <div class="sb-stats">
+                    <span data-stat="lord"></span><span data-stat="tower"></span><span data-stat="gold"></span>
                 </div>
                 <div class="sb-plate">
                     <div class="sb-pips" id="red-pips"><i></i><i></i><i></i></div>
@@ -82,9 +87,6 @@
     <!-- icon sprites -->
     <svg width="0" height="0" style="position:absolute" aria-hidden="true">
         <defs>
-            <symbol id="ic-turtle" viewBox="0 0 24 24">
-                <path fill="currentColor" d="M12 1.2c1.5 0 2.3 1.2 2.3 2.4 0 .7-.2 1.2-.5 1.6 1.9.7 3.3 2.2 3.9 4.1l2.6-1.4c.9-.4 1.7.7 1 1.4l-3.2 2.6c0 .2.1.5.1.7 0 1.7-.5 3.3-1.4 4.5l1.5 2.8c.4.8-.6 1.5-1.2.9l-2.1-2c-.7.4-1.5.7-2.3.8l-.2 2.4c-.1.6-.5 1-.7 1s-.6-.4-.7-1l-.2-2.4c-.8-.1-1.6-.4-2.3-.8l-2.1 2c-.6.6-1.6-.1-1.2-.9l1.5-2.8c-.9-1.2-1.4-2.8-1.4-4.5 0-.2 0-.5.1-.7L2.7 9.3c-.7-.7.1-1.8 1-1.4l2.6 1.4c.6-1.9 2-3.4 3.9-4.1-.3-.4-.5-.9-.5-1.6 0-1.2.8-2.4 2.3-2.4z" />
-            </symbol>
             <symbol id="ic-lord" viewBox="0 0 24 24">
                 <path fill="currentColor" d="M3 3l3.6 3L9 2.5l3 3.3 3-3.3L17.4 6 21 3v7.5c0 4.8-3.4 8.9-8 10.4V13.6c0-2.5 2-4.6 4.5-5.1-2.3-.2-4.4 1-5.5 2.9-1.1-1.9-3.2-3.1-5.5-2.9 2.5.5 4.5 2.6 4.5 5.1v7.3c-4.6-1.5-8-5.6-8-10.4V3z" />
             </symbol>
@@ -104,7 +106,7 @@
         </defs>
     </svg>
 
-    <script type="module" src="js/gameDisplay.js?v=8"></script>
+    <script type="module" src="js/gameDisplay.js?v=13"></script>
 </body>
 
 </html>

@@ -3,6 +3,7 @@
 
 import { heroes } from "./hero.js";
 import { onMessage } from "./websocketClient.js";
+import { mountSponsorStrip } from "./sponsorStrip.js?v=2";
 
 const ROLE_IMG = {
   EXP: "Assets/defaults/EXP.png",
@@ -570,3 +571,9 @@ const channel = new BroadcastChannel("team_channel");
 channel.onmessage = (event) => handleMessage(event.data);
 onMessage(handleMessage);
 window.addEventListener("storage", handleStorage);
+
+// ---------- Sponsor strip on top (js/sponsorStrip.js) ----------
+// While it has logos, .stage.has-strip shrinks the lineup to fit under it (css).
+mountSponsorStrip(document.getElementById("hd-sponsors"), {
+  onChange: (shown) => document.querySelector(".stage")?.classList.toggle("has-strip", shown),
+});

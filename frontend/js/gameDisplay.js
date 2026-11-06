@@ -5,7 +5,7 @@ import { onMessage } from "./websocketClient.js";
 import { mountSponsorSlideshow } from "./sponsorSlideshow.js?v=3";
 import {
   playIntro, wipeSwap, revealPanel, concealPanel, swapIcon, scoreChanged, playSwitch,
-} from "./gameDisplayAnim.js?v=1";
+} from "./gameDisplayAnim.js?v=4";
 
 const MAX_WINS = 3;
 const MAP_LABELS = {
@@ -135,13 +135,14 @@ document.fonts.load(`${NAME_FONT_PX}px Anton`).then(() => {
   fitName($("red-name"));
 });
 
+// Series score (games won, from the controller) lights the 3 pips. The big number
+// beside it shows this game's kills instead (from the stats bot, see setKills).
 const shownScore = { blue: 0, red: 0 };
 
 function setScore(side, value) {
   const score = Math.max(0, parseInt(value, 10) || 0);
   const prev = shownScore[side];
   shownScore[side] = score;
-  $(`${side}-score`).textContent = score;
   const pips = [...$(`${side}-pips`).children];
   // fill outward from the team name: blue left-to-right, red right-to-left
   if (side === "red") pips.reverse();
@@ -150,7 +151,19 @@ function setScore(side, value) {
   // the same update can arrive several times (BroadcastChannel, WebSocket, storage)
   if (!ready || score === prev) return;
   const newPips = score > prev ? pips.slice(Math.min(prev, MAX_WINS), Math.min(score, MAX_WINS)) : [];
-  scoreChanged($(`${side}-score`), newPips, score > prev);
+  scoreChanged(null, newPips, score > prev);
+}
+
+// Kills this game, from backend/ingame_stats_bot.py, in the big number by the timer.
+const shownKills = { blue: 0, red: 0 };
+
+function setKills(side, value) {
+  const kills = Math.max(0, parseInt(value, 10) || 0);
+  const prev = shownKills[side];
+  shownKills[side] = kills;
+  $(`${side}-score`).textContent = kills;
+  // the bot resends every few seconds; only animate a real change
+  if (ready && kills !== prev) scoreChanged($(`${side}-score`), [], kills > prev);
 }
 
 function applyCasters(value) {
@@ -216,7 +229,49 @@ function setMapType(slug) {
   ), 0);
 }
 
+// Turtle / lord / tower / gold counts from backend/ingame_stats_bot.py (WebSocket only,
+// not stored: the bot resends everything every few seconds, so a reload catches up).
+function formatStat(stat, value) {
+  if (value === null || value === undefined || value === "") return "";
+  const n = Math.max(0, Number(value) || 0);
+  if (stat === "gold" && n >= 1000) return `${(n / 1000).toFixed(1)}k`;
+  return String(n);
+}
+
+function setStats(stats) {
+  ["blue", "red"].forEach((side) => {
+    const values = stats?.[side];
+    if (!values) return;
+    Object.entries(values).forEach(([stat, value]) => {
+      if (stat === "kills") return setKills(side, value);
+      const el = document.querySelector(`.sb-side.${side} .sb-stats [data-stat="${stat}"]`);
+      if (el) el.textContent = formatStat(stat, value);
+    });
+  });
+}
+
+function clearStats() {
+  document.querySelectorAll(".sb-stats [data-stat]").forEach((el) => { el.textContent = ""; });
+  setKills("blue", 0);
+  setKills("red", 0);
+}
+
+// ---------- Team logos ----------
+// Uploaded on the controller (js/showLogo.js) as Base64 data: localStorage logo-blue /
+// logo-red, plus {type: "logo-update", team, data} and {type: "clear-logos"} messages.
+// SWITCH TEAMS swaps them by sending two logo-update messages.
+
+function setLogo(side, data) {
+  const img = $(`${side}-logo`);
+  if (data) img.src = data;
+  else img.removeAttribute("src");
+  img.hidden = !data;
+}
+
 function resetAll() {
+  clearStats();
+  setLogo("blue", null);
+  setLogo("red", null);
   setTeamName("blue", "");
   setTeamName("red", "");
   setScore("blue", 0);
@@ -235,6 +290,8 @@ function loadFromStorage() {
   setScore("red", ls("red-score"));
   setCasters(ls("casters"));
   setMapType(ls("map-type"));
+  setLogo("blue", ls("logo-blue"));
+  setLogo("red", ls("logo-red"));
 }
 
 // ---------- Messages (BroadcastChannel + WebSocket) ----------
@@ -262,6 +319,16 @@ function handleMessage(data) {
     case "map-type":
       setMapType(data.value);
       return;
+    case "ingame-stats":
+      setStats(data.stats);
+      return;
+    case "logo-update":
+      if (data.team === "blue" || data.team === "red") setLogo(data.team, data.data);
+      return;
+    case "clear-logos":
+      setLogo("blue", null);
+      setLogo("red", null);
+      return;
   }
 
   // older untyped messages from control.js
@@ -281,13 +348,54 @@ function handleStorage(e) {
     case "red-score": return setScore("red", v);
     case "casters": return setCasters(v);
     case "map-type": return setMapType(v);
+    case "logo-blue": return setLogo("blue", v);
+    case "logo-red": return setLogo("red", v);
   }
 }
 
 loadFromStorage();
 mountSponsorSlideshow($("sponsors")); // handles its own storage/messages
+// ---------- Game clock (the 00:00 above the league logo) ----------
+// Counts up MM:SS from 00:00, starting when the intro animation has finished.
+// Every intro (page load or OBS scene switch) resets it to 00:00 and starts again.
+// Time is computed from a start timestamp, so it stays right even if the browser
+// throttles timers while the source is off screen.
+let clockStart = null;
+let clockTimer = null;
+
+function renderClock() {
+  const secs = clockStart === null ? 0 : Math.max(0, Math.floor((Date.now() - clockStart) / 1000));
+  const mm = String(Math.floor(secs / 60)).padStart(2, "0");
+  const ss = String(secs % 60).padStart(2, "0");
+  document.querySelector(".sb-timer").textContent = `${mm}:${ss}`;
+}
+
+function resetClock() {
+  clearInterval(clockTimer);
+  clockTimer = null;
+  clockStart = null;
+  renderClock();
+}
+
+function startClock() {
+  clearInterval(clockTimer);
+  clockStart = Date.now();
+  renderClock();
+  clockTimer = setInterval(renderClock, 250);
+}
+
+let introRun = 0;
+
+function intro() {
+  const run = ++introRun;
+  resetClock();
+  playIntro().then(() => {
+    if (run === introRun) startClock(); // a newer intro takes over
+  });
+}
+
 let lastIntro = performance.now();
-playIntro();
+intro();
 ready = true;
 
 // Replay the intro whenever OBS puts this browser source on the program output
@@ -298,7 +406,7 @@ window.addEventListener("obsSourceActiveChanged", (e) => {
   if (!e.detail?.active) return;
   if (performance.now() - lastIntro < 1500) return;
   lastIntro = performance.now();
-  playIntro();
+  intro();
 });
 
 const channel = new BroadcastChannel("team_channel");

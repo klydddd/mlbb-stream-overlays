@@ -301,7 +301,14 @@ body {
 /* With a player photo: hero art shrinks to the top of the card and fades into
    the team color, so the player stands in front of it (like the reference). */
 .card.picked.has-photo .card-art {
-    height: 400px; /* whole pixels (~62% of the 646px card) so no seam at the edge */
+    height: 400px; /* ~62% of the 646px card */
+    /* Fade the art out over its last 60px. Its bottom edge can land on a fraction of a
+       pixel (e.g. when the lineup is scaled down under the sponsor strip), and the
+       browser then blends the dark hero art into that edge row as a thin dark line.
+       That stretch is already solid team colour (the ::after fade) over the same-colour
+       card, so fading it out changes nothing visible. */
+    -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 60px), transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 calc(100% - 60px), transparent 100%);
 }
 
 .team-cards.blue .card.picked.has-photo {
@@ -633,4 +640,86 @@ body {
 @keyframes hd-in-rise {
     from { translate: 0 120%; }
     to { translate: 0 0; }
+}
+
+/* ---------- Sponsor strip (js/sponsorStrip.js) ---------- */
+/* Full-width strip on top, same look as the one on display.html. While it shows,
+   the rest of the lineup (.stage-content) is scaled down and moved under it, so the
+   cards keep their exact layout (the photo/head alignment measures unscaled sizes). */
+.stage {
+    /* strip height; keep --hd-strip-scale = (1080 - height) / 1080 in step with it */
+    --hd-strip-h: 100px;
+    --hd-strip-scale: 0.9074;
+}
+
+.stage-content {
+    position: absolute;
+    inset: 0;
+    transform-origin: 50% 0;
+    transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.stage.has-strip .stage-content {
+    transform: translateY(var(--hd-strip-h)) scale(var(--hd-strip-scale));
+}
+
+.hd-sponsor-strip {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--hd-strip-h);
+    z-index: 2;
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    background: var(--plate-white);
+    border-bottom: 4px solid;
+    border-image: linear-gradient(90deg, var(--blue-strong) 50%, var(--red-strong) 50%) 1;
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
+    animation: hd-strip-in 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@keyframes hd-strip-in {
+    from { translate: 0 -110%; }
+    to { translate: 0 0; }
+}
+
+.hd-sponsor-strip[hidden],
+.hd-sponsor-strip .sponsor-group[hidden] {
+    display: none !important;
+}
+
+.hd-sponsor-strip .sponsor-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 0 40px;
+}
+
+.hd-sponsor-strip .sponsor-group + .sponsor-group:not([hidden]) {
+    border-left: 2px solid rgba(0, 16, 31, 0.12);
+}
+
+.hd-sponsor-strip .sponsor-group-label {
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 900;
+    letter-spacing: 0.14em;
+    line-height: 1;
+}
+
+.hd-sponsor-strip .sponsor-group-logos {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+}
+
+.hd-sponsor-strip .sponsor-group-logos img {
+    height: 58px;
+    max-width: 260px;
+    object-fit: contain;
 }
