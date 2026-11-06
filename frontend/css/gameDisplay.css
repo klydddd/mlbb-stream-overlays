@@ -48,16 +48,6 @@ body {
     color: var(--white);
 }
 
-/* ---------- minimap frame ---------- */
-.minimap-frame {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 340px;
-    height: 339px;
-    border: 6px solid var(--white);
-}
-
 /* ---------- scoreboard ---------- */
 .scoreboard {
     position: absolute;
@@ -108,14 +98,50 @@ body {
     height: 22px;
 }
 
-.blue .sb-icons .ic:nth-child(1) { left: 151px; }
-.blue .sb-icons .ic:nth-child(2) { left: 223px; }
-.blue .sb-icons .ic:nth-child(3) { left: 296px; }
-.blue .sb-icons .ic:nth-child(4) { left: 364px; }
-.red .sb-icons .ic:nth-child(4) { right: 152px; }
-.red .sb-icons .ic:nth-child(3) { right: 218px; }
-.red .sb-icons .ic:nth-child(2) { right: 289px; }
-.red .sb-icons .ic:nth-child(1) { right: 356px; }
+/* lord, tower, gold (no turtle: the game HUD doesn't show a turtle count) */
+.blue .sb-icons .ic:nth-child(1) { left: 165px; }
+.blue .sb-icons .ic:nth-child(2) { left: 245px; }
+.blue .sb-icons .ic:nth-child(3) { left: 325px; }
+.red .sb-icons .ic:nth-child(3) { right: 165px; }
+.red .sb-icons .ic:nth-child(2) { right: 245px; }
+.red .sb-icons .ic:nth-child(1) { right: 325px; }
+
+/* stat numbers beside the icons (blue: right of the icon, red: mirrored to the left) */
+.sb-stats span {
+    position: absolute;
+    top: 5px;
+    font-size: 24px;
+    line-height: 24px;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.blue .sb-stats [data-stat="lord"] { left: 191px; }
+.blue .sb-stats [data-stat="tower"] { left: 271px; }
+.blue .sb-stats [data-stat="gold"] { left: 351px; }
+.red .sb-stats [data-stat="lord"] { right: 191px; }
+.red .sb-stats [data-stat="tower"] { right: 271px; }
+.red .sb-stats [data-stat="gold"] { right: 351px; }
+
+/* team logo in the open team-coloured area beside the name plate */
+.sb-team-logo {
+    position: absolute;
+    top: 8px;
+    width: 72px;
+    height: 72px;
+    display: grid;
+    place-items: center;
+}
+
+.blue .sb-team-logo { left: 46px; }
+.red .sb-team-logo { right: 46px; }
+
+.sb-team-logo img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.35));
+}
 
 /* speckled white plate holding the team name and series pips */
 .sb-plate {

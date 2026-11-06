@@ -21,3 +21,6 @@ uvicorn[standard]
 # Additional utilities (if needed)
 python-multipart
 pywin32
+
+# Window capture on macOS (ingame_stats_bot.py)
+pyobjc-framework-Quartz; sys_platform == "darwin"

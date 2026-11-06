@@ -47,6 +47,10 @@ const HIDDEN_TEXT = { left: "inset(0 100% 0 0)", right: "inset(0 0 0 100%)" };
 
 // ---------- Intro (page load / OBS source refresh) ----------
 
+// When the last intro animation ends (map icon: 1050ms delay + 500ms)
+const INTRO_MS = 1550;
+
+// Resolves when the intro has finished playing
 export function playIntro() {
   // 1. White band opens out from the middle of the screen (x = 960 on the stage)
   anim($(".sb-band"), [{ clipPath: "inset(0 60.6% 0 39.4%)" }, { clipPath: FULL }], { duration: 550 });
@@ -84,14 +88,13 @@ export function playIntro() {
     anim($(`#${side}-score`), [{ scale: "0" }, { scale: "1" }], { duration: 600, delay: 720, easing: POP });
   });
 
-  // 7. Minimap frame draws out from its top-left corner
-  anim($(".minimap-frame"), [{ clipPath: "inset(0 100% 100% 0)" }, { clipPath: FULL }], { duration: 650, delay: 300 });
-
-  // 8. Right column: sponsors drop in, then casters and map slide in from the right edge
+  // 7. Right column: sponsors drop in, then casters and map slide in from the right edge
   anim($(".sponsors"), [{ clipPath: "inset(0 0 100% 0)" }, { clipPath: FULL }], { duration: 450, delay: 450 });
   anim($(".casters"), [{ clipPath: "inset(0 0 0 100%)" }, { clipPath: FULL }], { duration: 500, delay: 800 });
   anim($(".map-type"), [{ clipPath: "inset(0 0 0 100%)" }, { clipPath: FULL }], { duration: 500, delay: 920 });
   anim($(".map-type-icon"), [{ translate: "-83px 0" }, { translate: "0 0" }], { duration: 500, delay: 1050 });
+
+  return new Promise((resolve) => setTimeout(resolve, REDUCED ? 0 : INTRO_MS));
 }
 
 // ---------- Text swap: old value wipes out, new value wipes in ----------
@@ -134,9 +137,10 @@ export async function swapIcon(el, apply) {
 // ---------- Score / pips ----------
 
 // up: the score went up -> number pops, newly won pips flash white and stretch
+// scoreEl may be null (series score changes only the pips; kills change only the number)
 export function scoreChanged(scoreEl, newPips, up) {
   if (up) {
-    anim(scoreEl, [{ scale: "1" }, { scale: "1.45", offset: 0.35 }, { scale: "1" }], { duration: 650, easing: "ease-out", fill: "none" });
+    if (scoreEl) anim(scoreEl, [{ scale: "1" }, { scale: "1.45", offset: 0.35 }, { scale: "1" }], { duration: 650, easing: "ease-out", fill: "none" });
     newPips.forEach((pip, i) => {
       anim(pip, [
         { scale: "1 1", background: "var(--team)" },
@@ -144,7 +148,7 @@ export function scoreChanged(scoreEl, newPips, up) {
         { scale: "1 1", background: "var(--team)" },
       ], { duration: 700, delay: 120 + i * 90, easing: "ease-out", fill: "none" });
     });
-  } else {
+  } else if (scoreEl) {
     anim(scoreEl, [{ scale: "1" }, { scale: "0.7", offset: 0.4 }, { scale: "1" }], { duration: 400, easing: "ease-out", fill: "none" });
   }
 }

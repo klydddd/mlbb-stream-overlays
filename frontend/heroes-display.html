@@ -9,13 +9,36 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Anton&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="css/heroes-display.css?v=29">
+    <link rel="stylesheet" href="css/heroes-display.css?v=31">
     <link rel="icon" href="Assets/favico/favicon_io/android-chrome-512x512.png">
     <title>Heroes Display</title>
 </head>
 
 <body>
     <div class="stage">
+
+        <!-- Sponsor strip across the top (js/sponsorStrip.js), same logos as the other overlays.
+             While it has logos, .stage gets .has-strip and the lineup below shrinks to fit under it. -->
+        <div class="hd-sponsor-strip" id="hd-sponsors" hidden>
+            <div class="sponsor-group" data-group="partner" hidden>
+                <span class="sponsor-group-label">IN PARTNERSHIP WITH</span>
+                <div class="sponsor-group-logos"></div>
+            </div>
+            <div class="sponsor-group" data-group="presented" hidden>
+                <span class="sponsor-group-label">PRESENTED BY</span>
+                <div class="sponsor-group-logos"></div>
+            </div>
+            <div class="sponsor-group" data-group="sponsored" hidden>
+                <span class="sponsor-group-label">SPONSORED BY</span>
+                <div class="sponsor-group-logos"></div>
+            </div>
+            <div class="sponsor-group" data-group="monitor" hidden>
+                <span class="sponsor-group-label">OFFICIAL MONITOR</span>
+                <div class="sponsor-group-logos"></div>
+            </div>
+        </div>
+
+        <div class="stage-content">
 
         <!-- Corner labels -->
         <div class="corner corner-left">
@@ -63,9 +86,10 @@
             <div class="team-cards blue" id="hd-cards-blue"></div>
             <div class="team-cards red" id="hd-cards-red"></div>
         </section>
+        </div>
     </div>
 
-    <script type="module" src="js/heroesDisplay.js?v=30"></script>
+    <script type="module" src="js/heroesDisplay.js?v=31"></script>
 </body>
 
 </html>

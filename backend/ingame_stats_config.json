@@ -1,0 +1,81 @@
+{
+  "window": "QuickTime Player \u2014 Movie Recording",
+  "frame_size": [
+    3472,
+    2410
+  ],
+  "regions": {
+    "blue-lord": {
+      "box": [
+        1043,
+        16,
+        69,
+        77
+      ],
+      "channel": "min"
+    },
+    "blue-tower": {
+      "box": [
+        1202,
+        14,
+        94,
+        83
+      ],
+      "channel": "min"
+    },
+    "blue-gold": {
+      "box": [
+        1350,
+        13,
+        169,
+        83
+      ],
+      "channel": "min"
+    },
+    "red-lord": {
+      "box": [
+        2408,
+        7,
+        113,
+        92
+      ],
+      "channel": "min"
+    },
+    "red-tower": {
+      "box": [
+        2253,
+        2,
+        109,
+        92
+      ],
+      "channel": "min"
+    },
+    "red-gold": {
+      "box": [
+        2049,
+        3,
+        167,
+        95
+      ],
+      "channel": "min"
+    },
+    "blue-kills": {
+      "box": [
+        1532,
+        8,
+        118,
+        82
+      ],
+      "channel": "min"
+    },
+    "red-kills": {
+      "box": [
+        1822,
+        8,
+        150,
+        82
+      ],
+      "channel": "min"
+    }
+  }
+}
