@@ -441,13 +441,15 @@ button:active {
     cursor: pointer;
 }
 
-.photo-zoom-value {
+.photo-zoom-value,
+.draft-photo-zoom-value {
     width: 36px;
     text-align: right;
     font-variant-numeric: tabular-nums;
 }
 
-#photo-zoom-global-holder .photo-zoom input[type="range"] {
+#photo-zoom-global-holder .photo-zoom input[type="range"],
+#draft-photo-zoom-holder .photo-zoom input[type="range"] {
     width: 140px;
     flex: none;
 }

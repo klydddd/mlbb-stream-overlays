@@ -193,6 +193,12 @@ nextPhaseBtn.addEventListener('click', () => {
         currentPhaseDisplay.textContent = draftState.currentPhase;
         scheduleFinalSwitch();
 
+        // Entering the final phase: control.js relays this to the display, which
+        // shows every player's photo as LOCKED IN for a few seconds
+        if (draftState.currentPhase === FINAL_PHASE) {
+            window.dispatchEvent(new CustomEvent("draft-locked-in"));
+        }
+
         // Auto-focus the first input of the new phase
         focusPhaseInput(draftState.currentPhase);
     } else {

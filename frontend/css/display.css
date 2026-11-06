@@ -413,20 +413,6 @@ p {
     transition: filter 0.5s ease-in-out;
 }
 
-@keyframes blue-glow {
-    0% {
-        box-shadow: inset 0 0 0px rgba(135, 185, 245, 0.7);
-    }
-
-    50% {
-        box-shadow: inset 0 0 50px rgba(135, 185, 245, 0.7);
-    }
-
-    100% {
-        box-shadow: inset 0 0 0px rgba(135, 185, 245, 0.7);
-    }
-}
-
 @keyframes blue-select {
     0% {
         box-shadow: inset 0 0 0px rgba(135, 185, 245, 0.7);
@@ -438,20 +424,6 @@ p {
 
     100% {
         box-shadow: inset 0 0 0px rgba(135, 185, 245, 0.7);
-    }
-}
-
-@keyframes red-glow {
-    0% {
-        box-shadow: inset 0 0 0px rgba(245, 169, 43, 0.9);
-    }
-
-    50% {
-        box-shadow: inset 0 0 50px rgba(245, 169, 43, 0.9);
-    }
-
-    100% {
-        box-shadow: inset 0 0 0px rgba(245, 169, 43, 0.9);
     }
 }
 
@@ -492,12 +464,97 @@ p {
 }
 
 
+/* Active pick slot: a subtle, low-opacity team-colour gradient drifting slowly behind
+   the player photo (drawn as the slot's own background, so it stays under the photo). */
+.blue-picks,
+.red-picks {
+    background-size: 250% 250%;
+    background-repeat: no-repeat;
+    animation: pick-backdrop 9s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
+}
+
 .blue-picks {
-    animation: blue-glow 1s infinite;
+    background-image: linear-gradient(135deg,
+            rgba(47, 111, 214, 0.06) 0%, rgba(63, 134, 238, 0.22) 30%, rgba(156, 200, 255, 0.1) 50%,
+            rgba(30, 80, 190, 0.24) 72%, rgba(47, 111, 214, 0.06) 100%);
 }
 
 .red-picks {
-    animation: red-glow 1s infinite;
+    background-image: linear-gradient(135deg,
+            rgba(236, 138, 31, 0.06) 0%, rgba(245, 169, 43, 0.22) 30%, rgba(255, 214, 140, 0.1) 50%,
+            rgba(200, 95, 15, 0.24) 72%, rgba(236, 138, 31, 0.06) 100%);
+}
+
+@keyframes pick-backdrop {
+    from {
+        background-position: 0% 0%;
+    }
+
+    to {
+        background-position: 100% 100%;
+    }
+}
+
+/* Active pick slot: a team-colour glow rising from the bottom of the slot up to about
+   chest height (classes set by activePick.js). It is a layer above the slot's contents,
+   so it washes over the player photo and role icon. Layers, top to bottom:
+   two sets of light sparks drifting upward, a bright edge line, a breathing bloom,
+   and a soft base wash. A mask fades everything out before it reaches the face. */
+.blue-picks::before,
+.red-picks::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background-repeat: repeat, repeat, no-repeat, no-repeat, no-repeat;
+    -webkit-mask-image: linear-gradient(to top, #000 0%, #000 22%, transparent 50%);
+    mask-image: linear-gradient(to top, #000 0%, #000 22%, transparent 50%);
+    animation:
+        pick-bloom 2.6s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate,
+        pick-sparks 3.4s linear infinite;
+}
+
+.blue-picks::before {
+    background-image:
+        radial-gradient(circle, rgba(255, 255, 255, 0.85) 0 1.1px, rgba(255, 255, 255, 0) 2px),
+        radial-gradient(circle, rgba(170, 210, 255, 0.8) 0 1.5px, rgba(170, 210, 255, 0) 2.6px),
+        linear-gradient(to top, rgba(225, 240, 255, 0.95) 0%, rgba(80, 145, 240, 0.85) 1.5%, rgba(80, 145, 240, 0) 7%),
+        radial-gradient(ellipse 50% 100% at 50% 100%,
+            rgba(47, 111, 214, 0.85) 0%, rgba(63, 134, 238, 0.45) 40%, rgba(63, 134, 238, 0.12) 65%, rgba(63, 134, 238, 0) 85%),
+        linear-gradient(to top, rgba(20, 70, 170, 0.45) 0%, rgba(20, 70, 170, 0) 30%);
+}
+
+.red-picks::before {
+    background-image:
+        radial-gradient(circle, rgba(255, 255, 255, 0.85) 0 1.1px, rgba(255, 255, 255, 0) 2px),
+        radial-gradient(circle, rgba(255, 220, 150, 0.85) 0 1.5px, rgba(255, 220, 150, 0) 2.6px),
+        linear-gradient(to top, rgba(255, 244, 220, 0.95) 0%, rgba(245, 160, 40, 0.9) 1.5%, rgba(245, 160, 40, 0) 7%),
+        radial-gradient(ellipse 50% 100% at 50% 100%,
+            rgba(236, 138, 31, 0.9) 0%, rgba(245, 169, 43, 0.5) 40%, rgba(245, 169, 43, 0.14) 65%, rgba(245, 169, 43, 0) 85%),
+        linear-gradient(to top, rgba(170, 70, 10, 0.45) 0%, rgba(170, 70, 10, 0) 30%);
+}
+
+/* the bloom breathes up towards the chest and settles back (eased, back and forth) */
+@keyframes pick-bloom {
+    from {
+        background-size: 37px 53px, 61px 79px, 100% 100%, 140% 26%, 100% 100%;
+    }
+
+    to {
+        background-size: 37px 53px, 61px 79px, 100% 100%, 190% 52%, 100% 100%;
+    }
+}
+
+/* sparks float upward; each set moves a whole number of tiles, so the loop is seamless */
+@keyframes pick-sparks {
+    from {
+        background-position: 0 0, 19px 31px, 50% 100%, 50% 100%, 50% 100%;
+    }
+
+    to {
+        background-position: 0 -106px, 19px -48px, 50% 100%, 50% 100%, 50% 100%;
+    }
 }
 
 .bans {
@@ -933,4 +990,86 @@ p {
 /* keep the timer digits' line box inside the shorter 70px timer row */
 .pick-section:not(.pick-section-background) > .gap .timer {
     line-height: 1;
+}
+
+/* ---------- Player photo in the active pick slot (js/draftPlayerPhotos.js) ---------- */
+/* The photo fades in while the slot is active (.blue-picks / .red-picks from activePick.js)
+   and replaces the role icon. The hero portrait in the foreground covers it on pick. */
+.pick-section-background .pick .media-container img.draft-player-photo {
+    position: absolute;
+    inset: 0;
+    filter: none;
+    /* DRAFT PHOTO ZOOM from the controller (set on :root by draftPlayerPhotos.js),
+       zooming towards the head near the top of the slot */
+    scale: var(--draft-photo-zoom, 1);
+    transform-origin: 50% 10%;
+    object-fit: cover;
+    object-position: 50% 10%;
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 0.35s ease, transform 0.35s ease;
+}
+
+.pick-section-background .media-container > img:not(.draft-player-photo) {
+    transition: opacity 0.35s ease;
+}
+
+.pick-section-background .media-container.has-player-photo:is(.blue-picks, .red-picks) > img.draft-player-photo {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.pick-section-background .media-container.has-player-photo:is(.blue-picks, .red-picks) > img:not(.draft-player-photo) {
+    opacity: 0;
+}
+
+/* ---------- Lock-in reveal: player photos over the hero portraits (js/draftPlayerPhotos.js) ---------- */
+/* Shown for ~3s when the draft ends, before the outro. Opaque on purpose (see the
+   outro note in display.js): no translucent layers over the hero art in OBS. */
+.lockin-card {
+    position: absolute;
+    inset: 0;
+    z-index: 3; /* above the hero portrait, below the hero name bar (z-index 100) */
+    overflow: hidden;
+}
+
+.lockin-blue {
+    background: linear-gradient(160deg, #e6effc 0%, #bcd4f6 55%, #8db4ee 100%);
+}
+
+.lockin-red {
+    background: linear-gradient(160deg, #fdf1de 0%, #f8d9a8 55%, #f1b964 100%);
+}
+
+.pick-section .media-container .lockin-card img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 10%;
+    scale: var(--draft-photo-zoom, 1);
+    transform-origin: 50% 10%;
+    filter: none;
+    display: block;
+}
+
+/* team-colour light from below, with a bright edge line */
+.lockin-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.lockin-blue::after {
+    background:
+        linear-gradient(to top, rgba(225, 240, 255, 0.95) 0%, rgba(80, 145, 240, 0.9) 1.5%, rgba(80, 145, 240, 0) 7%),
+        linear-gradient(to top, rgba(47, 111, 214, 0.7) 0%, rgba(47, 111, 214, 0.25) 22%, rgba(47, 111, 214, 0) 42%);
+}
+
+.lockin-red::after {
+    background:
+        linear-gradient(to top, rgba(255, 244, 220, 0.95) 0%, rgba(245, 160, 40, 0.9) 1.5%, rgba(245, 160, 40, 0) 7%),
+        linear-gradient(to top, rgba(236, 138, 31, 0.75) 0%, rgba(236, 138, 31, 0.28) 22%, rgba(236, 138, 31, 0) 42%);
 }
