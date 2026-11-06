@@ -339,25 +339,29 @@ body {
     background: linear-gradient(180deg, rgba(245, 169, 43, 0) 0%, rgba(245, 169, 43, 0.9) calc(100% - 110px), #f5a92b calc(100% - 80px));
 }
 
-/* Player photo: cut-out standing on the name bar, over the hero art (like the reference) */
+/* Player photo: cut-out standing on the name bar, over the hero art (like the reference).
+   The frame is everything above the name bar; heroesDisplay.js places the image in
+   pixels (auto head alignment, zoom, pan). */
 .card-photo {
     position: absolute;
     left: 0;
     right: 0;
+    top: 0;
     bottom: 46px;
-    height: 60%;
     z-index: 2;
     pointer-events: none;
 }
 
 .card-photo img {
+    position: absolute;
+    left: 0;
+    bottom: 0;
     width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center bottom;
+    max-width: none;
     display: block;
     filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.35));
     animation: hd-photo-in 0.5s ease-out both;
+    transition: left 0.25s ease, top 0.25s ease, width 0.25s ease, height 0.25s ease;
 }
 
 @keyframes hd-photo-in {

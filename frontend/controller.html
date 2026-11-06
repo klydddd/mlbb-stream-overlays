@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/controller.css?v=2">
+    <link rel="stylesheet" href="css/controller.css?v=10">
     <link rel="icon" href="Assets/favico/favicon_io/android-chrome-512x512.png">
     <title>Control Panel</title>
 </head>
@@ -267,6 +267,16 @@
             <button id="clear-logos">CLEAR LOGO</button>
             <button id="clear-cam-links">CLEAR CAM LINK</button>
             <button id="clear-player-photos">CLEAR PHOTOS</button>
+            <label class="toggle-option" title="Automatically cut the player out of uploaded photos">
+                <input type="checkbox" id="photo-auto-bg" checked>
+                AUTO REMOVE PHOTO BG
+            </label>
+            <label class="toggle-option" title="Line up every player's head at the same size and height">
+                <input type="checkbox" id="photo-auto-align" checked>
+                AUTO ALIGN HEADS
+            </label>
+            <div id="photo-zoom-global-holder" class="toggle-option"></div>
+            <button id="reset-photo-adjust" title="Reset every photo zoom and position (keeps the photos)">RESET PHOTO ADJUSTMENTS</button>
         </div>
         <div class="timer-control">
 
@@ -299,11 +309,11 @@
     </div>
 
 
-    <script type="module" src="js/control.js?v=2"></script>
+    <script type="module" src="js/control.js?v=10"></script>
     <script src="js/swap.js"></script>
-    <script type="module" src="js/showLogo.js"></script>
+    <script type="module" src="js/showLogo.js?v=2"></script>
     <script type="module" src="js/clear.js"></script>
-    <script type="module" src="js/playerPhotos.js?v=2"></script>
+    <script type="module" src="js/playerPhotos.js?v=10"></script>
     <script type="module" src="js/autocomplete.js"></script>
     <script src="js/timer.js"></script>
     <script src="js/obsWebsocket/showDisplay.js"></script>

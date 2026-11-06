@@ -3,7 +3,7 @@ import { send, onMessage } from "./websocketClient.js";
 const channel = new BroadcastChannel("team_channel");
 
 // Off-screen canvas analysis to detect transparency and extract the most dominant color
-function analyzeImage(base64Data, callback) {
+export function analyzeImage(base64Data, callback) {
     const img = new Image();
     img.src = base64Data;
     img.onload = () => {

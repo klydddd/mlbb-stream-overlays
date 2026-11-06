@@ -376,3 +376,147 @@ button:active {
 .photo-upload.has-photo .photo-remove {
     display: block;
 }
+
+/* Background removal in progress */
+.photo-upload.processing {
+    pointer-events: none;
+    filter: saturate(0.6);
+}
+
+.photo-upload.processing span {
+    animation: photo-busy 1s ease-in-out infinite;
+}
+
+@keyframes photo-busy {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+}
+
+/* "AUTO REMOVE PHOTO BG" toggle in Team Controls */
+.toggle-option {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    margin: 2px;
+    border-radius: 5px;
+    background: rgba(255, 255, 255, 0.08);
+    color: white;
+    font-size: 12px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.toggle-option input {
+    width: auto;
+    margin: 0;
+    cursor: pointer;
+}
+
+/* Player photo zoom sliders */
+.photo-zooms {
+    display: flex;
+    gap: 5px;
+    margin: 0 5px 5px;
+}
+
+.photo-zooms .photo-zoom {
+    flex: 1;
+    min-width: 0;
+}
+
+.photo-zoom {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: white;
+    font-size: 11px;
+}
+
+.photo-zoom input[type="range"] {
+    flex: 1;
+    min-width: 0;
+    width: auto;
+    padding: 0;
+    margin: 0;
+    accent-color: #22d3ee;
+    cursor: pointer;
+}
+
+.photo-zoom-value {
+    width: 36px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+#photo-zoom-global-holder .photo-zoom input[type="range"] {
+    width: 140px;
+    flex: none;
+}
+
+/* Team photo zoom (above each team's photo buttons) */
+.photo-zoom-team {
+    margin: 5px 5px 0;
+}
+
+.photo-zoom-team .photo-zoom-label {
+    white-space: nowrap;
+}
+
+/* Per-player zoom + position stacked under each photo */
+.photo-zooms .photo-adjust {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.photo-adjust .photo-zoom-label {
+    width: 30px;
+    font-size: 9px;
+    opacity: 0.8;
+}
+
+.photo-offset-value {
+    width: 36px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+/* POS has nothing to pan until the photo is zoomed in */
+.photo-offset.inactive {
+    opacity: 0.4;
+}
+
+.photo-offsetx-value {
+    width: 36px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Team / global zoom + position rows */
+.photo-zoom-team {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.photo-zoom-team .photo-zoom {
+    flex: 1;
+    min-width: 0;
+}
+
+.photo-zoom-team .photo-zoom:first-child {
+    flex: 1.6;
+}
+
+#photo-zoom-global-holder {
+    gap: 14px;
+}
+
+#photo-zoom-global-holder .photo-offset input[type="range"],
+#photo-zoom-global-holder .photo-offsetx input[type="range"] {
+    width: 90px;
+    flex: none;
+}

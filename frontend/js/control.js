@@ -1,5 +1,5 @@
 import { send } from "./websocketClient.js";
-import { refreshPhotoThumbs } from "./playerPhotos.js?v=2";
+import { refreshPhotoThumbs } from "./playerPhotos.js?v=10";
 
 const page = document.body.getAttribute("data-page"); // to determine which page is display and controller
 const channel = new BroadcastChannel("team_channel");
@@ -204,7 +204,64 @@ if (switchBtn) {
         channel.postMessage(msg);
         send(msg);
       });
+
+      // per-player photo position follows the photo
+      const offBlue = localStorage.getItem(`photo-offset-${i}`);
+      const offRed = localStorage.getItem(`photo-offset-${i + 5}`);
+      [[i, offRed], [i + 5, offBlue]].forEach(([slot, value]) => {
+        if (value) localStorage.setItem(`photo-offset-${slot}`, value);
+        else localStorage.removeItem(`photo-offset-${slot}`);
+        const msg = { type: "photo-offset", slot, value: value ? +value : 0 };
+        channel.postMessage(msg);
+        send(msg);
+      });
+
+      // horizontal position too
+      const offxBlue = localStorage.getItem(`photo-offsetx-${i}`);
+      const offxRed = localStorage.getItem(`photo-offsetx-${i + 5}`);
+      [[i, offxRed], [i + 5, offxBlue]].forEach(([slot, value]) => {
+        if (value) localStorage.setItem(`photo-offsetx-${slot}`, value);
+        else localStorage.removeItem(`photo-offsetx-${slot}`);
+        const msg = { type: "photo-offset-x", slot, value: value ? +value : 0 };
+        channel.postMessage(msg);
+        send(msg);
+      });
+
+      // per-player photo zoom follows the photo
+      const zoomBlue = localStorage.getItem(`photo-zoom-${i}`);
+      const zoomRed = localStorage.getItem(`photo-zoom-${i + 5}`);
+      [[i, zoomRed], [i + 5, zoomBlue]].forEach(([slot, value]) => {
+        if (value) localStorage.setItem(`photo-zoom-${slot}`, value);
+        else localStorage.removeItem(`photo-zoom-${slot}`);
+        const msg = { type: "photo-zoom", slot, value: value ? +value : 100 };
+        channel.postMessage(msg);
+        send(msg);
+      });
     }
+    // team photo position (up/down, left/right) follows the team too
+    ["photo-offset", "photo-offsetx"].forEach((prefix) => {
+      const vBlue = localStorage.getItem(`${prefix}-blue`);
+      const vRed = localStorage.getItem(`${prefix}-red`);
+      [["blue", vRed], ["red", vBlue]].forEach(([side, value]) => {
+        if (value) localStorage.setItem(`${prefix}-${side}`, value);
+        else localStorage.removeItem(`${prefix}-${side}`);
+        const msg = { type: prefix === "photo-offset" ? "photo-offset" : "photo-offset-x", slot: side, value: value ? +value : 0 };
+        channel.postMessage(msg);
+        send(msg);
+      });
+    });
+
+    // team photo zoom follows the team to its new side
+    const teamZoomBlue = localStorage.getItem("photo-zoom-blue");
+    const teamZoomRed = localStorage.getItem("photo-zoom-red");
+    [["blue", teamZoomRed], ["red", teamZoomBlue]].forEach(([side, value]) => {
+      if (value) localStorage.setItem(`photo-zoom-${side}`, value);
+      else localStorage.removeItem(`photo-zoom-${side}`);
+      const msg = { type: "photo-zoom", slot: side, value: value ? +value : 100 };
+      channel.postMessage(msg);
+      send(msg);
+    });
+
     refreshPhotoThumbs();
 
     // Broadcast logo updates to sync display logo changes
