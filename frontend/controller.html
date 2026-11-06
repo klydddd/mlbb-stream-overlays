@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/controller.css?v=17">
+    <link rel="stylesheet" href="css/controller.css?v=18">
     <link rel="icon" href="Assets/favico/favicon_io/android-chrome-512x512.png">
     <title>Control Panel</title>
 </head>
@@ -370,6 +370,18 @@
             </div>
         </section>
 
+        <section class="panel panel-tournament-stats" data-panel="tournament-stats" data-group="setup">
+            <button type="button" class="panel-head"><span class="panel-title">TOURNAMENT STATS</span><span class="panel-chip"></span></button>
+            <div class="panel-body">
+                <select id="stats-tournament" title="Active tournament: +1 on a score logs the game here"></select>
+                <div class="stats-new-row">
+                    <input type="search" id="stats-new-name" placeholder="NEW TOURNAMENT NAME" autocomplete="off">
+                    <button type="button" id="stats-create">CREATE</button>
+                </div>
+                <p class="stats-status" id="stats-status">LOADING…</p>
+            </div>
+        </section>
+
         <section class="panel" data-panel="clear" data-group="draft">
             <button type="button" class="panel-head"><span class="panel-title">CLEAR / RESET</span><span class="panel-chip"></span></button>
             <div class="panel-body">
@@ -515,6 +527,7 @@
     <script type="module" src="js/playerPhotos.js?v=12"></script>
     <script type="module" src="js/autocomplete.js"></script>
     <script type="module" src="js/ingame.js?v=1"></script>
+    <script type="module" src="js/heroStatsController.js?v=1"></script>
     <script type="module" src="js/sponsors.js?v=3"></script>
     <script type="module" src="js/casterCams.js?v=1"></script>
     <script src="js/pasteButtons.js?v=1"></script>

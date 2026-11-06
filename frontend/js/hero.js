@@ -178,6 +178,8 @@ export function updateHeroPick(index, heroName, silent = false) {
   if (!silent) {
     container.classList.add(flashGlowClass);
     setTimeout(() => container.classList.remove(flashGlowClass), 1000);
+    // Real lock-in (not a silent restore): js/heroStatsDisplay.js shows the hero's tournament stats
+    document.dispatchEvent(new CustomEvent("hero-locked", { detail: { slot: heroSlot, name: hero.name, container } }));
   }
 
   const img = document.createElement('img');
