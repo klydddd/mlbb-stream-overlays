@@ -4,14 +4,16 @@
 // Clearing sends { type: "clear-player-photos" }.
 
 import { send } from "./websocketClient.js";
-import { removeBackground, hasTransparency, isModelLoaded } from "./bgRemoval.js";
+import { removeBackground, hasTransparency, isModelLoaded } from "./bgRemoval.js?v=2";
 
 const channel = new BroadcastChannel("team_channel");
 
 // Photos are downscaled before saving so 10 of them fit in localStorage
-// (~5MB shared with logos) and stay light over the WebSocket.
-const MAX_HEIGHT = 520;
-const MAX_WIDTH = 520;
+// (~5MB shared with logos) and stay light over the WebSocket. 1000px keeps them
+// sharp on the 170px-wide cards even when zoomed in.
+const MAX_HEIGHT = 1000;
+const MAX_WIDTH = 1000;
+const WEBP_QUALITY = 0.92;
 
 function readFile(file) {
   return new Promise((resolve, reject) => {
@@ -32,9 +34,11 @@ function downscale(dataUrl) {
       const canvas = document.createElement("canvas");
       canvas.width = w;
       canvas.height = h;
-      canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+      const ctx = canvas.getContext("2d");
+      ctx.imageSmoothingQuality = "high";
+      ctx.drawImage(img, 0, 0, w, h);
       // WebP keeps transparency (cut-out photos) and is much smaller than PNG
-      let data = canvas.toDataURL("image/webp", 0.85);
+      let data = canvas.toDataURL("image/webp", WEBP_QUALITY);
       if (!data.startsWith("data:image/webp")) data = canvas.toDataURL("image/png");
       resolve(data);
     };

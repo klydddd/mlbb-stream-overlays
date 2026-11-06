@@ -8,8 +8,9 @@ const TRANSFORMERS_URL =
   "https://cdn.jsdelivr.net/npm/@huggingface/transformers@4.3.1/+esm";
 const MODEL_ID = "Xenova/modnet";
 
-// Large photos are scaled down before matting (MODNet works at ~512px anyway)
-const MAX_INPUT = 1024;
+// Large photos are scaled down before matting. The model works at ~512px and its
+// mask is scaled back up; the photo itself is kept at up to 1600px for sharpness.
+const MAX_INPUT = 1600;
 // Alpha above this counts as "player" when trimming empty margins
 const TRIM_ALPHA = 20;
 const TRIM_PAD = 0.03; // 3% padding around the trimmed player
@@ -108,6 +109,7 @@ export async function removeBackground(dataUrl, { onProgress } = {}) {
   canvas.width = w;
   canvas.height = h;
   const ctx = canvas.getContext("2d");
+  ctx.imageSmoothingQuality = "high";
   ctx.drawImage(img, 0, 0, w, h);
 
   // Predict the alpha matte
