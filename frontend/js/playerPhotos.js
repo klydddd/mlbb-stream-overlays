@@ -254,6 +254,47 @@ function makeOffsetXControl(slot) {
   return wrap;
 }
 
+// ---------- Draft overlay photo zoom (display.html pick slots only, in %) ----------
+// localStorage "draft-photo-zoom"; message { type: "draft-photo-zoom", value }
+// Kept separate from the heroes-display zoom: the draft pick slots are a different shape.
+const DRAFT_ZOOM_KEY = "draft-photo-zoom";
+
+function getDraftZoom() {
+  const v = parseInt(localStorage.getItem(DRAFT_ZOOM_KEY), 10);
+  return Number.isFinite(v) ? v : ZOOM_DEFAULT;
+}
+
+function showDraftZoom(value) {
+  const input = document.querySelector(".draft-photo-zoom-input");
+  if (input) input.value = value;
+  const out = document.querySelector(".draft-photo-zoom-value");
+  if (out) out.textContent = `${value}%`;
+}
+
+export function setDraftPhotoZoom(value) {
+  const v = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, Math.round(value)));
+  if (v === ZOOM_DEFAULT) localStorage.removeItem(DRAFT_ZOOM_KEY);
+  else localStorage.setItem(DRAFT_ZOOM_KEY, String(v));
+  showDraftZoom(v);
+  broadcast({ type: "draft-photo-zoom", value: v });
+}
+
+function makeDraftZoomControl() {
+  const wrap = document.createElement("div");
+  wrap.className = "photo-zoom";
+  wrap.title = "Zoom every player photo in the draft overlay pick slots (double-click to reset)";
+  const v = getDraftZoom();
+  wrap.innerHTML = `
+    <span class="photo-zoom-label">DRAFT PHOTO ZOOM</span>
+    <input type="range" class="draft-photo-zoom-input"
+           min="${ZOOM_MIN}" max="${ZOOM_MAX}" step="${ZOOM_STEP}" value="${v}">
+    <span class="draft-photo-zoom-value">${v}%</span>`;
+  const input = wrap.querySelector("input");
+  input.addEventListener("input", () => setDraftPhotoZoom(+input.value));
+  input.addEventListener("dblclick", () => setDraftPhotoZoom(ZOOM_DEFAULT));
+  return wrap;
+}
+
 // Put every zoom and position back to default (keeps photos and the auto toggles)
 function resetPhotoAdjustments() {
   ["global", "blue", "red"].forEach((k) => {
@@ -266,6 +307,7 @@ function resetPhotoAdjustments() {
     setPhotoOffset(i, OFFSET_DEFAULT);
     setPhotoOffsetX(i, OFFSET_DEFAULT);
   }
+  setDraftPhotoZoom(ZOOM_DEFAULT);
 }
 
 // ---------- Auto head alignment (display side does the work) ----------
@@ -396,6 +438,8 @@ function init() {
     lr.title = "Move all player photos left / right (double-click to reset)";
     globalHolder.append(ctl, up, lr);
   }
+
+  document.getElementById("draft-photo-zoom-holder")?.appendChild(makeDraftZoomControl());
 
   refreshPanState();
 

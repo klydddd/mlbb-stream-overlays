@@ -1,5 +1,5 @@
 import { send } from "./websocketClient.js";
-import { refreshPhotoThumbs } from "./playerPhotos.js?v=11";
+import { refreshPhotoThumbs } from "./playerPhotos.js?v=12";
 
 const page = document.body.getAttribute("data-page"); // to determine which page is display and controller
 const channel = new BroadcastChannel("team_channel");
@@ -277,6 +277,13 @@ if (switchBtn) {
 //   timer RESET               -> heroes-display.html goes back to display.html
 window.addEventListener("draft-display-switch", (e) => {
   const msg = { type: e.detail?.target === "heroes" ? "show-heroes-display" : "show-draft-display" };
+  channel.postMessage(msg);
+  send(msg);
+});
+
+// Final phase reached (timer.js): display shows the LOCKED IN player photos
+window.addEventListener("draft-locked-in", () => {
+  const msg = { type: "draft-locked-in" };
   channel.postMessage(msg);
   send(msg);
 });

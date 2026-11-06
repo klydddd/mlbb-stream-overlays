@@ -292,6 +292,28 @@ function playOutro(done) {
     run(el, [{ clipPath: "inset(0 0 0 0)" }, { clipPath: "inset(0 0 100% 0)" }], 250, 450);
   });
 
+  // 2b. Caster cams (js/casterCamsDisplay.js): the name bar retracts up into the
+  // camera, then the camera shuts like a shutter onto its middle line.
+  // Clip-path only (no opacity), and the 2nd cam trails the 1st slightly.
+  document.querySelectorAll(".caster-cams:not([hidden]) .caster-cam:not([hidden])").forEach((cam, i) => {
+    const offset = i * 90;
+    const name = cam.querySelector(".caster-cam-name");
+    const frame = cam.querySelector(".caster-cam-frame");
+    if (name) run(name, [{ clipPath: "inset(0 0 0 0)" }, { clipPath: "inset(0 0 100% 0)" }], offset, 300);
+    if (frame) run(frame, [{ clipPath: "inset(0 0 0 0)" }, { clipPath: "inset(50% 0 50% 0)" }], 220 + offset, 450);
+  });
+
+  // 2c. Top sponsor strip (js/sponsorStrip.js): its groups slide up out of the strip
+  // (clipped to the strip's box), then the strip itself wipes up off the top edge.
+  const strip = document.querySelector(".top-area.has-strip .top-sponsors:not([hidden])");
+  if (strip) {
+    strip.style.clipPath = "inset(0 0 0 0)";
+    strip.querySelectorAll(".sponsor-group:not([hidden])").forEach((group, i) => {
+      run(group, [{ translate: "0 0" }, { translate: "0 -110%" }], i * STEP, 400);
+    });
+    run(strip, [{ clipPath: "inset(0 0 0 0)" }, { clipPath: "inset(0 0 100% 0)" }], 450, 350);
+  }
+
   // 3. Wipe away the remaining panels / bars
   Object.entries(CLIP).forEach(([sel, [from, to]]) => {
     document.querySelectorAll(sel).forEach((el) => {
