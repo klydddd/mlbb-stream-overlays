@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/controller.css?v=11">
+    <link rel="stylesheet" href="css/controller.css?v=14">
     <link rel="icon" href="Assets/favico/favicon_io/android-chrome-512x512.png">
     <title>Control Panel</title>
 </head>
@@ -17,6 +17,7 @@
         <div class="mode-seg" role="group" aria-label="Controller mode">
             <button type="button" data-ui-mode="setup" title="Show every control">SETUP</button>
             <button type="button" data-ui-mode="live" title="Show only picks, bans, draft buttons and timer">LIVE</button>
+            <button type="button" data-ui-mode="ingame" title="Show only in-game controls: score, casters, map, objectives, cams">INGAME</button>
         </div>
         <span class="ui-note" id="ui-note"></span>
         <span class="ui-spacer"></span>
@@ -38,8 +39,8 @@
                             Upload Logo
                         </label>
                         <input type="text" name="Cam Link" id="team-cam-link-1" placeholder="CAMERA LINK">
-                        <button style="width: 31%;">ADD SCORE</button>
-                        <button style="width: 31%;">DEDUCT SCORE</button>
+                        <button style="width: 31%;" data-score-team="blue" data-score-delta="1">ADD SCORE</button>
+                        <button style="width: 31%;" data-score-team="blue" data-score-delta="-1">DEDUCT SCORE</button>
                     </div>
                 </div>
             </section>
@@ -177,8 +178,8 @@
                             Upload Logo
                         </label>
                         <input type="text" name="Cam Link" id="team-cam-link-2" placeholder="CAMERA LINK">
-                        <button style="width: 31%;">ADD SCORE</button>
-                        <button style="width: 31%;">DEDUCT SCORE</button>
+                        <button style="width: 31%;" data-score-team="red" data-score-delta="1">ADD SCORE</button>
+                        <button style="width: 31%;" data-score-team="red" data-score-delta="-1">DEDUCT SCORE</button>
                     </div>
                 </div>
             </section>
@@ -378,6 +379,99 @@
         </section>
     </div>
 
+    <!-- INGAME mode only (js/ingame.js) -->
+    <div class="ingame-container">
+        <section class="panel" data-panel="ingame-score" data-group="ingame">
+            <button type="button" class="panel-head"><span class="panel-title">SCORE</span><span class="panel-chip"></span></button>
+            <div class="panel-body">
+                <div class="score-row blue">
+                    <span class="score-team" data-score-team-name="blueTeamName">BLUE</span>
+                    <span class="score-value" data-score-value="blue">0</span>
+                    <button type="button" data-score-team="blue" data-score-delta="1">ADD SCORE</button>
+                    <button type="button" data-score-team="blue" data-score-delta="-1">DEDUCT SCORE</button>
+                </div>
+                <div class="score-row red">
+                    <span class="score-team" data-score-team-name="redTeamName">RED</span>
+                    <span class="score-value" data-score-value="red">0</span>
+                    <button type="button" data-score-team="red" data-score-delta="1">ADD SCORE</button>
+                    <button type="button" data-score-team="red" data-score-delta="-1">DEDUCT SCORE</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="panel" data-panel="ingame-info" data-group="ingame">
+            <button type="button" class="panel-head"><span class="panel-title">CASTERS &amp; MAP</span><span class="panel-chip"></span></button>
+            <div class="panel-body">
+                <input type="text" id="casters-input" class="wide" placeholder="CASTERS" aria-label="Casters">
+                <select id="map-type-select" aria-label="Map type">
+                    <option value="">SELECT MAP TYPE</option>
+                    <option value="healing-turtle">HEALING TURTLE</option>
+                    <option value="revealing-wisps">REVEALING WISPS</option>
+                    <option value="golden-turret">GOLDEN TURRET</option>
+                    <option value="flying-cloud">FLYING CLOUD</option>
+                </select>
+            </div>
+        </section>
+
+        <section class="panel" data-panel="ingame-events" data-group="ingame">
+            <button type="button" class="panel-head"><span class="panel-title">OBJECTIVES &amp; REPLAY</span><span class="panel-chip"></span></button>
+            <div class="panel-body">
+                <button type="button" data-ingame-event="turtle" title="Send once">TURTLE</button>
+                <button type="button" data-ingame-event="lord" title="Send once">LORD</button>
+                <button type="button" data-ingame-event="replay" title="Send once">REPLAY</button>
+                <button type="button" data-ingame-event="item-check" title="Send once">ITEM CHECK</button>
+            </div>
+        </section>
+
+        <section class="panel" data-panel="ingame-cams" data-group="ingame">
+            <button type="button" class="panel-head"><span class="panel-title">CAMS</span><span class="panel-chip"></span></button>
+            <div class="panel-body">
+                <button type="button" class="toggle-btn" data-ingame-cam="player-1" aria-pressed="false">PLAYER 1</button>
+                <button type="button" class="toggle-btn" data-ingame-cam="player-2" aria-pressed="false">PLAYER 2</button>
+                <button type="button" class="toggle-btn" data-ingame-cam="player-3" aria-pressed="false">PLAYER 3</button>
+                <button type="button" class="toggle-btn" data-ingame-cam="player-4" aria-pressed="false">PLAYER 4</button>
+                <button type="button" class="toggle-btn" data-ingame-cam="player-5" aria-pressed="false">PLAYER 5</button>
+                <button type="button" class="toggle-btn" data-ingame-cam="team" aria-pressed="false">TEAM CAMS</button>
+                <button type="button" id="ingame-cams-off">ALL CAMS OFF</button>
+            </div>
+        </section>
+
+        <section class="panel panel-wide" data-panel="ingame-sponsors" data-group="ingame">
+            <button type="button" class="panel-head"><span class="panel-title">SPONSOR SLIDESHOW</span><span class="panel-chip"></span></button>
+            <div class="panel-body">
+                <div class="sponsor-row">
+                    <span class="sponsor-label">IN PARTNERSHIP WITH <span class="sponsor-count" data-sponsor-count="partner"></span></span>
+                    <label class="custom-file-upload sponsor-upload" title="Upload one or more logos">
+                        <input type="file" accept="image/*" multiple data-sponsor-upload="partner">
+                        ADD LOGO
+                    </label>
+                    <div class="sponsor-list" data-sponsor-list="partner"></div>
+                </div>
+                <div class="sponsor-row">
+                    <span class="sponsor-label">PRESENTED BY <span class="sponsor-count" data-sponsor-count="presented"></span></span>
+                    <label class="custom-file-upload sponsor-upload" title="Upload one or more logos">
+                        <input type="file" accept="image/*" multiple data-sponsor-upload="presented">
+                        ADD LOGO
+                    </label>
+                    <div class="sponsor-list" data-sponsor-list="presented"></div>
+                </div>
+                <div class="sponsor-row">
+                    <span class="sponsor-label">SPONSORED BY <span class="sponsor-count" data-sponsor-count="sponsored"></span></span>
+                    <label class="custom-file-upload sponsor-upload" title="Upload one or more logos">
+                        <input type="file" accept="image/*" multiple data-sponsor-upload="sponsored">
+                        ADD LOGO
+                    </label>
+                    <div class="sponsor-list" data-sponsor-list="sponsored"></div>
+                </div>
+                <div class="sponsor-row">
+                    <label class="sponsor-label" for="sponsor-interval">SECONDS PER LOGO</label>
+                    <input type="number" id="sponsor-interval" min="1" step="1" value="5">
+                    <button type="button" id="clear-sponsors">CLEAR ALL SPONSORS</button>
+                    <span class="sponsor-note" id="sponsor-note"></span>
+                </div>
+            </div>
+        </section>
+    </div>
 
     <script type="module" src="js/control.js?v=11"></script>
     <script src="js/swap.js"></script>
@@ -385,9 +479,11 @@
     <script type="module" src="js/clear.js"></script>
     <script type="module" src="js/playerPhotos.js?v=11"></script>
     <script type="module" src="js/autocomplete.js"></script>
+    <script type="module" src="js/ingame.js?v=1"></script>
+    <script type="module" src="js/sponsors.js?v=1"></script>
     <script src="js/timer.js"></script>
     <script src="js/obsWebsocket/showDisplay.js"></script>
-    <script src="js/panels.js?v=1"></script>
+    <script src="js/panels.js?v=2"></script>
 </body>
 
 

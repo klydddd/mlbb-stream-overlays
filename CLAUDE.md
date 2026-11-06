@@ -27,7 +27,7 @@ For frontend-only work, open `http://localhost:8080/controller.html` and `http:/
 
 ### Page pairs
 - `controller.html` (operator UI) drives `display.html` (the draft overlay captured by OBS). These two are the core of the app.
-- `gameController.html` / `gameDisplay.html` are for in-game overlays and are mostly unimplemented.
+- `gameDisplay.html` (`js/gameDisplay.js`, `css/gameDisplay.css`) is the in-game overlay: a fixed 1920x1080 stage scaled to fit, showing the scoreboard (team names, score + 3 series pips), minimap frame, casters, map type (icon from `Assets/gameProper/maps/<slug>.png`) and a sponsor logo slideshow in the top-right (`js/sponsors.js` on the controller; localStorage `sponsors` JSON + `sponsor-interval`, message `{type: "sponsors"}`). It is driven by the controller's INGAME mode (`js/ingame.js`). The cam, turtle/lord/replay/item-check messages (`ingame-cam`, `ingame-event`) are sent but not rendered yet. The center logo loads from `Assets/gameProper/league-logo.png` and hides itself if missing. `gameController.html` is unused.
 - `index.html` is a landing page.
 
 ### Three sync channels

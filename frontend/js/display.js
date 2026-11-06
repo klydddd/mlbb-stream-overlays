@@ -59,6 +59,11 @@ function handleIncomingMessage(data) {
       clearNames();
       clearPicks();
       clearBans();
+      clearScores();
+      return;
+    case "score-update":
+      // ADD / DEDUCT SCORE on the controller (js/ingame.js)
+      if (data.team === "blue" || data.team === "red") setScore(data.team, data.value);
       return;
     case "clear-names":
       clearNames();
@@ -319,12 +324,22 @@ function clearBans() {
   }
 }
 
-function clearScores() {
-  document.querySelectorAll(".blue-score .score, .red-score .score").forEach(el => {
-    el.className = "score";
-    el.innerHTML = "";
-  });
+// Series score: light up the score boxes (3 per side), filling outward from the
+// team-name side: blue left-to-right, red right-to-left. Stored as blue-score / red-score.
+function setScore(side, value) {
+  const wins = Math.max(0, parseInt(value, 10) || 0);
+  const boxes = [...document.querySelectorAll(`.${side}-score .score`)];
+  if (side === "red") boxes.reverse();
+  boxes.forEach((el, i) => el.classList.toggle("won", i < wins));
 }
+
+function clearScores() {
+  setScore("blue", 0);
+  setScore("red", 0);
+}
+
+setScore("blue", localStorage.getItem("blue-score"));
+setScore("red", localStorage.getItem("red-score"));
 
 channel.onmessage = (event) => {
   const data = event.data;
@@ -332,6 +347,12 @@ channel.onmessage = (event) => {
 };
 
 window.addEventListener('storage', (e) => {
+  if (e.key === null) clearScores(); // localStorage.clear() from RESET DRAFT
+  if (e.key === 'blue-score' || e.key === 'red-score') {
+    setScore(e.key.split('-')[0], e.newValue);
+    return;
+  }
+
   const isHeroPick = e.key && e.key.startsWith('heroPick-');
   const isBanPick = e.key && e.key.startsWith('banPick-');
   const isRoundName = e.key && e.key.startsWith('round-name');
