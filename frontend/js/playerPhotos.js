@@ -72,8 +72,25 @@ function init() {
       resizeImage(file, (data) => setPlayerPhoto(slot, data));
     });
 
-    // Right-click a photo button to remove just that photo
-    input.closest("label")?.addEventListener("contextmenu", (e) => {
+    const label = input.closest("label");
+
+    // "x" button to remove just this photo (only shown when a photo is set).
+    // It sits inside the <label>, so stop the click from opening the file picker.
+    const removeBtn = document.createElement("button");
+    removeBtn.type = "button";
+    removeBtn.className = "photo-remove";
+    removeBtn.title = "Remove photo";
+    removeBtn.setAttribute("aria-label", "Remove photo");
+    removeBtn.textContent = "\u00d7";
+    removeBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      setPlayerPhoto(slot, null);
+    });
+    label?.appendChild(removeBtn);
+
+    // Right-click still works as a shortcut
+    label?.addEventListener("contextmenu", (e) => {
       e.preventDefault();
       setPlayerPhoto(slot, null);
     });

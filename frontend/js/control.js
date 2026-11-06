@@ -1,5 +1,5 @@
 import { send } from "./websocketClient.js";
-import { refreshPhotoThumbs } from "./playerPhotos.js";
+import { refreshPhotoThumbs } from "./playerPhotos.js?v=2";
 
 const page = document.body.getAttribute("data-page"); // to determine which page is display and controller
 const channel = new BroadcastChannel("team_channel");
