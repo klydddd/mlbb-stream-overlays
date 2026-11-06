@@ -45,6 +45,28 @@
                 <input type="text" id="input-name-4" placeholder="PLAYER FOUR">
                 <input type="text" id="input-name-5" placeholder="PLAYER FIVE">
             </div>
+            <div class="photos">
+                <label class="custom-file-upload photo-upload" title="Upload player photo (right-click to remove)">
+                    <input type="file" class="player-photo-upload" accept="image/*" data-slot="1">
+                    <span>P1 PHOTO</span>
+                </label>
+                <label class="custom-file-upload photo-upload" title="Upload player photo (right-click to remove)">
+                    <input type="file" class="player-photo-upload" accept="image/*" data-slot="2">
+                    <span>P2 PHOTO</span>
+                </label>
+                <label class="custom-file-upload photo-upload" title="Upload player photo (right-click to remove)">
+                    <input type="file" class="player-photo-upload" accept="image/*" data-slot="3">
+                    <span>P3 PHOTO</span>
+                </label>
+                <label class="custom-file-upload photo-upload" title="Upload player photo (right-click to remove)">
+                    <input type="file" class="player-photo-upload" accept="image/*" data-slot="4">
+                    <span>P4 PHOTO</span>
+                </label>
+                <label class="custom-file-upload photo-upload" title="Upload player photo (right-click to remove)">
+                    <input type="file" class="player-photo-upload" accept="image/*" data-slot="5">
+                    <span>P5 PHOTO</span>
+                </label>
+            </div>
             <br>
 
             <p>PLAYER PICKS</p>
@@ -141,6 +163,28 @@
                 <input type="text" id="input-name-6" placeholder="PLAYER ONE">
 
             </div>
+            <div class="photos">
+                <label class="custom-file-upload photo-upload red" title="Upload player photo (right-click to remove)">
+                    <input type="file" class="player-photo-upload" accept="image/*" data-slot="10">
+                    <span>P5 PHOTO</span>
+                </label>
+                <label class="custom-file-upload photo-upload red" title="Upload player photo (right-click to remove)">
+                    <input type="file" class="player-photo-upload" accept="image/*" data-slot="9">
+                    <span>P4 PHOTO</span>
+                </label>
+                <label class="custom-file-upload photo-upload red" title="Upload player photo (right-click to remove)">
+                    <input type="file" class="player-photo-upload" accept="image/*" data-slot="8">
+                    <span>P3 PHOTO</span>
+                </label>
+                <label class="custom-file-upload photo-upload red" title="Upload player photo (right-click to remove)">
+                    <input type="file" class="player-photo-upload" accept="image/*" data-slot="7">
+                    <span>P2 PHOTO</span>
+                </label>
+                <label class="custom-file-upload photo-upload red" title="Upload player photo (right-click to remove)">
+                    <input type="file" class="player-photo-upload" accept="image/*" data-slot="6">
+                    <span>P1 PHOTO</span>
+                </label>
+            </div>
 
             <br>
 
@@ -220,6 +264,7 @@
             <button id="clear-scores">CLEAR SCORES</button>
             <button id="clear-logos">CLEAR LOGO</button>
             <button id="clear-cam-links">CLEAR CAM LINK</button>
+            <button id="clear-player-photos">CLEAR PHOTOS</button>
         </div>
         <div class="timer-control">
 
@@ -256,6 +301,7 @@
     <script src="js/swap.js"></script>
     <script type="module" src="js/showLogo.js"></script>
     <script type="module" src="js/clear.js"></script>
+    <script type="module" src="js/playerPhotos.js"></script>
     <script type="module" src="js/autocomplete.js"></script>
     <script src="js/timer.js"></script>
     <script src="js/obsWebsocket/showDisplay.js"></script>

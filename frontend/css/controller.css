@@ -312,3 +312,35 @@ button:active {
         transform: scale(1.06);
     }
 }
+
+/* Player photo uploads (heroes-display) */
+.photos {
+    display: flex;
+    gap: 5px;
+    margin: 5px;
+}
+
+.photo-upload {
+    flex: 1;
+    min-width: 0;
+    height: 64px;
+    font-size: 11px;
+    text-align: center;
+}
+
+/* thumbnail comes from inline background-image set by playerPhotos.js */
+.photo-upload.has-photo,
+.photo-upload.red.has-photo {
+    background-color: #1f2937;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center bottom;
+}
+
+.photo-upload.has-photo span {
+    align-self: flex-start;
+    font-size: 9px;
+    padding: 1px 4px;
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.55);
+}

@@ -41,6 +41,10 @@ function handleIncomingMessage(data) {
         }
       }
       return;
+    case "show-heroes-display":
+      // Last phase countdown finished: switch to the lineup screen (same room)
+      window.location.href = "heroes-display.html" + window.location.search;
+      return;
     case "reset":
       resetText("blue-team-name", "Blue Team Name");
       resetText("red-team-name", "Red Team Name");

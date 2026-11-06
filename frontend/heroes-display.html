@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Anton&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/heroes-display.css?v=17">
+    <link rel="icon" href="Assets/favico/favicon_io/android-chrome-512x512.png">
+    <title>Heroes Display</title>
+</head>
+
+<body>
+    <div class="stage">
+
+        <!-- Corner labels -->
+        <div class="corner corner-left">
+            <span class="chevrons">&#9654;&#9654;</span>
+            <span id="hd-round-name">PLAYOFFS</span>
+            <span class="chevrons outline">&#9655;&#9655;</span>
+        </div>
+        <div class="corner corner-right">
+            <span class="chevrons">&#9654;&#9654;</span>
+            <span>MATCH <span id="hd-match-number">0</span> &middot; GAME <span id="hd-game-number">0</span></span>
+            <span class="spark">&#10033;</span>
+        </div>
+
+        <!-- Header: team plates + center logo -->
+        <header class="header">
+            <div class="team-plate blue">
+                <div class="plate-logo" id="hd-logo-blue"></div>
+                <div class="plate-name"><span id="hd-blue-team-name">BLUE TEAM</span></div>
+                <div class="plate-pips" id="hd-pips-blue">
+                    <span class="pip"></span><span class="pip"></span><span class="pip"></span>
+                </div>
+            </div>
+
+            <div class="center-logo">
+                <img src="Assets/defaults/GD LOGO.png" alt="">
+            </div>
+
+            <div class="team-plate red">
+                <div class="plate-pips" id="hd-pips-red">
+                    <span class="pip"></span><span class="pip"></span><span class="pip"></span>
+                </div>
+                <div class="plate-name"><span id="hd-red-team-name">RED TEAM</span></div>
+                <div class="plate-logo" id="hd-logo-red"></div>
+            </div>
+        </header>
+
+        <!-- Ribbon -->
+        <div class="ribbon">
+            <div class="ribbon-dark"><span id="hd-ribbon-round">PLAYOFFS</span></div>
+            <div class="ribbon-gold"><span>MATCH <span id="hd-ribbon-match">0</span> GAME <span id="hd-ribbon-game">0</span></span></div>
+        </div>
+
+        <!-- Hero cards: populated by js/heroesDisplay.js -->
+        <section class="cards">
+            <div class="team-cards blue" id="hd-cards-blue"></div>
+            <div class="team-cards red" id="hd-cards-red"></div>
+        </section>
+    </div>
+
+    <script type="module" src="js/heroesDisplay.js?v=17"></script>
+</body>
+
+</html>

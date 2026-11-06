@@ -58,6 +58,29 @@ const phaseInputMap = {
 
 let autoAdvanceTimeout = null;
 
+// ===== FINAL PHASE → HEROES DISPLAY =====
+// When the last phase's countdown (phase 18) reaches 0, ask the display to switch
+// from display.html to heroes-display.html. control.js relays the event to the
+// display over BroadcastChannel + WebSocket.
+const FINAL_PHASE = 18;
+let finalSwitchTimeout = null;
+
+function cancelFinalSwitch() {
+    if (finalSwitchTimeout) {
+        clearTimeout(finalSwitchTimeout);
+        finalSwitchTimeout = null;
+    }
+}
+
+function scheduleFinalSwitch() {
+    cancelFinalSwitch();
+    if (draftState.currentPhase !== FINAL_PHASE || !draftState.isRunning) return;
+    finalSwitchTimeout = setTimeout(() => {
+        finalSwitchTimeout = null;
+        window.dispatchEvent(new CustomEvent("draft-display-switch", { detail: { target: "heroes" } }));
+    }, draftState.timeRemaining * 1000);
+}
+
 function getPhaseInputs(phaseNum) {
     return phaseInputMap[phaseNum] || [];
 }
@@ -134,6 +157,7 @@ startBtn.addEventListener('click', () => {
     draftState.timeRemaining = 50;
     saveState();
     currentPhaseDisplay.textContent = draftState.currentPhase;
+    scheduleFinalSwitch();
 
     // Auto-focus the first input of the current phase
     focusPhaseInput(draftState.currentPhase);
@@ -148,6 +172,10 @@ resetPhaseBtn.addEventListener('click', () => {
     saveState();
     currentPhaseDisplay.textContent = draftState.currentPhase;
     cancelAutoAdvance();
+
+    // Back to the draft overlay for the next game
+    cancelFinalSwitch();
+    window.dispatchEvent(new CustomEvent("draft-display-switch", { detail: { target: "draft" } }));
 });
 
 const currentPhaseWrapper = document.getElementById("phaseInfo");
@@ -163,6 +191,7 @@ nextPhaseBtn.addEventListener('click', () => {
         draftState.timeRemaining = 50;
         saveState();
         currentPhaseDisplay.textContent = draftState.currentPhase;
+        scheduleFinalSwitch();
 
         // Auto-focus the first input of the new phase
         focusPhaseInput(draftState.currentPhase);

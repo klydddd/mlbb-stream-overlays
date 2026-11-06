@@ -1,4 +1,5 @@
 import { send } from "./websocketClient.js";
+import { refreshPhotoThumbs } from "./playerPhotos.js";
 
 const page = document.body.getAttribute("data-page"); // to determine which page is display and controller
 const channel = new BroadcastChannel("team_channel");
@@ -192,6 +193,20 @@ if (switchBtn) {
     channel.postMessage(switchPayload);
     send(switchPayload);
 
+    // Swap player photos (slot i <-> i + 5, same as player names) and sync them
+    for (let i = 1; i <= 5; i++) {
+      const photoBlue = localStorage.getItem(`player-photo-${i}`);
+      const photoRed = localStorage.getItem(`player-photo-${i + 5}`);
+      [[i, photoRed], [i + 5, photoBlue]].forEach(([slot, data]) => {
+        if (data) localStorage.setItem(`player-photo-${slot}`, data);
+        else localStorage.removeItem(`player-photo-${slot}`);
+        const msg = { type: "player-photo", slot, data: data || null };
+        channel.postMessage(msg);
+        send(msg);
+      });
+    }
+    refreshPhotoThumbs();
+
     // Broadcast logo updates to sync display logo changes
     channel.postMessage({ type: "logo-update", team: "blue", data: logoRed });
     channel.postMessage({ type: "logo-update", team: "red", data: logoBlue });
@@ -199,6 +214,15 @@ if (switchBtn) {
     send({ type: "logo-update", team: "red", data: logoBlue });
   });
 }
+
+// Display page switching (triggered by timer.js):
+//   last phase countdown ends -> display.html goes to heroes-display.html
+//   timer RESET               -> heroes-display.html goes back to display.html
+window.addEventListener("draft-display-switch", (e) => {
+  const msg = { type: e.detail?.target === "heroes" ? "show-heroes-display" : "show-draft-display" };
+  channel.postMessage(msg);
+  send(msg);
+});
 
 // Reset button logic
 const resetBtn = document.getElementById("reset");
