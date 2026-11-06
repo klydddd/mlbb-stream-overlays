@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/controller.css?v=10">
+    <link rel="stylesheet" href="css/controller.css?v=11">
     <link rel="icon" href="Assets/favico/favicon_io/android-chrome-512x512.png">
     <title>Control Panel</title>
 </head>
@@ -12,300 +12,370 @@
 
 
 <body data-page="controller">
-    <!-- <P>GAME PANEL</P> -->
+    <!-- Layout toolbar: SETUP shows everything, LIVE hides pre-match setup panels (js/panels.js) -->
+    <div class="ui-toolbar" id="ui-toolbar">
+        <div class="mode-seg" role="group" aria-label="Controller mode">
+            <button type="button" data-ui-mode="setup" title="Show every control">SETUP</button>
+            <button type="button" data-ui-mode="live" title="Show only picks, bans, draft buttons and timer">LIVE</button>
+        </div>
+        <span class="ui-note" id="ui-note"></span>
+        <span class="ui-spacer"></span>
+        <button type="button" id="panels-collapse-all">COLLAPSE ALL</button>
+        <button type="button" id="panels-expand-all">EXPAND ALL</button>
+    </div>
+
     <div class="main-container">
         <div class="blue-side team-container">
-            <br>
+            <div class="side-title"><span>BLUE SIDE</span><span class="side-team" data-team-input="blueTeamName"></span></div>
 
-            <p>PLAYER NAMES/IGN</p>
-            <div class="team-desc">
-                <input type="text" name="Team Name" id="blueTeamName" placeholder="BLUE TEAM NAME">
-                <label class="custom-file-upload">
-                    <input type="file" class="team-logo-upload" accept="image/*" data-team="blue">
-                    Upload Logo
-                </label>
-                <input type="text" name="Cam Link" id="team-cam-link-1" placeholder="CAMERA LINK">
-                <button style="width: 31%;">ADD SCORE</button>
-                <button style="width: 31%;">DEDUCT SCORE</button>
-            </div>
+            <section class="panel" data-panel="team" data-group="setup">
+                <button type="button" class="panel-head"><span class="panel-title">TEAM INFO</span><span class="panel-chip"></span></button>
+                <div class="panel-body">
+                    <div class="team-desc">
+                        <input type="text" name="Team Name" id="blueTeamName" placeholder="BLUE TEAM NAME">
+                        <label class="custom-file-upload">
+                            <input type="file" class="team-logo-upload" accept="image/*" data-team="blue">
+                            Upload Logo
+                        </label>
+                        <input type="text" name="Cam Link" id="team-cam-link-1" placeholder="CAMERA LINK">
+                        <button style="width: 31%;">ADD SCORE</button>
+                        <button style="width: 31%;">DEDUCT SCORE</button>
+                    </div>
+                </div>
+            </section>
 
+            <section class="panel" data-panel="cams" data-group="setup">
+                <button type="button" class="panel-head"><span class="panel-title">CAMERA LINKS</span><span class="panel-chip"></span></button>
+                <div class="panel-body">
+                    <div class="camLinks">
+                        <input type="text" id="cam-1" placeholder="CAMERA LINK">
+                        <input type="text" id="cam-2" placeholder="CAMERA LINK">
+                        <input type="text" id="cam-3" placeholder="CAMERA LINK">
+                        <input type="text" id="cam-4" placeholder="CAMERA LINK">
+                        <input type="text" id="cam-5" placeholder="CAMERA LINK">
+                    </div>
+                </div>
+            </section>
 
+            <section class="panel" data-panel="names" data-group="setup">
+                <button type="button" class="panel-head"><span class="panel-title">PLAYER NAMES/IGN</span><span class="panel-chip"></span></button>
+                <div class="panel-body">
+                    <div class="names">
+                        <input type="text" id="input-name-1" placeholder="PLAYER ONE">
+                        <input type="text" id="input-name-2" placeholder="PLAYER TWO">
+                        <input type="text" id="input-name-3" placeholder="PLAYER THREE">
+                        <input type="text" id="input-name-4" placeholder="PLAYER FOUR">
+                        <input type="text" id="input-name-5" placeholder="PLAYER FIVE">
+                    </div>
+                </div>
+            </section>
 
-            <div class="camLinks">
-                <input type="text" id="cam-1" placeholder="CAMERA LINK">
-                <input type="text" id="cam-2" placeholder="CAMERA LINK">
-                <input type="text" id="cam-3" placeholder="CAMERA LINK">
-                <input type="text" id="cam-4" placeholder="CAMERA LINK">
-                <input type="text" id="cam-5" placeholder="CAMERA LINK">
-            </div>
-            <div class="names">
-                <input type="text" id="input-name-1" placeholder="PLAYER ONE">
-                <input type="text" id="input-name-2" placeholder="PLAYER TWO">
-                <input type="text" id="input-name-3" placeholder="PLAYER THREE">
-                <input type="text" id="input-name-4" placeholder="PLAYER FOUR">
-                <input type="text" id="input-name-5" placeholder="PLAYER FIVE">
-            </div>
-            <div class="photos">
-                <label class="custom-file-upload photo-upload" title="Click to upload a player photo">
-                    <input type="file" class="player-photo-upload" accept="image/*" data-slot="1">
-                    <span>P1 PHOTO</span>
-                </label>
-                <label class="custom-file-upload photo-upload" title="Click to upload a player photo">
-                    <input type="file" class="player-photo-upload" accept="image/*" data-slot="2">
-                    <span>P2 PHOTO</span>
-                </label>
-                <label class="custom-file-upload photo-upload" title="Click to upload a player photo">
-                    <input type="file" class="player-photo-upload" accept="image/*" data-slot="3">
-                    <span>P3 PHOTO</span>
-                </label>
-                <label class="custom-file-upload photo-upload" title="Click to upload a player photo">
-                    <input type="file" class="player-photo-upload" accept="image/*" data-slot="4">
-                    <span>P4 PHOTO</span>
-                </label>
-                <label class="custom-file-upload photo-upload" title="Click to upload a player photo">
-                    <input type="file" class="player-photo-upload" accept="image/*" data-slot="5">
-                    <span>P5 PHOTO</span>
-                </label>
-            </div>
-            <br>
+            <section class="panel" data-panel="photos" data-group="setup">
+                <button type="button" class="panel-head"><span class="panel-title">PLAYER PHOTOS</span><span class="panel-chip"></span></button>
+                <div class="panel-body">
+                    <div class="photos">
+                        <label class="custom-file-upload photo-upload" title="Click to upload a player photo">
+                            <input type="file" class="player-photo-upload" accept="image/*" data-slot="1">
+                            <span>P1 PHOTO</span>
+                        </label>
+                        <label class="custom-file-upload photo-upload" title="Click to upload a player photo">
+                            <input type="file" class="player-photo-upload" accept="image/*" data-slot="2">
+                            <span>P2 PHOTO</span>
+                        </label>
+                        <label class="custom-file-upload photo-upload" title="Click to upload a player photo">
+                            <input type="file" class="player-photo-upload" accept="image/*" data-slot="3">
+                            <span>P3 PHOTO</span>
+                        </label>
+                        <label class="custom-file-upload photo-upload" title="Click to upload a player photo">
+                            <input type="file" class="player-photo-upload" accept="image/*" data-slot="4">
+                            <span>P4 PHOTO</span>
+                        </label>
+                        <label class="custom-file-upload photo-upload" title="Click to upload a player photo">
+                            <input type="file" class="player-photo-upload" accept="image/*" data-slot="5">
+                            <span>P5 PHOTO</span>
+                        </label>
+                    </div>
+                </div>
+            </section>
 
-            <p>PLAYER PICKS</p>
+            <section class="panel" data-panel="picks" data-group="draft">
+                <button type="button" class="panel-head"><span class="panel-title">PLAYER PICKS</span><span class="panel-chip"></span></button>
+                <div class="panel-body">
+                    <div class="picks">
+                        <div class="input-wrapper">
+                            <input type="text" id="pick-1" placeholder="PLAYER ONE" autocomplete="off" tabindex="7">
+                            <div class="dropdown" id="dropdown-1"></div>
+                        </div>
+                        <div class="input-wrapper">
+                            <input type="text" id="pick-4" placeholder="PLAYER TWO" autocomplete="off" tabindex="10">
+                            <div class="dropdown" id="dropdown-4"></div>
+                        </div>
+                        <div class="input-wrapper">
+                            <input type="text" id="pick-5" placeholder="PLAYER THREE" autocomplete="off" tabindex="11">
+                            <div class="dropdown" id="dropdown-5"></div>
+                        </div>
+                        <div class="input-wrapper">
+                            <input type="text" id="pick-8" placeholder="PLAYER FOUR" autocomplete="off" tabindex="18">
+                            <div class="dropdown" id="dropdown-8"></div>
+                        </div>
+                        <div class="input-wrapper">
+                            <input type="text" id="pick-9" placeholder="PLAYER FIVE" autocomplete="off" tabindex="20">
+                            <div class="dropdown" id="dropdown-9"></div>
+                        </div>
+                    </div>
 
-            <div class="picks">
-                <div class="input-wrapper">
-                    <input type="text" id="pick-1" placeholder="PLAYER ONE" autocomplete="off" tabindex="7">
-                    <div class="dropdown" id="dropdown-1"></div>
+                    <div class="swapping-area" id="blue-swap">
+                        <button id="swap-1">swap</button>
+                        <button id="swap-2">swap</button>
+                        <button id="swap-3">swap</button>
+                        <button id="swap-4">swap</button>
+                        <button id="swap-5">swap</button>
+                    </div>
                 </div>
-                <div class="input-wrapper">
-                    <input type="text" id="pick-4" placeholder="PLAYER TWO" autocomplete="off" tabindex="10">
-                    <div class="dropdown" id="dropdown-4"></div>
-                </div>
-                <div class="input-wrapper">
-                    <input type="text" id="pick-5" placeholder="PLAYER THREE" autocomplete="off" tabindex="11">
-                    <div class="dropdown" id="dropdown-5"></div>
-                </div>
-                <div class="input-wrapper">
-                    <input type="text" id="pick-8" placeholder="PLAYER FOUR" autocomplete="off" tabindex="18">
-                    <div class="dropdown" id="dropdown-8"></div>
-                </div>
-                <div class="input-wrapper">
-                    <input type="text" id="pick-9" placeholder="PLAYER FIVE" autocomplete="off" tabindex="20">
-                    <div class="dropdown" id="dropdown-9"></div>
-                </div>
-            </div>
+            </section>
 
-
-            <div class="swapping-area" id="blue-swap">
-                <button id="swap-1">swap</button>
-                <button id="swap-2">swap</button>
-                <button id="swap-3">swap</button>
-                <button id="swap-4">swap</button>
-                <button id="swap-5">swap</button>
-            </div>
-
-            <br>
-            <p>BANS</p>
-            <div class="bans">
-                <div class="input-wrapper">
-                    <input type="text" name="Ban" id="ban-1" placeholder="BLUE BAN 1" autocomplete="off" tabindex="1">
-                    <div class="dropdown" id="dropdown-ban-1"></div>
+            <section class="panel" data-panel="bans" data-group="draft">
+                <button type="button" class="panel-head"><span class="panel-title">BANS</span><span class="panel-chip"></span></button>
+                <div class="panel-body">
+                    <div class="bans">
+                        <div class="input-wrapper">
+                            <input type="text" name="Ban" id="ban-1" placeholder="BLUE BAN 1" autocomplete="off" tabindex="1">
+                            <div class="dropdown" id="dropdown-ban-1"></div>
+                        </div>
+                        <div class="input-wrapper">
+                            <input type="text" name="Ban" id="ban-3" placeholder="BLUE BAN 2" autocomplete="off" tabindex="3">
+                            <div class="dropdown" id="dropdown-ban-3"></div>
+                        </div>
+                        <div class="input-wrapper">
+                            <input type="text" name="Ban" id="ban-5" placeholder="BLUE BAN 3" autocomplete="off" tabindex="5">
+                            <div class="dropdown" id="dropdown-ban-5"></div>
+                        </div>
+                        <div class="input-wrapper">
+                            <input type="text" name="Ban" id="ban-8" placeholder="BLUE BAN 4" autocomplete="off" tabindex="14">
+                            <div class="dropdown" id="dropdown-ban-8"></div>
+                        </div>
+                        <div class="input-wrapper">
+                            <input type="text" name="Ban" id="ban-10" placeholder="BLUE BAN 5" autocomplete="off" tabindex="16">
+                            <div class="dropdown" id="dropdown-ban-10"></div>
+                        </div>
+                    </div>
                 </div>
-                <div class="input-wrapper">
-                    <input type="text" name="Ban" id="ban-3" placeholder="BLUE BAN 2" autocomplete="off" tabindex="3">
-                    <div class="dropdown" id="dropdown-ban-3"></div>
-                </div>
-                <div class="input-wrapper">
-                    <input type="text" name="Ban" id="ban-5" placeholder="BLUE BAN 3" autocomplete="off" tabindex="5">
-                    <div class="dropdown" id="dropdown-ban-5"></div>
-                </div>
-                <div class="input-wrapper">
-                    <input type="text" name="Ban" id="ban-8" placeholder="BLUE BAN 4" autocomplete="off" tabindex="14">
-                    <div class="dropdown" id="dropdown-ban-8"></div>
-                </div>
-                <div class="input-wrapper">
-                    <input type="text" name="Ban" id="ban-10" placeholder="BLUE BAN 5" autocomplete="off" tabindex="16">
-                    <div class="dropdown" id="dropdown-ban-10"></div>
-                </div>
-            </div>
+            </section>
 
         </div>
 
         <div class="red-side team-container">
-            <br>
-            <p>PLAYER NAMES/IGN</p>
+            <div class="side-title"><span>RED SIDE</span><span class="side-team" data-team-input="redTeamName"></span></div>
 
-            <div class="team-desc">
-                <input type="text" name="Team Name" id="redTeamName" placeholder="RED TEAM NAME">
-                <label class="custom-file-upload red">
-                    <input type="file" class="team-logo-upload" accept="image/*" data-team="red">
-                    Upload Logo
-                </label>
-                <input type="text" name="Cam Link" id="team-cam-link-2" placeholder="CAMERA LINK">
-                <button style="width: 31%;">ADD SCORE</button>
-                <button style="width: 31%;">DEDUCT SCORE</button>
-            </div>
-
-            <div class="camLinks">
-
-
-                <input type="text" id="cam-10" placeholder="CAMERA LINK">
-                <input type="text" id="cam-9" placeholder="CAMERA LINK">
-                <input type="text" id="cam-8" placeholder="CAMERA LINK">
-                <input type="text" id="cam-7" placeholder="CAMERA LINK">
-                <input type="text" id="cam-6" placeholder="CAMERA LINK">
-            </div>
-
-            <div class="names">
-                <input type="text" id="input-name-10" placeholder="PLAYER FIVE">
-                <input type="text" id="input-name-9" placeholder="PLAYER FOUR">
-                <input type="text" id="input-name-8" placeholder="PLAYER THREE">
-                <input type="text" id="input-name-7" placeholder="PLAYER TWO">
-                <input type="text" id="input-name-6" placeholder="PLAYER ONE">
-
-            </div>
-            <div class="photos">
-                <label class="custom-file-upload photo-upload red" title="Click to upload a player photo">
-                    <input type="file" class="player-photo-upload" accept="image/*" data-slot="10">
-                    <span>P5 PHOTO</span>
-                </label>
-                <label class="custom-file-upload photo-upload red" title="Click to upload a player photo">
-                    <input type="file" class="player-photo-upload" accept="image/*" data-slot="9">
-                    <span>P4 PHOTO</span>
-                </label>
-                <label class="custom-file-upload photo-upload red" title="Click to upload a player photo">
-                    <input type="file" class="player-photo-upload" accept="image/*" data-slot="8">
-                    <span>P3 PHOTO</span>
-                </label>
-                <label class="custom-file-upload photo-upload red" title="Click to upload a player photo">
-                    <input type="file" class="player-photo-upload" accept="image/*" data-slot="7">
-                    <span>P2 PHOTO</span>
-                </label>
-                <label class="custom-file-upload photo-upload red" title="Click to upload a player photo">
-                    <input type="file" class="player-photo-upload" accept="image/*" data-slot="6">
-                    <span>P1 PHOTO</span>
-                </label>
-            </div>
-
-            <br>
-
-            <p>PLAYER PICKS</p>
-
-            <div class="picks">
-                <div class="input-wrapper">
-                    <input type="text" id="pick-10" placeholder="PLAYER FIVE" autocomplete="off" tabindex="19">
-                    <div class="dropdown" id="dropdown-10"></div>
+            <section class="panel" data-panel="team" data-group="setup">
+                <button type="button" class="panel-head"><span class="panel-title">TEAM INFO</span><span class="panel-chip"></span></button>
+                <div class="panel-body">
+                    <div class="team-desc">
+                        <input type="text" name="Team Name" id="redTeamName" placeholder="RED TEAM NAME">
+                        <label class="custom-file-upload red">
+                            <input type="file" class="team-logo-upload" accept="image/*" data-team="red">
+                            Upload Logo
+                        </label>
+                        <input type="text" name="Cam Link" id="team-cam-link-2" placeholder="CAMERA LINK">
+                        <button style="width: 31%;">ADD SCORE</button>
+                        <button style="width: 31%;">DEDUCT SCORE</button>
+                    </div>
                 </div>
-                <div class="input-wrapper">
-                    <input type="text" id="pick-7" placeholder="PLAYER FOUR" autocomplete="off" tabindex="17">
-                    <div class="dropdown" id="dropdown-7"></div>
-                </div>
-                <div class="input-wrapper">
-                    <input type="text" id="pick-6" placeholder="PLAYER THREE" autocomplete="off" tabindex="12">
-                    <div class="dropdown" id="dropdown-6"></div>
-                </div>
-                <div class="input-wrapper">
-                    <input type="text" id="pick-3" placeholder="PLAYER TWO" autocomplete="off" tabindex="9">
-                    <div class="dropdown" id="dropdown-3"></div>
-                </div>
-                <div class="input-wrapper">
-                    <input type="text" id="pick-2" placeholder="PLAYER ONE" autocomplete="off" tabindex="8">
-                    <div class="dropdown" id="dropdown-2"></div>
-                </div>
-            </div>
+            </section>
 
+            <section class="panel" data-panel="cams" data-group="setup">
+                <button type="button" class="panel-head"><span class="panel-title">CAMERA LINKS</span><span class="panel-chip"></span></button>
+                <div class="panel-body">
+                    <div class="camLinks">
+                        <input type="text" id="cam-10" placeholder="CAMERA LINK">
+                        <input type="text" id="cam-9" placeholder="CAMERA LINK">
+                        <input type="text" id="cam-8" placeholder="CAMERA LINK">
+                        <input type="text" id="cam-7" placeholder="CAMERA LINK">
+                        <input type="text" id="cam-6" placeholder="CAMERA LINK">
+                    </div>
+                </div>
+            </section>
 
-            <div class="swapping-area" id="red-swap">
-                <button id="swap-10">swap</button>
-                <button id="swap-9">swap</button>
-                <button id="swap-8">swap</button>
-                <button id="swap-7">swap</button>
-                <button id="swap-6">swap</button>
-            </div>
+            <section class="panel" data-panel="names" data-group="setup">
+                <button type="button" class="panel-head"><span class="panel-title">PLAYER NAMES/IGN</span><span class="panel-chip"></span></button>
+                <div class="panel-body">
+                    <div class="names">
+                        <input type="text" id="input-name-10" placeholder="PLAYER FIVE">
+                        <input type="text" id="input-name-9" placeholder="PLAYER FOUR">
+                        <input type="text" id="input-name-8" placeholder="PLAYER THREE">
+                        <input type="text" id="input-name-7" placeholder="PLAYER TWO">
+                        <input type="text" id="input-name-6" placeholder="PLAYER ONE">
+                    </div>
+                </div>
+            </section>
 
-            <br>
-            <p>BANS</p>
-            <div class="bans">
-                <div class="input-wrapper">
-                    <input type="text" name="Ban" id="ban-9" placeholder="RED BAN 5" autocomplete="off" tabindex="15">
-                    <div class="dropdown" id="dropdown-ban-9"></div>
+            <section class="panel" data-panel="photos" data-group="setup">
+                <button type="button" class="panel-head"><span class="panel-title">PLAYER PHOTOS</span><span class="panel-chip"></span></button>
+                <div class="panel-body">
+                    <div class="photos">
+                        <label class="custom-file-upload photo-upload red" title="Click to upload a player photo">
+                            <input type="file" class="player-photo-upload" accept="image/*" data-slot="10">
+                            <span>P5 PHOTO</span>
+                        </label>
+                        <label class="custom-file-upload photo-upload red" title="Click to upload a player photo">
+                            <input type="file" class="player-photo-upload" accept="image/*" data-slot="9">
+                            <span>P4 PHOTO</span>
+                        </label>
+                        <label class="custom-file-upload photo-upload red" title="Click to upload a player photo">
+                            <input type="file" class="player-photo-upload" accept="image/*" data-slot="8">
+                            <span>P3 PHOTO</span>
+                        </label>
+                        <label class="custom-file-upload photo-upload red" title="Click to upload a player photo">
+                            <input type="file" class="player-photo-upload" accept="image/*" data-slot="7">
+                            <span>P2 PHOTO</span>
+                        </label>
+                        <label class="custom-file-upload photo-upload red" title="Click to upload a player photo">
+                            <input type="file" class="player-photo-upload" accept="image/*" data-slot="6">
+                            <span>P1 PHOTO</span>
+                        </label>
+                    </div>
                 </div>
-                <div class="input-wrapper">
-                    <input type="text" name="Ban" id="ban-7" placeholder="RED BAN 4" autocomplete="off" tabindex="13">
-                    <div class="dropdown" id="dropdown-ban-7"></div>
+            </section>
+
+            <section class="panel" data-panel="picks" data-group="draft">
+                <button type="button" class="panel-head"><span class="panel-title">PLAYER PICKS</span><span class="panel-chip"></span></button>
+                <div class="panel-body">
+                    <div class="picks">
+                        <div class="input-wrapper">
+                            <input type="text" id="pick-10" placeholder="PLAYER FIVE" autocomplete="off" tabindex="19">
+                            <div class="dropdown" id="dropdown-10"></div>
+                        </div>
+                        <div class="input-wrapper">
+                            <input type="text" id="pick-7" placeholder="PLAYER FOUR" autocomplete="off" tabindex="17">
+                            <div class="dropdown" id="dropdown-7"></div>
+                        </div>
+                        <div class="input-wrapper">
+                            <input type="text" id="pick-6" placeholder="PLAYER THREE" autocomplete="off" tabindex="12">
+                            <div class="dropdown" id="dropdown-6"></div>
+                        </div>
+                        <div class="input-wrapper">
+                            <input type="text" id="pick-3" placeholder="PLAYER TWO" autocomplete="off" tabindex="9">
+                            <div class="dropdown" id="dropdown-3"></div>
+                        </div>
+                        <div class="input-wrapper">
+                            <input type="text" id="pick-2" placeholder="PLAYER ONE" autocomplete="off" tabindex="8">
+                            <div class="dropdown" id="dropdown-2"></div>
+                        </div>
+                    </div>
+
+                    <div class="swapping-area" id="red-swap">
+                        <button id="swap-10">swap</button>
+                        <button id="swap-9">swap</button>
+                        <button id="swap-8">swap</button>
+                        <button id="swap-7">swap</button>
+                        <button id="swap-6">swap</button>
+                    </div>
                 </div>
-                <div class="input-wrapper">
-                    <input type="text" name="Ban" id="ban-6" placeholder="RED BAN 3" autocomplete="off" tabindex="6">
-                    <div class="dropdown" id="dropdown-ban-6"></div>
+            </section>
+
+            <section class="panel" data-panel="bans" data-group="draft">
+                <button type="button" class="panel-head"><span class="panel-title">BANS</span><span class="panel-chip"></span></button>
+                <div class="panel-body">
+                    <div class="bans">
+                        <div class="input-wrapper">
+                            <input type="text" name="Ban" id="ban-9" placeholder="RED BAN 5" autocomplete="off" tabindex="15">
+                            <div class="dropdown" id="dropdown-ban-9"></div>
+                        </div>
+                        <div class="input-wrapper">
+                            <input type="text" name="Ban" id="ban-7" placeholder="RED BAN 4" autocomplete="off" tabindex="13">
+                            <div class="dropdown" id="dropdown-ban-7"></div>
+                        </div>
+                        <div class="input-wrapper">
+                            <input type="text" name="Ban" id="ban-6" placeholder="RED BAN 3" autocomplete="off" tabindex="6">
+                            <div class="dropdown" id="dropdown-ban-6"></div>
+                        </div>
+                        <div class="input-wrapper">
+                            <input type="text" name="Ban" id="ban-4" placeholder="RED BAN 2" autocomplete="off" tabindex="4">
+                            <div class="dropdown" id="dropdown-ban-4"></div>
+                        </div>
+                        <div class="input-wrapper">
+                            <input type="text" name="Ban" id="ban-2" placeholder="RED BAN 1" autocomplete="off" tabindex="2">
+                            <div class="dropdown" id="dropdown-ban-2"></div>
+                        </div>
+                    </div>
                 </div>
-                <div class="input-wrapper">
-                    <input type="text" name="Ban" id="ban-4" placeholder="RED BAN 2" autocomplete="off" tabindex="4">
-                    <div class="dropdown" id="dropdown-ban-4"></div>
-                </div>
-                <div class="input-wrapper">
-                    <input type="text" name="Ban" id="ban-2" placeholder="RED BAN 1" autocomplete="off" tabindex="2">
-                    <div class="dropdown" id="dropdown-ban-2"></div>
-                </div>
-            </div>
+            </section>
 
         </div>
     </div>
-    <div class="second-container">
-        <div class="team-control">
-            <p>DRAFT CONTROL</p>
-            <button id="reset">RESET DRAFT</button>
-            <button id="switch">SWITCH TEAMS</button>
-            <button id="show-display-button">SHOW DISPLAY</button>
-            <button id="show-heroes-display" title="Switch the overlay to the heroes lineup now">SHOW HEROES</button>
-            <button id="show-draft-display" title="Switch the overlay back to the draft display">SHOW DRAFT</button>
-            <BR>
-            <br>
-            <p>TEAM CONTROLS</p>
-            <button id="clear-names">CLEAR NAMES</button>
-            <button id="clear-picks">CLEAR PICKS</button>
-            <button id="clear-bans">CLEAR BANS</button>
-            <button id="clear-scores">CLEAR SCORES</button>
-            <button id="clear-logos">CLEAR LOGO</button>
-            <button id="clear-cam-links">CLEAR CAM LINK</button>
-            <button id="clear-player-photos">CLEAR PHOTOS</button>
-            <label class="toggle-option" title="Automatically cut the player out of uploaded photos">
-                <input type="checkbox" id="photo-auto-bg" checked>
-                AUTO REMOVE PHOTO BG
-            </label>
-            <label class="toggle-option" title="Line up every player's head at the same size and height">
-                <input type="checkbox" id="photo-auto-align" checked>
-                AUTO ALIGN HEADS
-            </label>
-            <div id="photo-zoom-global-holder" class="toggle-option"></div>
-            <button id="reset-photo-adjust" title="Reset every photo zoom and position (keeps the photos)">RESET PHOTO ADJUSTMENTS</button>
-        </div>
-        <div class="timer-control">
 
-            <p>MATCH INFO CONTROL</p>
-            <input type="text" placeholder="GAME NUMBER" id="gameNumberInput">
-            <input type="text" placeholder="MATCH NUMBER" id="matchNumberInput">
-            <div class="menu" id="customMenu">
-                <div class="menu-toggle" id="menuToggle">Select Match</div>
-                <div class="menu-options">
-                    <div>TRYOUTS</div>
-                    <div>GRAND FINALS</div>
-                    <div>SEMI FINAL</div>
-                    <div>PLAYOFFS</div>
-                    <div>LOWER BRACKET</div>
-                    <div>UPPER BRACKET</div>
-                    <div>PRELIMINARY ROUNDS</div>
+    <div class="second-container">
+        <section class="panel" data-panel="draft-control" data-group="draft">
+            <button type="button" class="panel-head"><span class="panel-title">DRAFT CONTROL</span><span class="panel-chip"></span></button>
+            <div class="panel-body">
+                <button id="reset">RESET DRAFT</button>
+                <button id="switch">SWITCH TEAMS</button>
+                <button id="show-display-button">SHOW DISPLAY</button>
+                <button id="show-heroes-display" title="Switch the overlay to the heroes lineup now">SHOW HEROES</button>
+                <button id="show-draft-display" title="Switch the overlay back to the draft display">SHOW DRAFT</button>
+            </div>
+        </section>
+
+        <section class="panel" data-panel="timer" data-group="draft">
+            <button type="button" class="panel-head"><span class="panel-title">TIMER CONTROL</span><span class="panel-chip"></span></button>
+            <div class="panel-body">
+                <button id="startBtn">START</button>
+                <button id="resetPhase">RESET</button>
+                <button id="nextPhaseBtn">NEXT PHASE</button>
+                <div class="phase-info" id="phaseInfo">
+                    CURRENT PHASE: <span id="currentPhase">0</span>/18
                 </div>
             </div>
-            <br>
-            <br>
-            <p>TIMER CONTROL</p>
-            <button id="startBtn">START</button>
-            <button id="resetPhase">RESET</button>
-            <button id="nextPhaseBtn">NEXT PHASE</button>
-            <div class="phase-info" id="phaseInfo">
-                CURRENT PHASE: <span id="currentPhase">0</span>/18
-            </div>
+        </section>
 
-        </div>
+        <section class="panel" data-panel="match-info" data-group="setup">
+            <button type="button" class="panel-head"><span class="panel-title">MATCH INFO CONTROL</span><span class="panel-chip"></span></button>
+            <div class="panel-body">
+                <input type="text" placeholder="GAME NUMBER" id="gameNumberInput">
+                <input type="text" placeholder="MATCH NUMBER" id="matchNumberInput">
+                <div class="menu" id="customMenu">
+                    <div class="menu-toggle" id="menuToggle">Select Match</div>
+                    <div class="menu-options">
+                        <div>TRYOUTS</div>
+                        <div>GRAND FINALS</div>
+                        <div>SEMI FINAL</div>
+                        <div>PLAYOFFS</div>
+                        <div>LOWER BRACKET</div>
+                        <div>UPPER BRACKET</div>
+                        <div>PRELIMINARY ROUNDS</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="panel" data-panel="clear" data-group="draft">
+            <button type="button" class="panel-head"><span class="panel-title">CLEAR / RESET</span><span class="panel-chip"></span></button>
+            <div class="panel-body">
+                <button id="clear-names">CLEAR NAMES</button>
+                <button id="clear-picks">CLEAR PICKS</button>
+                <button id="clear-bans">CLEAR BANS</button>
+                <button id="clear-scores">CLEAR SCORES</button>
+                <button id="clear-logos">CLEAR LOGO</button>
+                <button id="clear-cam-links">CLEAR CAM LINK</button>
+                <button id="clear-player-photos">CLEAR PHOTOS</button>
+            </div>
+        </section>
+
+        <section class="panel" data-panel="photo-settings" data-group="setup">
+            <button type="button" class="panel-head"><span class="panel-title">PHOTO SETTINGS</span><span class="panel-chip"></span></button>
+            <div class="panel-body">
+                <label class="toggle-option" title="Automatically cut the player out of uploaded photos">
+                    <input type="checkbox" id="photo-auto-bg" checked>
+                    AUTO REMOVE PHOTO BG
+                </label>
+                <label class="toggle-option" title="Line up every player's head at the same size and height">
+                    <input type="checkbox" id="photo-auto-align" checked>
+                    AUTO ALIGN HEADS
+                </label>
+                <div id="photo-zoom-global-holder" class="toggle-option"></div>
+                <button id="reset-photo-adjust" title="Reset every photo zoom and position (keeps the photos)">RESET PHOTO ADJUSTMENTS</button>
+            </div>
+        </section>
     </div>
 
 
@@ -317,6 +387,7 @@
     <script type="module" src="js/autocomplete.js"></script>
     <script src="js/timer.js"></script>
     <script src="js/obsWebsocket/showDisplay.js"></script>
+    <script src="js/panels.js?v=1"></script>
 </body>
 
 

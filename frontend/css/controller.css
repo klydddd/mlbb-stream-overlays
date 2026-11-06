@@ -29,29 +29,27 @@ p {
 .main-container {
     display: flex;
     width: 100%;
-    height: 100vh;
+    min-height: 0;
 }
 
 .blue-side {
     background: linear-gradient(135deg, #a494e9da, #584ec4c6);
     width: 50%;
-    height: 100%;
 }
 
 .red-side {
     background: linear-gradient(135deg, #e98b78da, #a63a1fc6);
     width: 50%;
-    height: 100%;
 }
 
 .second-container {
     display: flex;
-    width: 100vw;
-}
-
-.timer-control, .team-control {
-    margin: 10px;
-    width: 50%;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 8px;
+    width: 100%;
+    padding: 8px;
+    box-sizing: border-box;
 }
 
 /* Inputs & Buttons */
@@ -108,8 +106,8 @@ button:active {
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
 }
 
-.timer-control button, .team-control button,
-.timer-control input, .team-control input {
+.second-container .panel-body > button,
+.second-container .panel-body > input {
     height: 30px;
     width: 100px;
 }
@@ -519,4 +517,216 @@ button:active {
 #photo-zoom-global-holder .photo-offsetx input[type="range"] {
     width: 90px;
     flex: none;
+}
+
+/* ===== Collapsible panels + SETUP / LIVE mode (js/panels.js) ===== */
+body {
+    height: auto;
+    min-height: 100vh;
+}
+
+.ui-toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 6px 10px;
+    background: #1a1d20;
+    border-bottom: 1px solid #33383d;
+}
+
+.ui-toolbar > button {
+    height: 26px;
+    padding: 0 10px;
+    background: #2c3034;
+    border: 1px solid #40464c;
+    box-shadow: none;
+}
+
+.ui-spacer {
+    flex: 1;
+}
+
+.ui-note {
+    color: #9aa4ae;
+    letter-spacing: 0.06em;
+}
+
+.mode-seg {
+    display: inline-flex;
+    gap: 2px;
+    padding: 3px;
+    border-radius: 7px;
+    background: #111;
+}
+
+.mode-seg button {
+    height: 26px;
+    padding: 0 16px;
+    background: transparent;
+    color: #9aa4ae;
+    box-shadow: none;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+}
+
+.mode-seg button:hover {
+    transform: none;
+    background: #2c3034;
+    box-shadow: none;
+}
+
+.mode-seg button[aria-pressed="true"] {
+    background: #0cbdd5;
+    color: white;
+}
+
+.team-container {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 8px;
+    box-sizing: border-box;
+}
+
+.side-title {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 0 4px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+}
+
+.side-title span {
+    font-size: 13px;
+}
+
+.side-team {
+    opacity: 0.85;
+    text-transform: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.panel {
+    border-radius: 7px;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.panel[hidden] {
+    display: none !important;
+}
+
+.second-container .panel {
+    flex: 1 1 260px;
+    background: #2b2f33;
+}
+
+.panel-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    height: auto;
+    padding: 7px 10px;
+    text-align: left;
+    background: transparent;
+    border-radius: 7px;
+    box-shadow: none;
+    letter-spacing: 0.08em;
+}
+
+.panel-head:hover {
+    background: rgba(255, 255, 255, 0.07);
+    transform: none;
+    box-shadow: none;
+}
+
+.panel-head:active {
+    transform: none;
+}
+
+.panel-head:focus-visible {
+    outline: 2px solid #0cbdd5;
+    outline-offset: -2px;
+}
+
+/* caret */
+.panel-head::before {
+    content: "";
+    width: 0;
+    height: 0;
+    border-top: 4px solid transparent;
+    border-bottom: 4px solid transparent;
+    border-left: 6px solid white;
+    transform: rotate(90deg);
+    transition: transform 0.15s;
+}
+
+.panel.folded .panel-head::before {
+    transform: none;
+}
+
+.panel-chip {
+    margin-left: auto;
+    padding: 1px 8px;
+    border-radius: 9px;
+    background: rgba(0, 0, 0, 0.35);
+    font-size: 10px;
+    font-variant-numeric: tabular-nums;
+}
+
+.panel-chip.full {
+    color: #4ade80;
+}
+
+.panel-body {
+    padding: 0 4px 6px;
+}
+
+.second-container .panel-body {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 5px;
+    padding: 0 8px 8px;
+}
+
+.second-container .phase-info {
+    margin-left: 0;
+}
+
+.panel.folded .panel-body {
+    display: none;
+}
+
+/* per-player photo sliders behind a disclosure */
+.photo-fine-tune {
+    margin: 0 5px 5px;
+}
+
+.photo-fine-tune summary {
+    cursor: pointer;
+    padding: 3px 0;
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    opacity: 0.85;
+    user-select: none;
+}
+
+.photo-fine-tune .photo-zooms {
+    margin: 4px 0 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .panel-head::before {
+        transition: none;
+    }
 }
