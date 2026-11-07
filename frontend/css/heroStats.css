@@ -1,0 +1,57 @@
+/* Draft hero stats overlay on a pick slot (js/heroStatsDisplay.js).
+   Gold-tinted art with three stacked label/number pairs, shown for a few seconds after lock-in. */
+.hero-stats {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: #fff;
+    font-family: var(--font-primary), "Arial Black", sans-serif;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.65);
+    pointer-events: none;
+    /* gold tint over the hero art, drawn here so it doesn't fight the img glow filters */
+    backdrop-filter: sepia(1) saturate(1.5) brightness(0.62);
+    -webkit-backdrop-filter: sepia(1) saturate(1.5) brightness(0.62);
+    background: linear-gradient(180deg, rgba(120, 84, 18, 0.25), rgba(60, 40, 6, 0.45));
+    /* starts collapsed; js/heroStatsDisplay.js wipes it open (no opacity fades, see the JS header) */
+    clip-path: inset(0 0 100% 0);
+}
+
+/* The vertical hero-name bar (.hero-name, 30px, absolute) covers the slot's left edge on both
+   sides, so the numbers are centered in the visible part to its right. */
+.hero-stats-inner {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 30px;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    container-type: inline-size; /* text scales with the visible width */
+}
+
+.hero-stats-label {
+    font-size: min(17px, 12cqi);
+    font-weight: 900;
+    letter-spacing: 0.04em;
+    line-height: 1.05;
+    max-width: 90%;
+}
+
+.hero-stats-value {
+    font-size: min(56px, 30cqi);
+    font-weight: 900;
+    line-height: 1;
+    margin: 2px 0 min(12px, 7cqi);
+    white-space: nowrap;
+}
+
+.hero-stats-value:last-child {
+    margin-bottom: 0;
+}

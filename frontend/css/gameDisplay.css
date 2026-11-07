@@ -310,11 +310,6 @@ body {
     max-width: calc((100% - 16px) / 2);
 }
 
-@media (prefers-reduced-motion: reduce) {
-    .sponsor-slide {
-        transition: none;
-    }
-}
 
 /* ---------- casters ---------- */
 .casters {

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="Assets/favico/favicon_io/android-chrome-512x512.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/waiting.css?v=7">
+    <title>Waiting Screen</title>
+</head>
+
+<!-- Waiting / break screen (OBS browser source, 1920x1080).
+     The big box on the left is left transparent: put the highlight reel / camera
+     under this source in OBS, or set a LOOP VIDEO URL in the controller.
+     Driven by the WAITING tab of controller.html via js/waitingController.js. -->
+<body>
+    <div class="stage" id="stage">
+
+        <!-- background: panels only; everything else is transparent -->
+        <svg class="bg" viewBox="0 0 1920 1080" aria-hidden="true">
+            <defs>
+                <mask id="video-hole">
+                    <rect width="1920" height="1080" fill="#fff" />
+                    <rect x="50" y="273" width="1152" height="648" fill="#000" />
+                </mask>
+                <clipPath id="panels-clip">
+                    <rect x="50" y="52" width="1152" height="164" />
+                    <rect x="1265" y="52" width="607" height="869" />
+                    <rect x="50" y="977" width="1822" height="51" />
+                </clipPath>
+                <!-- light falls from the middle: corners and the bottom of the right column go darker -->
+                <linearGradient id="shade-diag" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="1920" y2="1080">
+                    <stop offset="0" stop-color="#000" stop-opacity="0.22" />
+                    <stop offset="0.35" stop-color="#000" stop-opacity="0" />
+                    <stop offset="0.7" stop-color="#000" stop-opacity="0" />
+                    <stop offset="1" stop-color="#000" stop-opacity="0.18" />
+                </linearGradient>
+                <linearGradient id="shade-down" gradientUnits="userSpaceOnUse" x1="0" y1="52" x2="0" y2="921">
+                    <stop offset="0" stop-color="#000" stop-opacity="0" />
+                    <stop offset="1" stop-color="#000" stop-opacity="0.2" />
+                </linearGradient>
+            </defs>
+            <g mask="url(#video-hole)">
+                <g class="bg-panels">
+                    <rect x="50" y="52" width="1152" height="164" />
+                    <rect x="1265" y="52" width="607" height="869" />
+                    <rect x="50" y="977" width="1822" height="51" />
+                </g>
+                <!-- shading over the panels -->
+                <g clip-path="url(#panels-clip)">
+                    <rect x="1265" y="52" width="607" height="869" fill="url(#shade-down)" />
+                    <rect width="1920" height="1080" fill="url(#shade-diag)" />
+                </g>
+            </g>
+        </svg>
+
+        <!-- film grain over the panels (tile drawn by js/waiting.js) -->
+        <div class="grain" aria-hidden="true"></div>
+
+        <!-- vertical side texts -->
+        <span class="side-text left top" data-info="region"></span>
+        <span class="side-text left bottom" data-info="event"></span>
+        <span class="side-text right top" data-info="event"></span>
+        <span class="side-text right bottom" data-info="region"></span>
+
+        <!-- header: league logo + sponsor groups (same data as the other overlays) -->
+        <header class="header">
+            <!-- event logo from the controller (WAITING > SCREEN TEXT), not the in-game league logo -->
+            <img class="league-logo" id="event-logo" alt="" hidden>
+            <div class="sponsor-strip" id="waiting-sponsors" hidden>
+                <div class="sponsor-group" data-group="presented"><span class="sponsor-group-label">PRESENTED BY</span><div class="sponsor-group-logos"></div></div>
+                <div class="sponsor-group" data-group="partner"><span class="sponsor-group-label">IN PARTNERSHIP WITH</span><div class="sponsor-group-logos"></div></div>
+                <div class="sponsor-group" data-group="monitor"><span class="sponsor-group-label">OFFICIAL MONITOR</span><div class="sponsor-group-logos"></div></div>
+                <div class="sponsor-group" data-group="sponsored"><span class="sponsor-group-label">SPONSORED BY</span><div class="sponsor-group-logos"></div></div>
+            </div>
+        </header>
+
+        <!-- video box: transparent unless a loop video URL is set -->
+        <div class="video-box" id="video-box"></div>
+
+        <!-- right column: countdown, stage, game logo, schedule -->
+        <aside class="side-panel">
+            <div class="countdown">
+                <span class="countdown-time" id="countdown-time">00:00:00</span>
+                <span class="countdown-stage" data-info="stage"></span>
+            </div>
+            <div class="game-logo">
+                <img src="Assets/favico/Mobile-Legends.png" alt="">
+                <span>MOBILE LEGENDS</span>
+            </div>
+            <div class="matches" id="matches"></div>
+        </aside>
+
+        <!-- ticker -->
+        <div class="ticker">
+            <div class="ticker-track" id="ticker-track"><span id="ticker-text"></span></div>
+        </div>
+    </div>
+
+    <template id="match-template">
+        <div class="match">
+            <svg class="petal petal-tr" viewBox="0 0 20 24"><path d="M2 22 C2 10 8 2 18 1 C18 12 12 20 2 22 Z" /></svg>
+            <svg class="petal petal-bl" viewBox="0 0 20 24"><path d="M2 22 C2 10 8 2 18 1 C18 12 12 20 2 22 Z" /></svg>
+            <div class="team a">
+                <div class="team-logo"><img alt="" hidden></div>
+                <div class="team-text"><span class="team-tag"></span><span class="team-name"></span></div>
+            </div>
+            <div class="match-info"><span class="match-time"></span><span class="match-format"></span></div>
+            <div class="team b">
+                <div class="team-text"><span class="team-tag"></span><span class="team-name"></span></div>
+                <div class="team-logo"><img alt="" hidden></div>
+            </div>
+        </div>
+    </template>
+
+    <script type="module" src="js/waiting.js?v=4"></script>
+</body>
+
+</html>

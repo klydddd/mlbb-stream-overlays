@@ -5,6 +5,10 @@ import { heroes } from "./hero.js";
 import { onMessage } from "./websocketClient.js";
 import { mountSponsorStrip } from "./sponsorStrip.js?v=2";
 
+// Role icons (small corner icon + big faded glyph on empty cards). Off for now;
+// set to true to bring them back.
+const SHOW_ROLES = false;
+
 const ROLE_IMG = {
   EXP: "Assets/defaults/EXP.png",
   GOLD: "Assets/defaults/GOLD.png",
@@ -50,12 +54,16 @@ function buildCards() {
       // (both teams animate at the same time, mirrored).
       const pos = LAYOUT[side].findIndex((c) => c.pick === pick); // 0..4, left to right
       card.style.setProperty("--i", side === "blue" ? pos : 4 - pos);
+      const roleGlyph = SHOW_ROLES ? ` style="background-image:url('${ROLE_IMG[role]}')"` : "";
+      const roleIcon = SHOW_ROLES
+        ? `<div class="card-role"><span class="card-role-icon" style="background-image:url('${ROLE_IMG[role]}')"></span></div>`
+        : "";
       card.innerHTML = `
-        <div class="card-placeholder" style="background-image:url('${ROLE_IMG[role]}')"></div>
+        <div class="card-placeholder"${roleGlyph}></div>
         <div class="card-art"></div>
         <div class="card-photo"></div>
         <div class="card-hero-name"></div>
-        <div class="card-role"><span class="card-role-icon" style="background-image:url('${ROLE_IMG[role]}')"></span></div>
+        ${roleIcon}
         <div class="card-player"></div>`;
       wrap.appendChild(card);
 
@@ -443,6 +451,9 @@ function handleMessage(data) {
   if (!data || typeof data !== "object") return;
 
   switch (data.type) {
+    case "hero-swap": // js/swap.js: two players on one team traded heroes
+      Object.entries(data.picks || {}).forEach(([slot, name]) => setPick(parseInt(slot, 10), name));
+      return;
     case "switch":
       if (data.blueTeamName !== undefined) setBlueName(data.blueTeamName);
       if (data.redTeamName !== undefined) setRedName(data.redTeamName);

@@ -1,5 +1,6 @@
 import { send } from "./websocketClient.js";
 import { refreshPhotoThumbs } from "./playerPhotos.js?v=12";
+import { heroIsTaken, rejectTakenHero } from "./draftGuard.js";
 
 const page = document.body.getAttribute("data-page"); // to determine which page is display and controller
 const channel = new BroadcastChannel("team_channel");
@@ -348,6 +349,11 @@ pickInputs.forEach((input, index) => {
   if (input) {
     input.addEventListener('keydown', (e) => {
       if (e.key === "Enter") {
+        if (heroIsTaken(input.value, `heroPick-${index + 1}`)) {
+          e.stopImmediatePropagation(); // keep autocomplete from picking a suggestion instead
+          rejectTakenHero(input, `heroPick-${index + 1}`, input.value);
+          return;
+        }
         localStorage.setItem(`heroPick-${index + 1}`, input.value.trim());
         send({
           heroPick: {
@@ -366,6 +372,11 @@ banInputs.forEach((input, index) => {
   if (input) {
     input.addEventListener('keydown', (e) => {
       if (e.key === "Enter") {
+        if (heroIsTaken(input.value, `banPick-${index + 1}`)) {
+          e.stopImmediatePropagation(); // keep autocomplete from picking a suggestion instead
+          rejectTakenHero(input, `banPick-${index + 1}`, input.value);
+          return;
+        }
         localStorage.setItem(`banPick-${index + 1}`, input.value.trim());
         send({
           banPick: {

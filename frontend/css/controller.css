@@ -1053,3 +1053,264 @@ button.paste-btn.paste-blocked {
 .sponsor-row.muted {
     opacity: 0.45;
 }
+
+/* TOURNAMENT STATS panel (js/heroStatsController.js) */
+.panel-tournament-stats .panel-body {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.panel-tournament-stats select {
+    height: 34px;
+    width: 100%;
+    color: white;
+    background-color: #333;
+    border: 1px solid #40464c;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.stats-new-row {
+    display: flex;
+    gap: 6px;
+}
+
+.stats-new-row input {
+    flex: 1;
+    height: 34px;
+    padding: 0 10px;
+    text-transform: none;
+}
+
+.stats-new-row button {
+    height: 34px;
+    padding: 0 14px;
+}
+
+.stats-status {
+    margin: 0;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    color: #9aa3ad;
+    text-align: center;
+}
+
+.stats-toast {
+    position: fixed;
+    left: 50%;
+    bottom: 24px;
+    transform: translate(-50%, 20px);
+    z-index: 9999;
+    padding: 10px 18px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: white;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s, transform 0.25s;
+}
+
+.stats-toast.warn { background: #b45309; }
+.stats-toast.ok { background: #047857; }
+.stats-toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+/* Pick/ban input refused because the hero is already in another slot (js/draftGuard.js) */
+input.slot-taken {
+    border-color: #ef4444 !important;
+    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.45) !important;
+    animation: slot-taken-shake 0.4s ease;
+}
+
+@keyframes slot-taken-shake {
+    0%, 100% { translate: 0 0; }
+    20% { translate: -5px 0; }
+    40% { translate: 5px 0; }
+    60% { translate: -3px 0; }
+    80% { translate: 3px 0; }
+}
+
+/* ===== WAITING mode (js/panels.js + js/waitingController.js) =====
+   Reuses the .ingame-container layout; only one of the two containers shows. */
+body.ui-waiting .waiting-container {
+    display: flex;
+}
+
+body.ui-ingame .waiting-container,
+body.ui-waiting .ingame-container:not(.waiting-container) {
+    display: none;
+}
+
+body.ui-waiting .main-container,
+body.ui-waiting .second-container {
+    display: none;
+}
+
+.waiting-preview {
+    width: 100%;
+    font-size: 34px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    font-variant-numeric: tabular-nums;
+}
+
+.waiting-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    width: 100%;
+}
+
+.waiting-container input[type="number"],
+.waiting-container input[type="time"] {
+    min-width: 0;
+    width: 110px;
+}
+
+.waiting-container .panel-body input.wide {
+    flex-basis: 100%;
+}
+
+.waiting-matches {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+}
+
+.wm-card {
+    display: grid;
+    grid-template-columns: 70px 1fr 120px 1fr auto;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    border-radius: 6px;
+    background: #23272b;
+}
+
+.wm-num {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+}
+
+.wm-team,
+.wm-mid,
+.wm-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+}
+
+.wm-mid {
+    flex-direction: column;
+}
+
+.waiting-container .wm-card input {
+    min-width: 0;
+    text-transform: none;
+}
+
+.waiting-container .wm-tag { width: 90px; }
+.waiting-container .wm-name { flex: 1 1 140px; }
+.waiting-container .wm-score { width: 80px; }
+.waiting-container .wm-time,
+.waiting-container .wm-format { width: 100%; }
+
+.waiting-container .wm-logo {
+    position: relative;
+    width: 44px;
+    height: 34px;
+    min-width: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    box-sizing: border-box;
+}
+
+.wm-logo img {
+    position: absolute;
+    inset: 2px;
+    width: calc(100% - 4px);
+    height: calc(100% - 4px);
+    object-fit: contain;
+    background: #23272b;
+}
+
+.waiting-container .wm-team .wm-x,
+.waiting-container .wm-actions button {
+    min-width: 0;
+    padding: 0 10px;
+}
+
+.waiting-hint {
+    flex: 1 1 300px;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    opacity: 0.7;
+}
+
+@media (max-width: 900px) {
+    .wm-card {
+        grid-template-columns: 1fr;
+    }
+}
+
+.waiting-container textarea.waiting-text {
+    flex-basis: 100%;
+    min-height: 34px;
+    padding: 7px 12px;
+    resize: vertical;
+    font: inherit;
+    color: white;
+    text-align: center;
+    background-color: #333;
+    border: 1px solid #40464c;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+.waiting-logo-row {
+    align-items: center;
+}
+
+.waiting-logo-preview {
+    height: 34px;
+    max-width: 120px;
+    object-fit: contain;
+}
+
+/* RACE TO 1 / 2 / 3 (js/seriesRaceController.js), in MATCH INFO and INGAME > SCORE */
+.race-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+}
+
+.race-label {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+}
+
+.race-row .toggle-btn {
+    width: auto;
+    min-width: 44px;
+    background: #3a3f44;
+    border: 1px solid #50575e;
+    box-shadow: none;
+}
+
+.race-row .toggle-btn[aria-pressed="true"] {
+    background: #16a34a;
+    border-color: #4ade80;
+    box-shadow: 0 0 0 2px #4ade80;
+    font-weight: 700;
+}
