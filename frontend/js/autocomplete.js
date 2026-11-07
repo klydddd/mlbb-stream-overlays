@@ -1,5 +1,6 @@
 import { heroes, updateBanPick, updateHeroPick } from "./hero.js";
 import { send } from "./websocketClient.js";
+import { heroIsTaken, rejectTakenHero } from "./draftGuard.js";
 
 function setupHeroDropdown(inputPrefix, dropdownPrefix, count, localStorageKeyPrefix, onSelect) {
   for (let i = 1; i <= count; i++) {
@@ -22,7 +23,9 @@ function setupHeroDropdown(inputPrefix, dropdownPrefix, count, localStorageKeyPr
         return;
       }
 
-      const matches = heroes.filter(h => h.name.toLowerCase().startsWith(query));
+      // Heroes already picked or banned in another slot are not suggested
+      const slotKey = `${localStorageKeyPrefix}-${i}`;
+      const matches = heroes.filter(h => h.name.toLowerCase().startsWith(query) && !heroIsTaken(h.name, slotKey));
       currentMatches = matches;
 
       if (matches.length === 0) {
@@ -37,6 +40,13 @@ function setupHeroDropdown(inputPrefix, dropdownPrefix, count, localStorageKeyPr
         option.textContent = hero.name;
 
         option.addEventListener("mousedown", () => {
+          // The list can be stale if another slot took this hero after it was shown
+          if (heroIsTaken(hero.name, `${localStorageKeyPrefix}-${i}`)) {
+            dropdown.innerHTML = "";
+            dropdown.style.display = "none";
+            rejectTakenHero(input, `${localStorageKeyPrefix}-${i}`, hero.name);
+            return;
+          }
           input.value = hero.name;
           dropdown.innerHTML = "";
           dropdown.style.display = "none";

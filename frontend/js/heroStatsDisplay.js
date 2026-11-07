@@ -19,7 +19,9 @@ const REFRESH_MS = 60000;    // safety refetch in case a change message was miss
 const OUT = "cubic-bezier(0.22, 1, 0.36, 1)";   // fast start, soft landing
 const IN = "cubic-bezier(0.55, 0, 0.75, 0.2)";  // soft start, fast exit
 const POP = "cubic-bezier(0.34, 1.56, 0.64, 1)"; // slight overshoot
-const REDUCED = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+// Broadcast overlay: always animate. The OS "reduce motion" setting belongs to the
+// operator's machine (and OBS picks it up), but the audience is the stream viewers.
+const REDUCED = false;
 
 const TINT_MS = 450;         // tint wipe down
 const ROW_START_MS = 200;    // first row starts while the tint is still wiping

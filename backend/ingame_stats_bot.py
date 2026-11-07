@@ -569,7 +569,10 @@ class DryRelay:
 def room_url(room):
     base = os.environ.get("WS_URL", "ws://localhost:8080/ws").rstrip("/")
     if not room:
-        room = input("Room code from the controller URL (Enter for a random one): ").strip()
+        room = input("Room code, or paste the whole controller URL (Enter for a random one): ").strip()
+    found = re.search(r"[?&]room=([^&#\s]+)", room)  # a pasted URL: keep just the code
+    if found:
+        room = found.group(1)
     if not room:
         room = "".join(random.choices(string.ascii_lowercase + string.digits, k=8))
         print(f"Generated room code {room}. Add ?room={room} to the controller and overlay URLs.")

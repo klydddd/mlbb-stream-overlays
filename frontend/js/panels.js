@@ -1,14 +1,16 @@
 // Controller layout helpers (UI only — nothing here is synced to the display).
 // - Click a panel header to fold/unfold it. Blue and red copies of a panel fold together.
 // - SETUP / LIVE / INGAME toggle: LIVE hides every panel with data-group="setup";
-//   INGAME shows only the data-group="ingame" panels (js/ingame.js), which the other modes hide.
+//   INGAME shows only the data-group="ingame" panels (js/ingame.js), WAITING only the
+//   data-group="waiting" panels (js/waitingController.js); the other modes hide both.
 // - Folded panels show a "filled / total" chip so you can see they're done.
 // - Per-player photo sliders (injected by playerPhotos.js) go behind a "fine-tune" disclosure.
 // State is kept in localStorage under "controller-ui".
 (function () {
   const STORAGE_KEY = "controller-ui";
-  const MODES = ["setup", "live", "ingame"];
-  const NOTES = { live: "LIVE MODE: SETUP SECTIONS HIDDEN", ingame: "INGAME MODE: DRAFT SECTIONS HIDDEN" };
+  const MODES = ["setup", "live", "ingame", "waiting"];
+  const SOLO_MODES = ["ingame", "waiting"]; // modes that show only their own group
+  const NOTES = { live: "LIVE MODE: SETUP SECTIONS HIDDEN", ingame: "INGAME MODE: DRAFT SECTIONS HIDDEN", waiting: "WAITING MODE: CONTROLS FOR WAITING.HTML" };
 
   function loadState() {
     try {
@@ -38,7 +40,7 @@
     if (photos.length) {
       return [panel.querySelectorAll(".photo-upload.has-photo").length, photos.length];
     }
-    const fields = [...panel.querySelectorAll('.panel-body input[type="text"], .panel-body input[type="url"]')]
+    const fields = [...panel.querySelectorAll('.panel-body input[type="text"], .panel-body input[type="url"], .panel-body textarea')]
       .filter((f) => !f.closest("[hidden]"));
     if (!fields.length) return null;
     return [fields.filter((f) => f.value.trim() !== "").length, fields.length];
@@ -65,9 +67,10 @@
 
   function render() {
     const live = state.mode === "live";
-    const ingame = state.mode === "ingame";
+    const solo = SOLO_MODES.includes(state.mode);
     document.body.classList.toggle("ui-live", live);
-    document.body.classList.toggle("ui-ingame", ingame);
+    document.body.classList.toggle("ui-ingame", state.mode === "ingame");
+    document.body.classList.toggle("ui-waiting", state.mode === "waiting");
 
     document.querySelectorAll("[data-ui-mode]").forEach((btn) => {
       btn.setAttribute("aria-pressed", String(btn.dataset.uiMode === state.mode));
@@ -78,7 +81,7 @@
 
     panels().forEach((panel) => {
       const group = panel.dataset.group;
-      panel.hidden = ingame ? group !== "ingame" : group === "ingame" || (live && group === "setup");
+      panel.hidden = solo ? group !== state.mode : SOLO_MODES.includes(group) || (live && group === "setup");
       const folded = state.folded.has(panel.dataset.panel);
       panel.classList.toggle("folded", folded);
       const head = panel.querySelector(".panel-head");

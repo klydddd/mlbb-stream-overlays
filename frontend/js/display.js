@@ -1,5 +1,6 @@
 import { heroes, updateBanPick, updateHeroPick, updateHeroPickSilent } from "./hero.js";
 import { onMessage } from "./websocketClient.js";
+import { watchSeriesRace, DEFAULT_RACE } from "./seriesRace.js";
 
 const blueName = localStorage.getItem(`blue-team-name`);
 const redName = localStorage.getItem(`red-team-name`);
@@ -10,8 +11,20 @@ const resetText = (id, fallback) => {
   if (el) el.textContent = fallback;
 };
 
+// Hero swaps (js/swap.js) re-render the two picks silently: no voiceline and no
+// hero stats pop-up, since nobody locked anything in.
+function applyHeroSwap(picks) {
+  Object.entries(picks || {}).forEach(([slot, name]) => {
+    const i = parseInt(slot, 10);
+    if (i >= 1 && i <= 10) updateHeroPickSilent(i - 1, name || "");
+  });
+}
+
 function handleIncomingMessage(data) {
   switch (data.type) {
+    case "hero-swap":
+      applyHeroSwap(data.picks);
+      return;
     case "switch":
       const blue = document.getElementById("blue-team-name");
       const red = document.getElementById("red-team-name");
@@ -347,13 +360,21 @@ function clearBans() {
   }
 }
 
-// Series score: light up the score boxes (3 per side), filling outward from the
-// team-name side: blue left-to-right, red right-to-left. Stored as blue-score / red-score.
+// Series score: light up the score boxes, filling outward from the team-name side:
+// blue left-to-right, red right-to-left. Stored as blue-score / red-score.
+// Only the first `race` boxes show (race to 1/2/3, js/seriesRace.js).
+let race = DEFAULT_RACE;
+const shownWins = { blue: 0, red: 0 };
+
 function setScore(side, value) {
   const wins = Math.max(0, parseInt(value, 10) || 0);
+  shownWins[side] = wins;
   const boxes = [...document.querySelectorAll(`.${side}-score .score`)];
   if (side === "red") boxes.reverse();
-  boxes.forEach((el, i) => el.classList.toggle("won", i < wins));
+  boxes.forEach((el, i) => {
+    el.style.display = i < race ? "" : "none";
+    el.classList.toggle("won", i < wins);
+  });
 }
 
 function clearScores() {
@@ -364,15 +385,32 @@ function clearScores() {
 setScore("blue", localStorage.getItem("blue-score"));
 setScore("red", localStorage.getItem("red-score"));
 
+watchSeriesRace((value) => {
+  race = value;
+  setScore("blue", shownWins.blue);
+  setScore("red", shownWins.red);
+});
+
 channel.onmessage = (event) => {
   const data = event.data;
   handleIncomingMessage(data);
 };
 
+const swapSlots = new Set(); // pick slots (1-10) whose next storage change is a swap
+
 window.addEventListener('storage', (e) => {
   if (e.key === null) clearScores(); // localStorage.clear() from RESET DRAFT
   if (e.key === 'blue-score' || e.key === 'red-score') {
     setScore(e.key.split('-')[0], e.newValue);
+    return;
+  }
+
+  // A swap writes "hero-swap" just before its two heroPick keys (storage events keep
+  // write order), so those two pick changes render silently.
+  if (e.key === 'hero-swap') {
+    try {
+      (JSON.parse(e.newValue || "{}").slots || []).forEach((s) => swapSlots.add(Number(s)));
+    } catch (err) { /* ignore */ }
     return;
   }
 
@@ -390,7 +428,9 @@ window.addEventListener('storage', (e) => {
     const index = parseInt(e.key.split('-')[1]) - 1;
     const isFinalPhase = localStorage.getItem('phase-number') === '18';
 
-    if (isFinalPhase) {
+    if (swapSlots.delete(index + 1)) {
+      updateHeroPickSilent(index, e.newValue || "");
+    } else if (isFinalPhase) {
       updateHeroPickSilent(index, e.newValue);
     } else {
       updateHeroPick(index, e.newValue, false);

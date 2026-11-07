@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/controller.css?v=18">
+    <link rel="stylesheet" href="css/controller.css?v=23">
     <link rel="icon" href="Assets/favico/favicon_io/android-chrome-512x512.png">
     <title>Control Panel</title>
 </head>
@@ -18,6 +18,7 @@
             <button type="button" data-ui-mode="setup" title="Show every control">SETUP</button>
             <button type="button" data-ui-mode="live" title="Show only picks, bans, draft buttons and timer">LIVE</button>
             <button type="button" data-ui-mode="ingame" title="Show only in-game controls: score, casters, map, objectives, cams">INGAME</button>
+            <button type="button" data-ui-mode="waiting" title="Show only waiting-screen controls: countdown, schedule, ticker">WAITING</button>
         </div>
         <span class="ui-note" id="ui-note"></span>
         <span class="ui-spacer"></span>
@@ -355,6 +356,12 @@
             <div class="panel-body">
                 <input type="text" placeholder="GAME NUMBER" id="gameNumberInput">
                 <input type="text" placeholder="MATCH NUMBER" id="matchNumberInput">
+                <div class="race-row" role="group" aria-label="Series length">
+                    <span class="race-label">RACE TO</span>
+                    <button type="button" class="toggle-btn" data-series-race="1" aria-pressed="false" title="Best of 1: one score box per team">1</button>
+                    <button type="button" class="toggle-btn" data-series-race="2" aria-pressed="false" title="Best of 3: two score boxes per team">2</button>
+                    <button type="button" class="toggle-btn" data-series-race="3" aria-pressed="false" title="Best of 5: three score boxes per team">3</button>
+                </div>
                 <div class="menu" id="customMenu">
                     <div class="menu-toggle" id="menuToggle">Select Match</div>
                     <div class="menu-options">
@@ -418,6 +425,12 @@
         <section class="panel" data-panel="ingame-score" data-group="ingame">
             <button type="button" class="panel-head"><span class="panel-title">SCORE</span><span class="panel-chip"></span></button>
             <div class="panel-body">
+                <div class="race-row" role="group" aria-label="Series length">
+                    <span class="race-label">RACE TO</span>
+                    <button type="button" class="toggle-btn" data-series-race="1" aria-pressed="false" title="Best of 1: one score box per team">1</button>
+                    <button type="button" class="toggle-btn" data-series-race="2" aria-pressed="false" title="Best of 3: two score boxes per team">2</button>
+                    <button type="button" class="toggle-btn" data-series-race="3" aria-pressed="false" title="Best of 5: three score boxes per team">3</button>
+                </div>
                 <div class="score-row blue">
                     <span class="score-team" data-score-team-name="blueTeamName">BLUE</span>
                     <span class="score-value" data-score-value="blue">0</span>
@@ -520,20 +533,76 @@
         </section>
     </div>
 
-    <script type="module" src="js/control.js?v=12"></script>
-    <script src="js/swap.js"></script>
+    <!-- WAITING mode only (js/waitingController.js), drives waiting.html -->
+    <div class="ingame-container waiting-container">
+        <section class="panel" data-panel="waiting-countdown" data-group="waiting">
+            <button type="button" class="panel-head"><span class="panel-title">COUNTDOWN</span><span class="panel-chip"></span></button>
+            <div class="panel-body">
+                <span class="waiting-preview" id="waiting-countdown-preview">00:00:00</span>
+                <div class="waiting-row">
+                    <input type="number" id="waiting-minutes" min="1" step="1" value="15" aria-label="Countdown minutes">
+                    <button type="button" id="waiting-start">START MINUTES</button>
+                </div>
+                <div class="waiting-row">
+                    <input type="time" id="waiting-until" aria-label="Count down to this time">
+                    <button type="button" id="waiting-start-until">COUNT DOWN TO TIME</button>
+                </div>
+                <div class="waiting-row">
+                    <button type="button" data-waiting-adjust="-1">−1 MIN</button>
+                    <button type="button" data-waiting-adjust="1">+1 MIN</button>
+                    <button type="button" id="waiting-pause">PAUSE</button>
+                    <button type="button" id="waiting-countdown-reset">RESET</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="panel" data-panel="waiting-info" data-group="waiting">
+            <button type="button" class="panel-head"><span class="panel-title">SCREEN TEXT</span><span class="panel-chip"></span></button>
+            <div class="panel-body">
+                <div class="waiting-row waiting-logo-row">
+                    <span class="sponsor-label">EVENT LOGO</span>
+                    <label class="custom-file-upload sponsor-upload" title="Logo for the waiting screen header (separate from the in-game logo)">
+                        <input type="file" accept="image/*" id="waiting-logo-upload">
+                        UPLOAD LOGO
+                    </label>
+                    <img id="waiting-logo-preview" class="waiting-logo-preview" alt="" hidden>
+                    <button type="button" id="waiting-logo-clear" hidden>REMOVE LOGO</button>
+                </div>
+                <textarea class="wide waiting-text" rows="2" data-waiting-info="stage" data-paste placeholder="STAGE (E.G. DAY 3 GROUP STAGE)" aria-label="Stage label"></textarea>
+                <textarea class="wide waiting-text" rows="2" data-waiting-info="event" data-paste placeholder="EVENT (SIDE TEXT, E.G. ALLIANCE GAMES REGIONALS)" aria-label="Event name"></textarea>
+                <textarea class="wide waiting-text" rows="2" data-waiting-info="region" data-paste placeholder="REGION (SIDE TEXT, E.G. NORTH &amp; SOUTH LUZON)" aria-label="Region"></textarea>
+                <textarea class="wide waiting-text" rows="2" data-waiting-info="ticker" data-paste placeholder="TICKER (BLANK = MATCH RESULTS FROM THE SCHEDULE; NEW LINES SHOW AS •)" aria-label="Ticker text"></textarea>
+                <input type="url" class="wide" data-waiting-info="video" data-paste="replace" placeholder="LOOP VIDEO URL, .MP4 OR EMBED (BLANK = TRANSPARENT FOR OBS, PRESS ENTER)" aria-label="Loop video URL">
+                <span class="sponsor-note" id="waiting-note"></span>
+            </div>
+        </section>
+
+        <section class="panel panel-wide" data-panel="waiting-schedule" data-group="waiting">
+            <button type="button" class="panel-head"><span class="panel-title">MATCH SCHEDULE</span><span class="panel-chip"></span></button>
+            <div class="panel-body">
+                <div class="waiting-matches" id="waiting-matches"></div>
+                <button type="button" id="waiting-add-match">ADD MATCH</button>
+                <span class="waiting-hint">UP TO 4 MATCHES. SCORES FEED THE TICKER WHEN IT'S BLANK. SPONSOR LOGOS COME FROM INGAME &gt; SPONSOR SLIDESHOW.</span>
+            </div>
+        </section>
+    </div>
+
+    <script type="module" src="js/control.js?v=13"></script>
+    <script type="module" src="js/swap.js?v=2"></script>
     <script type="module" src="js/showLogo.js?v=2"></script>
     <script type="module" src="js/clear.js"></script>
     <script type="module" src="js/playerPhotos.js?v=12"></script>
-    <script type="module" src="js/autocomplete.js"></script>
+    <script type="module" src="js/autocomplete.js?v=2"></script>
     <script type="module" src="js/ingame.js?v=1"></script>
+    <script type="module" src="js/seriesRaceController.js?v=1"></script>
     <script type="module" src="js/heroStatsController.js?v=1"></script>
     <script type="module" src="js/sponsors.js?v=3"></script>
     <script type="module" src="js/casterCams.js?v=1"></script>
+    <script type="module" src="js/waitingController.js?v=3"></script>
     <script src="js/pasteButtons.js?v=1"></script>
     <script src="js/timer.js?v=2"></script>
     <script src="js/obsWebsocket/showDisplay.js"></script>
-    <script src="js/panels.js?v=3"></script>
+    <script src="js/panels.js?v=5"></script>
 </body>
 
 

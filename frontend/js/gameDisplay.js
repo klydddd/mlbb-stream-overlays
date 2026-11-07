@@ -3,11 +3,13 @@
 // and the WebSocket room. Control side lives in js/ingame.js + js/control.js.
 import { onMessage } from "./websocketClient.js";
 import { mountSponsorSlideshow } from "./sponsorSlideshow.js?v=3";
+import { watchSeriesRace, DEFAULT_RACE } from "./seriesRace.js";
 import {
   playIntro, wipeSwap, revealPanel, concealPanel, swapIcon, scoreChanged, playSwitch,
-} from "./gameDisplayAnim.js?v=4";
+} from "./gameDisplayAnim.js?v=5";
 
-const MAX_WINS = 3;
+// pips per team: race to 1/2/3 from the controller (js/seriesRace.js)
+let MAX_WINS = DEFAULT_RACE;
 const MAP_LABELS = {
   "healing-turtle": "HEALING TURTLE",
   "revealing-wisps": "REVEALING WISPS",
@@ -135,7 +137,7 @@ document.fonts.load(`${NAME_FONT_PX}px Anton`).then(() => {
   fitName($("red-name"));
 });
 
-// Series score (games won, from the controller) lights the 3 pips. The big number
+// Series score (games won, from the controller) lights the pips (MAX_WINS of them). The big number
 // beside it shows this game's kills instead (from the stats bot, see setKills).
 const shownScore = { blue: 0, red: 0 };
 
@@ -146,7 +148,10 @@ function setScore(side, value) {
   const pips = [...$(`${side}-pips`).children];
   // fill outward from the team name: blue left-to-right, red right-to-left
   if (side === "red") pips.reverse();
-  pips.forEach((pip, i) => pip.classList.toggle("won", i < Math.min(score, MAX_WINS)));
+  pips.forEach((pip, i) => {
+    pip.hidden = i >= MAX_WINS;
+    pip.classList.toggle("won", i < Math.min(score, MAX_WINS));
+  });
 
   // the same update can arrive several times (BroadcastChannel, WebSocket, storage)
   if (!ready || score === prev) return;
@@ -354,6 +359,12 @@ function handleStorage(e) {
 }
 
 loadFromStorage();
+watchSeriesRace((value) => {
+  MAX_WINS = value;
+  // redraw without the "new pip" animation (setScore skips it when the score is unchanged)
+  setScore("blue", shownScore.blue);
+  setScore("red", shownScore.red);
+});
 mountSponsorSlideshow($("sponsors")); // handles its own storage/messages
 // ---------- Game clock (the 00:00 above the league logo) ----------
 // Counts up MM:SS from 00:00, starting when the intro animation has finished.

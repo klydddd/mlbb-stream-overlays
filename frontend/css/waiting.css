@@ -1,0 +1,367 @@
+/* Waiting / break screen (waiting.html). Fixed 1920x1080 stage in px;
+   js/waiting.js scales it to fit the window. Change the look with the tokens below. */
+:root {
+    --panel: #a28a05;        /* header, right column, ticker */
+    --panel-opacity: 1;    /* lower = more of your OBS background shows through */
+    --divider: rgba(70, 38, 0, 0.6);   /* line under the countdown */
+    --row: 45, 15, 0;                  /* match rows: rgb, alpha set per row */
+    --chip: rgba(30, 12, 0, 0.55);     /* time/format chip */
+    --side-text: #50a9ff;    /* vertical side texts */
+    --accent: #ffe27a;       /* countdown at 00:00:00 */
+    --text: #ffffff;
+    --font-big: "Anton", "Impact", "Arial Narrow", sans-serif;
+    --font: "Archivo", "Arial", sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: transparent;
+}
+
+[hidden] {
+    display: none !important;
+}
+
+.stage {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1920px;
+    height: 1080px;
+    transform-origin: 0 0;
+    font-family: var(--font);
+    color: var(--text);
+    text-transform: uppercase;
+}
+
+/* ---------- background ---------- */
+.bg {
+    position: absolute;
+    inset: 0;
+    width: 1920px;
+    height: 1080px;
+}
+
+.bg-panels rect { fill: var(--panel); fill-opacity: var(--panel-opacity); }
+
+/* fine grain on the panels only; --grain is a tile made in js/waiting.js */
+.grain {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image: var(--grain, none);
+    clip-path: path("M50 52H1202V216H50Z M1265 52H1872V921H1265Z M50 977H1872V1028H50Z");
+}
+
+/* ---------- side texts ---------- */
+.side-text {
+    position: absolute;
+    font-weight: 800;
+    font-size: 17px;
+    letter-spacing: 0.04em;
+    color: var(--side-text);
+    white-space: pre;
+    line-height: 1.15;
+    writing-mode: vertical-rl;
+}
+
+/* left side reads bottom-to-top */
+.side-text.left { left: 14px; transform: rotate(180deg); }
+.side-text.right { right: 14px; }
+.side-text.left.top { top: 54px; }
+.side-text.left.bottom { bottom: 54px; }
+.side-text.right.top { top: 54px; }
+.side-text.right.bottom { bottom: 54px; }
+
+/* ---------- header ---------- */
+.header {
+    position: absolute;
+    left: 50px;
+    top: 52px;
+    width: 1152px;
+    height: 164px;
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    padding: 0 48px;
+}
+
+.league-logo {
+    flex: none;
+    max-width: 300px;
+    max-height: 120px;
+    object-fit: contain;
+}
+
+.sponsor-strip {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-start;
+    gap: 24px;
+}
+
+.sponsor-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.sponsor-group-label {
+    font-weight: 800;
+    font-size: 17px;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+}
+
+.sponsor-group-logos {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    height: 76px;
+}
+
+.sponsor-group-logos img {
+    max-height: 76px;
+    max-width: 190px;
+    object-fit: contain;
+}
+
+/* ---------- video box ---------- */
+.video-box {
+    position: absolute;
+    left: 50px;
+    top: 273px;
+    width: 1152px;
+    height: 648px;
+    overflow: hidden;
+}
+
+.video-box video,
+.video-box iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    object-fit: cover;
+    display: block;
+}
+
+/* ---------- right column ---------- */
+.side-panel {
+    position: absolute;
+    left: 1265px;
+    top: 52px;
+    width: 607px;
+    height: 869px;
+}
+
+.countdown {
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 164px;
+    border-bottom: 8px solid var(--divider);
+}
+
+.countdown-time {
+    position: absolute;
+    left: 34px;
+    top: 10px;
+    font-family: var(--font-big);
+    font-size: 140px;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    transform: scaleX(0.62);
+    transform-origin: 0 0;
+    white-space: nowrap;
+}
+
+.countdown-time.done {
+    color: var(--accent);
+}
+
+.countdown-stage {
+    position: absolute;
+    left: 388px;
+    right: 24px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-weight: 900;
+    font-size: 25px;
+    line-height: 1.05;
+    white-space: pre-line;
+}
+
+.game-logo {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 186px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    font-family: var(--font-big);
+    font-size: 36px;
+    letter-spacing: 0.04em;
+}
+
+.game-logo img {
+    height: 64px;
+}
+
+.matches {
+    position: absolute;
+    left: 31px;
+    right: 29px;
+    top: 268px;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+
+.match {
+    position: relative;
+    height: 122px;
+    display: grid;
+    grid-template-columns: 1fr 86px 1fr;
+    align-items: center;
+    padding: 0 18px;
+    /* see-through so the triangles show, a bit darker to the right and lower down */
+    --a: 0.4;
+    background:
+        var(--grain, none),
+        linear-gradient(90deg, rgba(var(--row), var(--a)), rgba(var(--row), calc(var(--a) + 0.14)));
+}
+
+.match:nth-child(2) { --a: 0.45; }
+.match:nth-child(3) { --a: 0.5; }
+.match:nth-child(4) { --a: 0.55; }
+
+.match.enter {
+    animation: match-in 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@keyframes match-in {
+    from { opacity: 0; transform: translateX(40px); }
+    to { opacity: 1; transform: none; }
+}
+
+.petal {
+    position: absolute;
+    width: 26px;
+    height: 30px;
+    fill: var(--text);
+}
+
+.petal-tr { right: -6px; top: -14px; }
+.petal-bl { left: -14px; bottom: -14px; }
+
+.team {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+}
+
+.team.b {
+    justify-content: flex-end;
+    text-align: right;
+}
+
+.team-logo {
+    flex: none;
+    width: 78px;
+    height: 78px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.team-logo img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.team-text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.team-tag {
+    font-family: var(--font-big);
+    font-size: 46px;
+    line-height: 1.05;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.team-name {
+    font-weight: 800;
+    font-size: 15px;
+    line-height: 1.1;
+    text-transform: none;
+}
+
+.match-info {
+    justify-self: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 5px 8px;
+    background: var(--chip);
+    font-size: 15px;
+    line-height: 1.15;
+    white-space: nowrap;
+}
+
+.match-info:has(span:empty + span:empty) {
+    visibility: hidden;
+}
+
+/* ---------- ticker ---------- */
+.ticker {
+    position: absolute;
+    left: 50px;
+    top: 977px;
+    width: 1822px;
+    height: 51px;
+    padding: 0 52px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+}
+
+.ticker-track {
+    display: flex;
+    white-space: nowrap;
+    font-weight: 900;
+    font-size: 25px;
+}
+
+.ticker-track.scroll {
+    animation: ticker var(--ticker-duration, 30s) linear infinite;
+}
+
+.ticker-track.scroll span {
+    padding-right: 120px;
+}
+
+@keyframes ticker {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+}

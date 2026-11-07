@@ -900,11 +900,6 @@ p {
     object-fit: contain;
 }
 
-@media (prefers-reduced-motion: reduce) {
-    .center-sponsors .sponsor-slide {
-        transition: none;
-    }
-}
 
 /* ---------- center column layout ----------
    GAME / MATCH / ROUND sits in the ban row's center box; the pick column below

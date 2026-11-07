@@ -163,8 +163,3 @@ body[data-sponsor-style="top"] .center-sponsors {
     to { opacity: 1; transform: none; }
 }
 
-@media (prefers-reduced-motion: reduce) {
-    .caster-cam {
-        animation: none;
-    }
-}
