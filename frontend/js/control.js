@@ -276,8 +276,10 @@ if (switchBtn) {
 // Display page switching (triggered by timer.js):
 //   last phase countdown ends -> display.html goes to heroes-display.html
 //   timer RESET               -> heroes-display.html goes back to display.html
-//   SHOW INGAME button        -> heroes-display.html / display.html go to gameDisplay.html
-const SWITCH_TYPES = { heroes: "show-heroes-display", ingame: "show-ingame-display" };
+//   SHOW INGAME button        -> the overlay goes to gameDisplay.html
+//   SHOW CAMS button          -> the overlay goes to cams.html
+// (pages and rules: js/overlayChain.js)
+const SWITCH_TYPES = { heroes: "show-heroes-display", ingame: "show-ingame-display", cams: "show-cams-display" };
 window.addEventListener("draft-display-switch", (e) => {
   const msg = { type: SWITCH_TYPES[e.detail?.target] || "show-draft-display" };
   channel.postMessage(msg);
@@ -297,6 +299,9 @@ document.getElementById("show-heroes-display")?.addEventListener("click", () => 
 });
 document.getElementById("show-ingame-display")?.addEventListener("click", () => {
   window.dispatchEvent(new CustomEvent("draft-display-switch", { detail: { target: "ingame" } }));
+});
+document.getElementById("show-cams-display")?.addEventListener("click", () => {
+  window.dispatchEvent(new CustomEvent("draft-display-switch", { detail: { target: "cams" } }));
 });
 document.getElementById("show-draft-display")?.addEventListener("click", () => {
   window.dispatchEvent(new CustomEvent("draft-display-switch", { detail: { target: "draft" } }));

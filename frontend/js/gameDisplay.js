@@ -2,6 +2,7 @@
 // localStorage (restore on load + `storage` events), BroadcastChannel "team_channel",
 // and the WebSocket room. Control side lives in js/ingame.js + js/control.js.
 import { onMessage } from "./websocketClient.js";
+import { followSwitch } from "./overlayChain.js";
 import { mountSponsorSlideshow } from "./sponsorSlideshow.js?v=3";
 import { watchSeriesRace, DEFAULT_RACE } from "./seriesRace.js";
 import {
@@ -301,23 +302,13 @@ function loadFromStorage() {
 
 // ---------- Messages (BroadcastChannel + WebSocket) ----------
 
-// True when this page was reached from the draft source via SHOW INGAME
-// (heroesDisplay.js / display.js set the flag). A standalone gameDisplay OBS
-// source ignores the page-switch messages and stays on the HUD.
-function inDraftChain() {
-  try { return sessionStorage.getItem("overlay-chain") === "1"; } catch { return false; }
-}
-
 function handleMessage(data) {
   if (!data || typeof data !== "object") return;
+  // SHOW DRAFT / HEROES / CAMS: only when this tab is the draft source, not a
+  // standalone HUD source (js/overlayChain.js)
+  if (followSwitch(data.type, "gameDisplay.html")) return;
 
   switch (data.type) {
-    case "show-draft-display": // SHOW DRAFT / timer RESET on the controller
-      if (inDraftChain()) window.location.href = "display.html" + window.location.search;
-      return;
-    case "show-heroes-display":
-      if (inDraftChain()) window.location.href = "heroes-display.html" + window.location.search;
-      return;
     case "reset":
       resetAll();
       return;

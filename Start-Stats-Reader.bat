@@ -65,14 +65,16 @@ echo.
 echo   1  Set up the boxes  - first time, or if the stream layout changed
 echo   2  Start reading stats
 echo   3  Start reading stats with a preview window - to check it works
-echo   4  Quit
+echo   4  Start the overlay server and show the OBS links  (no stats reader)
+echo   5  Quit
 echo.
 set "CHOICE="
 set /p "CHOICE=  Type a number and press Enter: "
 if "%CHOICE%"=="1" goto :calibrate
 if "%CHOICE%"=="2" goto :run
 if "%CHOICE%"=="3" goto :run_debug
-if "%CHOICE%"=="4" exit /b 0
+if "%CHOICE%"=="4" goto :serve_only
+if "%CHOICE%"=="5" exit /b 0
 goto :menu
 
 :calibrate
@@ -121,21 +123,51 @@ if not exist "%VENV%\calibrated.txt" (
 cls
 call :ensure_server
 echo.
-echo  Open the controller in your browser and copy its address from the top bar.
-echo  It looks like: http://localhost:8080/controller.html?room=abc123
-echo  Paste it below - right-click pastes in this window - then press Enter.
-echo.
-echo  To STOP reading later: close this window.
+call :ask_url
+echo  Reading stats now. To STOP: close this window.
 echo.
 pushd "%BACKEND%"
-"%VPY%" ingame_stats_bot.py run %EXTRA%
+"%VPY%" ingame_stats_bot.py run --room "%URL%" %EXTRA%
 popd
 echo.
 echo  The stats reader stopped.
 pause
 goto :menu
 
+rem Overlay server + OBS links only: needs no boxes, for PCs that don't read stats.
+:serve_only
+cls
+if defined WS_URL (
+    echo.
+    echo  WS_URL is set, so the overlays use the server at %WS_URL%, not one on this PC.
+) else (
+    call :ensure_server
+    if errorlevel 1 goto :serve_only_end
+)
+echo.
+call :ask_url
+if not defined WS_URL echo  Leave the overlay server window open while you stream.
+:serve_only_end
+echo.
+pause
+goto :menu
+
 rem ================= helpers =================
+
+rem Ask for the controller address until it has a room code, then print the OBS links.
+rem Leaves the address in URL.
+:ask_url
+echo  Open the controller in your browser and copy its address from the top bar.
+echo  It looks like: http://localhost:8080/controller.html?room=abc123
+echo  Paste it below - right-click pastes in this window - then press Enter.
+echo.
+:ask_url_again
+set "URL="
+set /p "URL=  Controller address: "
+rem Prints the links to paste into OBS; fails when the address has no room code.
+"%VPY%" "%BACKEND%\obs_links.py" "%URL%"
+if errorlevel 1 goto :ask_url_again
+exit /b 0
 
 :ensure_server
 rem The overlays talk through the local server on port 8080. Start it if it is not running.

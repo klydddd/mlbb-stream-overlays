@@ -1,5 +1,6 @@
-// Caster cams on display.html: one or two vdo.ninja feeds, large and centered in the
-// empty area above the draft overlay. Controlled by js/casterCams.js on the controller.
+// Caster cams on display.html (one or two vdo.ninja feeds, large and centered in the
+// empty area above the draft overlay) and on cams.html (the cams-only screen; same
+// element ids). Controlled by js/casterCams.js on the controller.
 // Listens on localStorage (restore + storage events), BroadcastChannel and WebSocket.
 import { onMessage } from "./websocketClient.js";
 

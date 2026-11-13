@@ -6,7 +6,8 @@
 //
 // localStorage: caster-layout ("" | "1" | "2"), caster-name-1/2, caster-link-1/2
 // Message:      { type: "caster-cams", layout, casters: [{ name, link }, { name, link }] }
-import { send } from "./websocketClient.js";
+// Answers { type: "cams-request" } (sent by cams.html on connect) with the current state.
+import { onMessage, send } from "./websocketClient.js";
 
 const channel = new BroadcastChannel("team_channel");
 const SLOTS = [1, 2];
@@ -112,3 +113,9 @@ window.addEventListener("storage", (e) => {
 });
 
 render();
+
+function handleRequest(data) {
+  if (data?.type === "cams-request") broadcast();
+}
+channel.addEventListener("message", (e) => handleRequest(e.data));
+onMessage(handleRequest);

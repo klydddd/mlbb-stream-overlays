@@ -6,7 +6,8 @@
 //               "sponsor-draft-style"  "center" | "top": which version display.html uses
 // Messages:     { type: "sponsors", sponsors, interval }, { type: "sponsor-draft-style", value }
 //               (BroadcastChannel + WebSocket)
-import { send } from "./websocketClient.js";
+// Answers { type: "cams-request" } (sent by cams.html on connect) with the current logos.
+import { onMessage, send } from "./websocketClient.js";
 
 const channel = new BroadcastChannel("team_channel");
 
@@ -178,3 +179,13 @@ window.addEventListener("storage", (e) => {
 
 render();
 renderStyle();
+
+// ---------- late displays ----------
+function handleRequest(data) {
+  if (data?.type !== "cams-request") return;
+  const msg = { type: "sponsors", sponsors: load(), interval: getInterval() };
+  channel.postMessage(msg);
+  send(msg);
+}
+channel.addEventListener("message", (e) => handleRequest(e.data));
+onMessage(handleRequest);

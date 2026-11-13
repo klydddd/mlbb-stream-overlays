@@ -1,5 +1,6 @@
 import { heroes, updateBanPick, updateHeroPick, updateHeroPickSilent } from "./hero.js";
 import { onMessage } from "./websocketClient.js";
+import { goTo } from "./overlayChain.js";
 import { watchSeriesRace, DEFAULT_RACE } from "./seriesRace.js";
 
 const blueName = localStorage.getItem(`blue-team-name`);
@@ -56,16 +57,15 @@ function handleIncomingMessage(data) {
       return;
     case "show-ingame-display":
       // SHOW INGAME on the controller (heroes screen skipped): outro, then the live HUD
-      playOutro(() => {
-        try { sessionStorage.setItem("overlay-chain", "1"); } catch {}
-        window.location.href = "gameDisplay.html" + window.location.search;
-      });
+      playOutro(() => goTo("gameDisplay.html"));
+      return;
+    case "show-cams-display":
+      // SHOW CAMS on the controller: outro, then the caster cams screen
+      playOutro(() => goTo("cams.html"));
       return;
     case "show-heroes-display":
       // Last phase countdown finished: play the outro, then switch to the lineup screen (same room)
-      playOutro(() => {
-        window.location.href = "heroes-display.html" + window.location.search;
-      });
+      playOutro(() => goTo("heroes-display.html"));
       return;
     case "reset":
       resetText("blue-team-name", "Blue Team Name");

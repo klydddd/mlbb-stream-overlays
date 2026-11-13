@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="Assets/favico/favicon_io/android-chrome-512x512.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@700;800;900&family=Roboto:wght@700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/cams.css?v=14">
+    <title>Caster Cams</title>
+</head>
+
+<!-- Caster cams screen (OBS browser source, 1920x1080, transparent background).
+     Sponsor strip on top (js/sponsorStrip.js), the 1 or 2 caster cams from the controller's
+     CASTER CAMS panel (js/casterCamsDisplay.js), and the next match from the WAITING
+     schedule (js/camsDisplay.js). -->
+<body>
+    <div class="stage" id="stage">
+
+        <div class="cams-sponsors" id="cams-sponsors" hidden>
+            <div class="sponsor-group" data-group="partner" hidden>
+                <span class="sponsor-group-label">IN PARTNERSHIP WITH</span>
+                <div class="sponsor-group-logos"></div>
+            </div>
+            <div class="sponsor-group" data-group="presented" hidden>
+                <span class="sponsor-group-label">PRESENTED BY</span>
+                <div class="sponsor-group-logos"></div>
+            </div>
+            <div class="sponsor-group" data-group="sponsored" hidden>
+                <span class="sponsor-group-label">SPONSORED BY</span>
+                <div class="sponsor-group-logos"></div>
+            </div>
+            <div class="sponsor-group" data-group="monitor" hidden>
+                <span class="sponsor-group-label">OFFICIAL MONITOR</span>
+                <div class="sponsor-group-logos"></div>
+            </div>
+        </div>
+
+        <!-- same ids/classes as display.html, so js/casterCamsDisplay.js drives both -->
+        <div class="caster-cams" id="caster-cams" hidden>
+            <div class="caster-cam" hidden>
+                <div class="caster-cam-frame"><iframe title="Caster 1 camera" allow="autoplay; fullscreen" scrolling="no"></iframe></div>
+                <div class="caster-cam-name">CASTER</div>
+            </div>
+            <div class="caster-cam" hidden>
+                <div class="caster-cam-frame"><iframe title="Caster 2 camera" allow="autoplay; fullscreen" scrolling="no"></iframe></div>
+                <div class="caster-cam-name">CASTER</div>
+            </div>
+        </div>
+
+        <!-- match card (js/camsDisplay.js): rotating slide on the left 2/3, every match on the right 1/3 -->
+        <div class="next-match" id="next-match" hidden>
+            <div class="next-main">
+            <span class="next-label"><span class="next-label-text">NEXT MATCH</span></span>
+            <div class="next-slot">
+            <svg class="petal petal-tr" viewBox="0 0 20 24"><path d="M2 22 C2 10 8 2 18 1 C18 12 12 20 2 22 Z" /></svg>
+            <svg class="petal petal-bl" viewBox="0 0 20 24"><path d="M2 22 C2 10 8 2 18 1 C18 12 12 20 2 22 Z" /></svg>
+            <div class="next-row">
+                <span class="next-stage"></span>
+                <div class="next-team a">
+                    <div class="next-logo"><img alt="" hidden></div>
+                    <div class="next-text"><span class="next-tag"></span><span class="next-name"></span></div>
+                </div>
+                <div class="next-mid">
+                    <span class="next-vs">VS</span>
+                    <span class="next-info"></span>
+                </div>
+                <div class="next-team b">
+                    <div class="next-text"><span class="next-tag"></span><span class="next-name"></span></div>
+                    <div class="next-logo"><img alt="" hidden></div>
+                </div>
+            </div>
+            </div>
+            </div>
+            <div class="match-list">
+                <span class="list-label">MATCHES</span>
+                <div class="list-rows" id="match-list-rows"></div>
+            </div>
+        </div>
+    </div>
+
+    <template id="list-row-template">
+        <div class="list-row">
+            <div class="list-team a"><div class="list-logo"><img alt="" hidden></div><span class="list-tag"></span></div>
+            <span class="list-mid"></span>
+            <div class="list-team b"><span class="list-tag"></span><div class="list-logo"><img alt="" hidden></div></div>
+        </div>
+    </template>
+
+    <script type="module" src="js/casterCamsDisplay.js?v=2"></script>
+    <script type="module" src="js/camsDisplay.js?v=12"></script>
+</body>
+
+</html>
