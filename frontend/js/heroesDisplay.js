@@ -3,7 +3,7 @@
 
 import { heroes } from "./hero.js";
 import { onMessage } from "./websocketClient.js";
-import { goTo } from "./overlayChain.js";
+import { goTo } from "./overlayChain.js?v=2";
 import { mountSponsorStrip } from "./sponsorStrip.js?v=2";
 
 // Role icons (small corner icon + big faded glyph on empty cards). Off for now;
@@ -446,6 +446,37 @@ function loadFromStorage() {
   }
 }
 
+// ---------- Outro (before the controller switches this source to another page) ----------
+// The css intro in reverse: cards drop below the frame (center cards first, the edges
+// last), the ribbon closes to its middle, the team plates slide off their sides, and
+// the corner labels and sponsor strip go up. Slides and wipes only, no opacity (OBS
+// shows half-transparent panels as grey). `translate` matches the intro keyframes.
+let leaving = false;
+
+function playOutro(done) {
+  if (leaving) return; // the same message comes over BroadcastChannel and WebSocket
+  leaving = true;
+  const EASE = "cubic-bezier(0.55, 0, 0.75, 0.2)";
+  let end = 0;
+  const go = (el, keyframes, delay, duration) => {
+    if (!el) return;
+    el.animate(keyframes, { duration, delay, easing: EASE, fill: "forwards" });
+    end = Math.max(end, delay + duration);
+  };
+  document.querySelectorAll(".card").forEach((card) => {
+    const i = Number(card.style.getPropertyValue("--i")) || 0; // 0 = outer edge .. 4 = center
+    go(card, [{ translate: "0 0" }, { translate: "0 120%" }], (4 - i) * 60, 420);
+  });
+  go(document.querySelector(".ribbon"), [{ clipPath: "inset(0 0 0 0)" }, { clipPath: "inset(0 50% 0 50%)" }], 250, 320);
+  go(document.querySelector(".team-plate.blue"), [{ translate: "0 0" }, { translate: "-1100px 0" }], 380, 450);
+  go(document.querySelector(".team-plate.red"), [{ translate: "0 0" }, { translate: "1100px 0" }], 380, 450);
+  document.querySelectorAll(".corner").forEach((el) =>
+    go(el, [{ translate: "0 0" }, { translate: "0 -90px" }], 420, 320));
+  const strip = document.getElementById("hd-sponsors");
+  if (strip && !strip.hidden) go(strip, [{ translate: "0 0" }, { translate: "0 -110%" }], 480, 320);
+  setTimeout(done, end + 60);
+}
+
 // ---------- Message handling (BroadcastChannel + WebSocket) ----------
 
 function handleMessage(data) {
@@ -465,15 +496,15 @@ function handleMessage(data) {
         if (p !== undefined) setPick(i, p, false);
       }
       return;
-    // page switches from the controller (js/overlayChain.js), same room
+    // page switches from the controller (js/overlayChain.js), same room; outro first
     case "show-draft-display": // SHOW DRAFT / timer RESET
-      goTo("display.html");
+      playOutro(() => goTo("display.html"));
       return;
     case "show-ingame-display":
-      goTo("gameDisplay.html");
+      playOutro(() => goTo("gameDisplay.html"));
       return;
     case "show-cams-display":
-      goTo("cams.html");
+      playOutro(() => goTo("cams.html"));
       return;
     case "reset":
       setBlueName("");
@@ -581,6 +612,14 @@ function handleStorage(e) {
 }
 
 // ---------- Boot ----------
+
+// Scale the 1920x1080 stage to fit the window / OBS source (keeps 16:9, top-left anchored)
+function fitStage() {
+  const stage = document.querySelector(".stage");
+  stage.style.transform = `scale(${Math.min(window.innerWidth / 1920, window.innerHeight / 1080)})`;
+}
+window.addEventListener("resize", fitStage);
+fitStage();
 
 buildCards();
 loadFromStorage();

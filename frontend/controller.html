@@ -33,6 +33,7 @@
     <div class="obs-settings" id="obs-settings" hidden>
         <label>OBS WEBSOCKET <input type="text" id="obs-url" spellcheck="false" aria-label="OBS WebSocket address"></label>
         <label>PASSWORD <input type="password" id="obs-password" autocomplete="off" placeholder="BLANK IF AUTH IS OFF" aria-label="OBS WebSocket password"></label>
+        <label title="Hidden on SHOW INGAME, shown on SHOW DRAFT / HEROES / CAMS">BACKGROUND SOURCE <input type="text" id="obs-bg" spellcheck="false" placeholder="MAIN BG" aria-label="OBS background source name"></label>
         <span class="obs-settings-note">FROM OBS: TOOLS &gt; WEBSOCKET SERVER SETTINGS. SAVED IN THIS BROWSER ONLY.</span>
     </div>
 
@@ -615,7 +616,7 @@
     <script src="js/timer.js?v=2"></script>
     <script src="js/obsWebsocket/showDisplay.js"></script>
     <script src="js/panels.js?v=5"></script>
-    <script type="module" src="js/obsWebsocket/reloadSources.js?v=3"></script>
+    <script type="module" src="js/obsWebsocket/reloadSources.js?v=4"></script>
 </body>
 
 

@@ -1,5 +1,10 @@
-// RELOAD OBS (controller toolbar): refreshes every browser source in OBS, the same as
-// pressing "Refresh cache of current page" in each source's properties.
+// OBS WebSocket from the controller:
+// - RELOAD OBS (toolbar): refreshes every browser source in OBS, the same as pressing
+//   "Refresh cache of current page" in each source's properties.
+// - Background source: SHOW INGAME hides the "MAIN BG" source (name set in OBS SETTINGS),
+//   SHOW DRAFT / HEROES / CAMS show it again. Follows the "draft-display-switch" event
+//   (js/control.js), so the timer's automatic switches count too. Every scene and group
+//   holding a source with that name (case ignored) is changed.
 //
 // Talks to the OBS WebSocket server (OBS 28+: Tools > WebSocket Server Settings) with the
 // v5 protocol: Hello -> Identify (with the password hash if OBS asks for one) ->
@@ -12,6 +17,8 @@
 const DEFAULT_URL = "ws://localhost:4455";
 const URL_KEY = "obs-ws-url";
 const PASSWORD_KEY = "obs-ws-password";
+const BG_KEY = "obs-bg-source";
+const DEFAULT_BG = "MAIN BG";
 const TIMEOUT_MS = 6000;
 
 const $ = (id) => document.getElementById(id);
@@ -20,6 +27,7 @@ const status = $("obs-status");
 const settings = $("obs-settings");
 const urlInput = $("obs-url");
 const passwordInput = $("obs-password");
+const bgInput = $("obs-bg");
 
 const read = (key) => {
   try { return localStorage.getItem(key) || ""; } catch { return ""; }
@@ -149,10 +157,7 @@ async function reloadAll() {
     if (failed.length) setStatus(`RELOADED ${done}/${browsers.length}. FAILED: ${failed.join(", ")}`, "error");
     else setStatus(`RELOADED ${done} BROWSER SOURCE${done === 1 ? "" : "S"}`, "ok");
   } catch (err) {
-    const hint = err.hint === "enable"
-      ? " · IS OBS OPEN? TOOLS > WEBSOCKET SERVER SETTINGS > ENABLE"
-      : err.hint === "settings" ? " · CHECK OBS SETTINGS" : "";
-    setStatus((err.message || "OBS ERROR") + hint, "error");
+    setStatus(errorText(err), "error");
     if (err.hint === "settings") settings.hidden = false;
   } finally {
     obs?.close();
@@ -161,11 +166,59 @@ async function reloadAll() {
   }
 }
 
+// ---------- Background source: hidden for the in-game HUD, shown for the other pages ----------
+
+function errorText(err) {
+  const hint = err.hint === "enable"
+    ? " · IS OBS OPEN? TOOLS > WEBSOCKET SERVER SETTINGS > ENABLE"
+    : err.hint === "settings" ? " · CHECK OBS SETTINGS" : "";
+  return (err.message || "OBS ERROR") + hint;
+}
+
+async function setBackground(visible) {
+  const name = (read(BG_KEY) || DEFAULT_BG).trim();
+  const want = name.toLowerCase();
+  let obs;
+  try {
+    obs = await connect(read(URL_KEY) || DEFAULT_URL, read(PASSWORD_KEY));
+    const { scenes = [] } = await obs.request("GetSceneList");
+    const { groups = [] } = await obs.request("GetGroupList").catch(() => ({}));
+    // [sceneName, request that lists its items] for every scene and group
+    const holders = [
+      ...scenes.map((s) => [s.sceneName, "GetSceneItemList"]),
+      ...groups.map((g) => [g, "GetGroupSceneItemList"]),
+    ];
+    let changed = 0;
+    for (const [sceneName, listRequest] of holders) {
+      const { sceneItems = [] } = await obs.request(listRequest, { sceneName }).catch(() => ({}));
+      for (const item of sceneItems) {
+        if ((item.sourceName || "").trim().toLowerCase() !== want) continue;
+        await obs.request("SetSceneItemEnabled", { sceneName, sceneItemId: item.sceneItemId, sceneItemEnabled: visible });
+        changed++;
+      }
+    }
+    if (changed) setStatus(`${name.toUpperCase()} ${visible ? "SHOWN" : "HIDDEN"}`, "ok");
+    else setStatus(`NO "${name.toUpperCase()}" SOURCE IN OBS · CHECK OBS SETTINGS`, "error");
+  } catch (err) {
+    setStatus(errorText(err), "error");
+  } finally {
+    obs?.close();
+  }
+}
+
+// one change at a time, in click order (quick clicks never leave it in the wrong state)
+let bgQueue = Promise.resolve();
+window.addEventListener("draft-display-switch", (e) => {
+  const visible = e.detail?.target !== "ingame";
+  bgQueue = bgQueue.then(() => setBackground(visible));
+});
+
 // ---------- settings row ----------
 
 function fillSettings() {
   urlInput.value = read(URL_KEY) || DEFAULT_URL;
   passwordInput.value = read(PASSWORD_KEY);
+  bgInput.value = read(BG_KEY) || DEFAULT_BG;
 }
 
 $("obs-settings-toggle").addEventListener("click", () => {
@@ -174,7 +227,13 @@ $("obs-settings-toggle").addEventListener("click", () => {
 });
 
 // kept in memory too, for RESET DRAFT below
-const saved = { url: read(URL_KEY), password: read(PASSWORD_KEY) };
+const saved = { url: read(URL_KEY), password: read(PASSWORD_KEY), bg: read(BG_KEY) };
+
+bgInput.addEventListener("change", () => {
+  const v = bgInput.value.trim();
+  saved.bg = v && v.toLowerCase() !== DEFAULT_BG.toLowerCase() ? v : "";
+  write(BG_KEY, saved.bg);
+});
 
 urlInput.addEventListener("change", () => {
   const v = urlInput.value.trim();
@@ -192,6 +251,7 @@ button.addEventListener("click", reloadAll);
 $("reset")?.addEventListener("click", () => {
   write(URL_KEY, saved.url);
   write(PASSWORD_KEY, saved.password);
+  write(BG_KEY, saved.bg);
   fillSettings(); // reset also blanks every text input, this one included
 });
 

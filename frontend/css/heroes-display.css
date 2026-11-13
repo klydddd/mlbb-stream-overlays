@@ -25,16 +25,21 @@
 
 html,
 body {
-    width: 1920px;
-    height: 1080px;
+    width: 100%;
+    height: 100%;
     overflow: hidden;
     background: transparent;
 }
 
+/* fixed 1920x1080 layout, scaled to fit the window / OBS source by js/heroesDisplay.js
+   (fitStage), so any source size works, including 3840x2160 for supersampling */
 .stage {
-    position: relative;
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 1920px;
     height: 1080px;
+    transform-origin: 0 0;
     font-family: var(--font-body);
     color: var(--ink);
 }

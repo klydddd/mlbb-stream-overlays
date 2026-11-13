@@ -15,6 +15,18 @@
     <link rel="stylesheet" href="css/heroStats.css?v=5">
     <link rel="icon" href="Assets/favico/favicon_io/android-chrome-512x512.png">
     <title>Display</title>
+    <!-- intro guard: panels stay shut until js/display.js starts the intro (no flash of the
+         finished layout); released after 3 s in case the script never runs -->
+    <style>
+        html.intro-wait .ban-section,
+        html.intro-wait .pick-section,
+        html.intro-wait .name-section,
+        html.intro-wait .progress-container { clip-path: inset(50% 0 50% 0); }
+    </style>
+    <script>
+        document.documentElement.classList.add("intro-wait");
+        setTimeout(() => document.documentElement.classList.remove("intro-wait"), 3000);
+    </script>
 </head>
 
 <body data-page="index">
@@ -253,7 +265,7 @@
     </div>
 
 
-    <script type="module" src="js/display.js?v=17"></script>
+    <script type="module" src="js/display.js?v=18"></script>
     <script type="module" src="js/heroStatsDisplay.js?v=4"></script>
     <script type="module" src="js/casterCamsDisplay.js?v=2"></script>
     <script type="module">
