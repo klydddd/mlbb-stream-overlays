@@ -445,6 +445,15 @@ function loadFromStorage() {
   }
 }
 
+// ---------- Page switching ----------
+
+// Marks this browser source as the draft chain, so gameDisplay.html (reached from
+// here) obeys SHOW DRAFT / SHOW HEROES. A standalone gameDisplay source never has it.
+function goToIngame() {
+  try { sessionStorage.setItem("overlay-chain", "1"); } catch {}
+  window.location.href = "gameDisplay.html" + window.location.search;
+}
+
 // ---------- Message handling (BroadcastChannel + WebSocket) ----------
 
 function handleMessage(data) {
@@ -467,6 +476,10 @@ function handleMessage(data) {
     case "show-draft-display":
       // Timer was reset on the controller: go back to the draft overlay (same room)
       window.location.href = "display.html" + window.location.search;
+      return;
+    case "show-ingame-display":
+      // SHOW INGAME on the controller: move this source on to the live HUD (same room)
+      goToIngame();
       return;
     case "reset":
       setBlueName("");

@@ -54,6 +54,13 @@ function handleIncomingMessage(data) {
         }
       }
       return;
+    case "show-ingame-display":
+      // SHOW INGAME on the controller (heroes screen skipped): outro, then the live HUD
+      playOutro(() => {
+        try { sessionStorage.setItem("overlay-chain", "1"); } catch {}
+        window.location.href = "gameDisplay.html" + window.location.search;
+      });
+      return;
     case "show-heroes-display":
       // Last phase countdown finished: play the outro, then switch to the lineup screen (same room)
       playOutro(() => {

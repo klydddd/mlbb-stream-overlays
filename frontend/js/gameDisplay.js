@@ -301,10 +301,23 @@ function loadFromStorage() {
 
 // ---------- Messages (BroadcastChannel + WebSocket) ----------
 
+// True when this page was reached from the draft source via SHOW INGAME
+// (heroesDisplay.js / display.js set the flag). A standalone gameDisplay OBS
+// source ignores the page-switch messages and stays on the HUD.
+function inDraftChain() {
+  try { return sessionStorage.getItem("overlay-chain") === "1"; } catch { return false; }
+}
+
 function handleMessage(data) {
   if (!data || typeof data !== "object") return;
 
   switch (data.type) {
+    case "show-draft-display": // SHOW DRAFT / timer RESET on the controller
+      if (inDraftChain()) window.location.href = "display.html" + window.location.search;
+      return;
+    case "show-heroes-display":
+      if (inDraftChain()) window.location.href = "heroes-display.html" + window.location.search;
+      return;
     case "reset":
       resetAll();
       return;
