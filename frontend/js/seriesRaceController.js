@@ -1,8 +1,8 @@
 // RACE TO 1 / 2 / 3 toggle on the controller (MATCH INFO in SETUP, SCORE in INGAME).
 // Every [data-series-race] button sets it; all copies stay in step.
 // Display side and storage format: js/seriesRace.js.
-import { send } from "./websocketClient.js";
-import { parseRace } from "./seriesRace.js";
+import { send, onMessage } from "./websocketClient.js";
+import { parseRace } from "./seriesRace.js?v=2";
 
 const channel = new BroadcastChannel("team_channel");
 let race = parseRace(localStorage.getItem("series-race"));
@@ -37,6 +37,11 @@ window.addEventListener("storage", (e) => {
     race = parseRace(e.newValue);
     render();
   }
+});
+
+// a display that just loaded (OBS reload, another PC) asks for the current value
+onMessage((data) => {
+  if (data?.type === "series-race-request") send({ type: "series-race", value: race });
 });
 
 render();

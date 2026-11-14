@@ -4,7 +4,7 @@
 import { onMessage } from "./websocketClient.js";
 import { followSwitch } from "./overlayChain.js?v=2";
 import { mountSponsorSlideshow } from "./sponsorSlideshow.js?v=3";
-import { watchSeriesRace, DEFAULT_RACE } from "./seriesRace.js";
+import { watchSeriesRace, DEFAULT_RACE } from "./seriesRace.js?v=2";
 import {
   playIntro, playOutro, wipeSwap, revealPanel, concealPanel, swapIcon, scoreChanged, playSwitch,
 } from "./gameDisplayAnim.js?v=6";

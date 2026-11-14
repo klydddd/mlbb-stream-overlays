@@ -13,6 +13,7 @@
     --chip: rgba(30, 12, 0, 0.55);
     --accent: #ffe27a;
     --text: #ffffff;
+    --lost: #4a3d02;    /* losing team of a decided match (js/matchResult.js) */
     --font-big: "Anton", "Impact", "Arial Narrow", sans-serif;
     --font: "Archivo", "Arial", sans-serif;
 }
@@ -429,6 +430,13 @@ body {
     font-size: 17px;
     white-space: nowrap;
 }
+
+/* decided match (BO1: 1 win, BO3: 2, BO5: 3; js/matchResult.js): the losing team's name and logo go a darker shade (colour and
+   brightness, never opacity: OBS greys half-transparent things) */
+.next-team.lost,
+.list-team.lost { color: var(--lost); }
+.next-team.lost img,
+.list-team.lost img { filter: brightness(0.45) saturate(0.6); }
 
 .list-row.is-result .list-mid {
     font-family: var(--font-big);

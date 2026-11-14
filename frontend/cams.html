@@ -16,7 +16,7 @@
      Sponsor strip on top (js/sponsorStrip.js), the 1 or 2 caster cams from the controller's
      CASTER CAMS panel (js/casterCamsDisplay.js), and the next match from the WAITING
      schedule (js/camsDisplay.js). -->
-<body>
+<body data-cam-page="cams">
     <div class="stage" id="stage">
 
         <div class="cams-sponsors" id="cams-sponsors" hidden>
@@ -39,7 +39,7 @@
         </div>
 
         <!-- same ids/classes as display.html, so js/casterCamsDisplay.js drives both -->
-        <div class="caster-cams" id="caster-cams" hidden>
+        <div class="caster-cams" id="caster-cams" data-report="chain" hidden>
             <div class="caster-cam" hidden>
                 <div class="caster-cam-frame"><iframe title="Caster 1 camera" allow="autoplay; fullscreen" scrolling="no"></iframe></div>
                 <div class="caster-cam-name">CASTER</div>
@@ -89,8 +89,8 @@
         </div>
     </template>
 
-    <script type="module" src="js/casterCamsDisplay.js?v=2"></script>
-    <script type="module" src="js/camsDisplay.js?v=12"></script>
+    <script type="module" src="js/casterCamsDisplay.js?v=6"></script>
+    <script type="module" src="js/camsDisplay.js?v=13"></script>
 </body>
 
 </html>

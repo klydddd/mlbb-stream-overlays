@@ -1,10 +1,11 @@
 // heroesDisplay.js — drives heroes-display.html (full lineup screen).
 // Listens to the same sources as display.js: localStorage, BroadcastChannel("team_channel") and WebSocket.
 
-import { heroes } from "./hero.js";
+import { heroes } from "./hero.js?v=2";
 import { onMessage } from "./websocketClient.js";
 import { goTo } from "./overlayChain.js?v=2";
 import { mountSponsorStrip } from "./sponsorStrip.js?v=2";
+import { watchSeriesRace, DEFAULT_RACE } from "./seriesRace.js?v=2";
 
 // Role icons (small corner icon + big faded glyph on empty cards). Off for now;
 // set to true to bring them back.
@@ -37,7 +38,8 @@ const LAYOUT = {
   ],
 };
 
-const MAX_WINS = 3;
+// pips per team: race to 1/2/3 from the controller (js/seriesRace.js)
+let MAX_WINS = DEFAULT_RACE;
 
 const $ = (id) => document.getElementById(id);
 const cardsByPick = {};   // pick slot -> card refs
@@ -62,6 +64,7 @@ function buildCards() {
       card.innerHTML = `
         <div class="card-placeholder"${roleGlyph}></div>
         <div class="card-art"></div>
+        <div class="card-glow"></div>
         <div class="card-photo"></div>
         <div class="card-hero-name"></div>
         ${roleIcon}
@@ -86,18 +89,15 @@ function buildCards() {
 
 // ---------- Updaters ----------
 
-const GLOW = {
-  blue: ["glow-blue-1", "glow-blue-2", "glow-blue-3"],
-  red: ["glow-red-1", "glow-red-2", "glow-red-3"],
-};
-
 function stopAnimations(refs) {
-  refs.timers.forEach((t) => { clearTimeout(t); clearInterval(t); });
+  refs.timers.forEach((t) => clearTimeout(t));
   refs.timers = [];
+  refs.card.classList.remove("glowing");
 }
 
-// Same behaviour as hero.js: float + random glow after the reveal,
-// plus a team-colored flash when the pick arrives live (not on page load).
+// Same behaviour as hero.js: float + glow after the reveal (the glow is CSS only,
+// .glowing in heroes-display.css, with a random rhythm per card), plus a team-colored
+// flash when the pick arrives live (not on page load).
 function animatePick(refs, img, flash) {
   if (flash) {
     const cls = `${refs.side}-select`;
@@ -109,14 +109,9 @@ function animatePick(refs, img, flash) {
 
   refs.timers.push(setTimeout(() => {
     img.classList.add("float");
-    let currentGlow = "";
-    refs.timers.push(setInterval(() => {
-      if (currentGlow) img.classList.remove(currentGlow);
-      const glows = GLOW[refs.side];
-      const nextGlow = Math.random() > 0.4 ? glows[Math.floor(Math.random() * glows.length)] : "";
-      if (nextGlow) img.classList.add(nextGlow);
-      currentGlow = nextGlow;
-    }, 2500 + Math.random() * 1500));
+    refs.card.style.setProperty("--glow-duration", `${(8 + Math.random() * 4).toFixed(2)}s`);
+    refs.card.style.setProperty("--glow-delay", `${(-Math.random() * 12).toFixed(2)}s`);
+    refs.card.classList.add("glowing");
   }, 900));
 }
 
@@ -389,9 +384,21 @@ function setLogo(side, data) {
 }
 
 // Reuses the "blue-score" / "red-score" localStorage keys that clear.js already resets.
+const shownScore = { blue: 0, red: 0 };
+
 function setScore(side, value) {
-  const wins = Math.max(0, Math.min(MAX_WINS, parseInt(value, 10) || 0));
-  document.querySelectorAll(`#hd-pips-${side} .pip`).forEach((pip, i) => {
+  shownScore[side] = parseInt(value, 10) || 0;
+  const wins = Math.max(0, Math.min(MAX_WINS, shownScore[side]));
+  const box = document.getElementById(`hd-pips-${side}`);
+  // one pip per win needed (race to 1/2/3)
+  if (box.children.length !== MAX_WINS) {
+    box.replaceChildren(...Array.from({ length: MAX_WINS }, () => {
+      const pip = document.createElement("span");
+      pip.className = "pip";
+      return pip;
+    }));
+  }
+  box.querySelectorAll(".pip").forEach((pip, i) => {
     // Blue fills from the inside (next to the name), red mirrors it.
     const idx = side === "blue" ? i : MAX_WINS - 1 - i;
     pip.classList.toggle("won", idx < wins);
@@ -623,6 +630,11 @@ fitStage();
 
 buildCards();
 loadFromStorage();
+watchSeriesRace((value) => {
+  MAX_WINS = value;
+  setScore("blue", shownScore.blue);
+  setScore("red", shownScore.red);
+});
 
 const channel = new BroadcastChannel("team_channel");
 channel.onmessage = (event) => handleMessage(event.data);

@@ -11,6 +11,7 @@
 // Over the WebSocket the countdown carries `remaining` (ms) and the end time is worked
 // out on this machine, so clock differences between PCs don't matter.
 // On connect this page sends { type: "waiting-request" } and the controller resends everything.
+import { matchLost } from "./matchResult.js";
 import { onMessage, send } from "./websocketClient.js";
 import { mountSponsorStrip } from "./sponsorStrip.js";
 import { applyGrain } from "./grain.js";
@@ -156,6 +157,7 @@ function renderMatches(fromIndex = Infinity) {
     ["a", "b"].forEach((side) => {
       const t = m[side] || {};
       const team = node.querySelector(`.team.${side}`);
+      team.classList.toggle("lost", matchLost(m, side)); // only once decided (BO1/3/5, js/matchResult.js)
       team.querySelector(".team-tag").textContent = t.tag || "";
       team.querySelector(".team-name").textContent = t.name || "";
       const img = team.querySelector("img");

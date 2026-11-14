@@ -1,7 +1,7 @@
-import { heroes, updateBanPick, updateHeroPick, updateHeroPickSilent } from "./hero.js";
+import { heroes, updateBanPick, updateHeroPick, updateHeroPickSilent } from "./hero.js?v=2";
 import { onMessage } from "./websocketClient.js";
 import { goTo } from "./overlayChain.js";
-import { watchSeriesRace, DEFAULT_RACE } from "./seriesRace.js";
+import { watchSeriesRace, DEFAULT_RACE } from "./seriesRace.js?v=2";
 
 const blueName = localStorage.getItem(`blue-team-name`);
 const redName = localStorage.getItem(`red-team-name`);
@@ -350,21 +350,17 @@ function clearNames() {
   }
 }
 
+// Clearing goes through hero.js so the slot's pending timers, glow and shimmer state
+// are reset too (a pending reveal would otherwise put the hero back after the clear).
 function clearPicks() {
   for (let i = 1; i <= 10; i++) {
     resetText(`hero-name-${i}`, "");
-    const heroContainer = document.getElementById(`hero-${i}`);
-    if (heroContainer) heroContainer.innerHTML = "";
-    const bgContainer = document.getElementById(`hero-name-bg-${i}`);
-    if (bgContainer) bgContainer.style.width = "0";
+    updateHeroPick(i - 1, "");
   }
 }
 
 function clearBans() {
-  for (let i = 1; i <= 10; i++) {
-    const heroContainer = document.getElementById(`ban-${i}`);
-    if (heroContainer) heroContainer.innerHTML = "";
-  }
+  for (let i = 1; i <= 10; i++) updateBanPick(i - 1, "");
 }
 
 // Series score: light up the score boxes, filling outward from the team-name side:

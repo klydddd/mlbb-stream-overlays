@@ -39,8 +39,17 @@
 }
 
 .score {
-    background-color: rgba(24, 24, 24, 0.229);
     transition: background-color 0.3s;
+}
+
+/* a game not won yet: the team colour, faded (like the in-game HUD pips). Solid colours,
+   the team colour at ~28% over the aliceblue gap, since OBS greys half-transparent fills */
+.blue-score .score {
+    background-color: #d3e6fc;
+}
+
+.red-score .score {
+    background-color: #f1e2c4;
 }
 
 /* a won game in the series (js/display.js setScore) */

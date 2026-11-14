@@ -31,6 +31,22 @@ const fiveVisualPhases = [
   { set: null, remove: [10, 10, true, false] }
 ];
 
+// Effect layers for the active pick slot (styled in display.css, shown only while the
+// slot has .blue-picks / .red-picks). Added once per slot, on first use: the backdrop
+// goes first so it sits under the role icon and player photo, the glow goes last.
+function ensurePickFx(div) {
+  if (div.querySelector(":scope > .pick-fx-glow")) return;
+  const backdrop = document.createElement("div");
+  backdrop.className = "pick-fx-backdrop";
+  const glow = document.createElement("div");
+  glow.className = "pick-fx-glow";
+  glow.innerHTML =
+    '<i class="pick-fx-base"></i><i class="pick-fx-bloom"></i><i class="pick-fx-edge"></i>' +
+    '<i class="pick-fx-sparks-b"></i><i class="pick-fx-sparks-a"></i>';
+  div.prepend(backdrop);
+  div.append(glow);
+}
+
 function setVisual(first, last, pick = false, blue = false) {
   for (let i = first; i <= last; i++) {
     if (!pick) {
@@ -39,6 +55,7 @@ function setVisual(first, last, pick = false, blue = false) {
       phaseTexts.textContent = "BANNING";
     } else {
       const div = document.querySelector(`.pick-${i}`);
+      if (div) ensurePickFx(div);
       if (!blue) {
         if (div) div.classList.add("red-picks");
       } else {

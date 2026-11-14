@@ -8,6 +8,7 @@
 // On connect it sends { type: "waiting-request" } (js/waitingController.js resends the
 // schedule) and { type: "cams-request" } (js/casterCams.js and js/sponsors.js resend
 // the cams and the sponsor logos), so an OBS on another PC gets the current state.
+import { matchLost } from "./matchResult.js";
 import { onMessage, send } from "./websocketClient.js";
 import { mountSponsorStrip } from "./sponsorStrip.js";
 import { followSwitch } from "./overlayChain.js?v=2";
@@ -98,6 +99,7 @@ function fillCard({ row, label, stage }) {
   ["a", "b"].forEach((side) => {
     const t = m[side] || {};
     const team = card.querySelector(`.next-team.${side}`);
+    team.classList.toggle("lost", matchLost(m, side)); // only once decided (js/matchResult.js)
     const tag = (t.tag || "").trim();
     const name = (t.name || "").trim();
     // the tag is the big line; with no tag the name takes its place
@@ -132,6 +134,7 @@ function renderList() {
     ["a", "b"].forEach((side) => {
       const t = m[side] || {};
       const team = node.querySelector(`.list-team.${side}`);
+      team.classList.toggle("lost", matchLost(m, side)); // only once decided (js/matchResult.js)
       team.querySelector(".list-tag").textContent = (t.tag || "").trim() || (t.name || "").trim();
       const img = team.querySelector("img");
       if (t.logo) {

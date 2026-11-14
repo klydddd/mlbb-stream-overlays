@@ -16,6 +16,7 @@ PACKAGES=(opencv-python numpy mss pyobjc-framework-Quartz websocket-client fasta
 export PYTHONUTF8=1
 SERVER_PID=""
 SERVER_LOG="$VENV/server.log"
+BOXES_FILE="$BACKEND/ingame_stats_config.json"
 
 printf '\033]0;MLBB Stats Reader\007'   # window title
 
@@ -83,6 +84,25 @@ setup_failed() {
     echo "  Setup failed. Check your internet connection and try again."
     echo "  If it keeps failing, send a photo of this window to whoever set up the stream."
     fail
+}
+
+# The boxes live in backend/ingame_stats_config.json (written by "calibrate", read by "run").
+# A config from an earlier setup, or copied from another PC, counts as set up.
+has_boxes() {
+    "$VPY" - "$BOXES_FILE" <<'PY' >/dev/null 2>&1
+import json, sys
+cfg = json.load(open(sys.argv[1]))
+sys.exit(0 if cfg.get("regions") else 1)
+PY
+}
+
+# One line saying which window the saved boxes are for, e.g. "8 boxes for: QuickTime Player".
+describe_boxes() {
+    "$VPY" - "$BOXES_FILE" <<'PY' 2>/dev/null
+import json, sys
+cfg = json.load(open(sys.argv[1]))
+print(f"{len(cfg.get('regions', {}))} boxes for: {cfg.get('window') or 'the window picked during setup'}")
+PY
 }
 
 server_up() {
@@ -179,8 +199,7 @@ calibrate() {
     echo "  If the picture is all one colour: System Settings > Privacy & Security >"
     echo "  Screen Recording > turn on Terminal, then quit Terminal and start again."
     echo
-    if (cd "$BACKEND" && "$VPY" ingame_stats_bot.py calibrate); then
-        echo done > "$VENV/calibrated.txt"
+    if (cd "$BACKEND" && "$VPY" ingame_stats_bot.py calibrate) && has_boxes; then
         echo
         echo "  Boxes saved. Now choose 2 to start reading stats."
     else
@@ -191,9 +210,9 @@ calibrate() {
 }
 
 run_reader() {
-    if [ ! -f "$VENV/calibrated.txt" ]; then
+    if ! has_boxes; then
         echo
-        echo "  The boxes are not set up on this Mac yet. Choose 1 first."
+        echo "  The boxes are not set up yet. Choose 1 first."
         pause
         return
     fi
@@ -222,8 +241,9 @@ while true; do
     echo "     MLBB STATS READER"
     echo "  ========================================="
     echo
-    if [ -f "$VENV/calibrated.txt" ]; then
-        echo "   Boxes are set up on this Mac."
+    if has_boxes; then
+        echo "   Boxes are set up ($(describe_boxes))."
+        echo "   Have that window open with a match on screen, then choose 2."
     else
         echo "   FIRST TIME? Choose 1 first to mark where the numbers are."
     fi
