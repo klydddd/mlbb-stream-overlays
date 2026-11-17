@@ -988,6 +988,16 @@ body.ui-ingame .second-container {
     letter-spacing: 0.06em;
 }
 
+/* OBS CAM SOURCES status (js/obsWebsocket/camSources.js) */
+.caster-obs-status {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.caster-obs-status[data-kind="ok"] { color: #6fd08c; }
+.caster-obs-status[data-kind="error"] { color: #ff7b72; }
+
 .caster-tag {
     width: 64px;
     flex: none;
@@ -1016,6 +1026,60 @@ body.ui-ingame .second-container {
 .caster-row input.invalid {
     border-color: #ef4444;
     box-shadow: 0 0 0 1px #ef4444;
+}
+
+/* zoom / position / mirror row under each caster, plus ALL CAMS */
+/* line 1: tag | ZOOM | MIRROR | RESET (same columns on ALL CAMS); line 2: X and Y */
+.caster-view-row {
+    display: grid;
+    grid-template-columns: 64px minmax(0, 1fr) auto auto;
+    align-items: center;
+    gap: 6px 8px;
+    font-size: 11px;
+}
+
+.caster-view-row[hidden] {
+    display: none;
+}
+
+.caster-pan {
+    grid-column: 2 / -1;
+    display: flex;
+    gap: 14px;
+}
+
+.caster-pan .caster-slider {
+    flex: 1;
+    min-width: 0;
+}
+
+.caster-slider {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.caster-slider input[type="range"] {
+    flex: 1;
+    min-width: 0;
+    width: auto;
+    padding: 0;
+    margin: 0;
+    accent-color: #22d3ee;
+    cursor: pointer;
+}
+
+.caster-slider output {
+    width: 34px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.second-container .panel-casters .toggle-btn.caster-small-btn {
+    width: auto;
+    height: 26px;
+    padding: 0 10px;
 }
 
 /* ---------- PASTE buttons (js/pasteButtons.js) ---------- */
@@ -1314,3 +1378,49 @@ body.ui-waiting .second-container {
     box-shadow: 0 0 0 2px #4ade80;
     font-weight: 700;
 }
+
+/* ---------- RELOAD OBS (js/obsWebsocket/reloadSources.js) ---------- */
+.obs-status {
+    max-width: 520px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #9aa4ae;
+    letter-spacing: 0.06em;
+}
+
+.obs-status[data-kind="ok"] { color: #6fd08c; }
+.obs-status[data-kind="error"] { color: #ff7b72; }
+
+#obs-reload:disabled { opacity: 0.6; cursor: wait; }
+
+.obs-settings {
+    position: sticky;
+    top: 39px;
+    z-index: 49;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 14px;
+    padding: 6px 10px;
+    background: #15181b;
+    border-bottom: 1px solid #33383d;
+    color: #9aa4ae;
+    letter-spacing: 0.06em;
+}
+
+.obs-settings[hidden] { display: none; }
+
+.obs-settings label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.obs-settings input {
+    height: 26px;
+    width: 220px;
+}
+
+.obs-settings-note { font-size: 0.85em; opacity: 0.8; }
+

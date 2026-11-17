@@ -1,9 +1,11 @@
 // heroesDisplay.js — drives heroes-display.html (full lineup screen).
 // Listens to the same sources as display.js: localStorage, BroadcastChannel("team_channel") and WebSocket.
 
-import { heroes } from "./hero.js";
+import { heroes } from "./hero.js?v=2";
 import { onMessage } from "./websocketClient.js";
+import { goTo } from "./overlayChain.js?v=2";
 import { mountSponsorStrip } from "./sponsorStrip.js?v=2";
+import { watchSeriesRace, DEFAULT_RACE } from "./seriesRace.js?v=2";
 
 // Role icons (small corner icon + big faded glyph on empty cards). Off for now;
 // set to true to bring them back.
@@ -36,7 +38,8 @@ const LAYOUT = {
   ],
 };
 
-const MAX_WINS = 3;
+// pips per team: race to 1/2/3 from the controller (js/seriesRace.js)
+let MAX_WINS = DEFAULT_RACE;
 
 const $ = (id) => document.getElementById(id);
 const cardsByPick = {};   // pick slot -> card refs
@@ -61,6 +64,7 @@ function buildCards() {
       card.innerHTML = `
         <div class="card-placeholder"${roleGlyph}></div>
         <div class="card-art"></div>
+        <div class="card-glow"></div>
         <div class="card-photo"></div>
         <div class="card-hero-name"></div>
         ${roleIcon}
@@ -85,18 +89,15 @@ function buildCards() {
 
 // ---------- Updaters ----------
 
-const GLOW = {
-  blue: ["glow-blue-1", "glow-blue-2", "glow-blue-3"],
-  red: ["glow-red-1", "glow-red-2", "glow-red-3"],
-};
-
 function stopAnimations(refs) {
-  refs.timers.forEach((t) => { clearTimeout(t); clearInterval(t); });
+  refs.timers.forEach((t) => clearTimeout(t));
   refs.timers = [];
+  refs.card.classList.remove("glowing");
 }
 
-// Same behaviour as hero.js: float + random glow after the reveal,
-// plus a team-colored flash when the pick arrives live (not on page load).
+// Same behaviour as hero.js: float + glow after the reveal (the glow is CSS only,
+// .glowing in heroes-display.css, with a random rhythm per card), plus a team-colored
+// flash when the pick arrives live (not on page load).
 function animatePick(refs, img, flash) {
   if (flash) {
     const cls = `${refs.side}-select`;
@@ -108,14 +109,9 @@ function animatePick(refs, img, flash) {
 
   refs.timers.push(setTimeout(() => {
     img.classList.add("float");
-    let currentGlow = "";
-    refs.timers.push(setInterval(() => {
-      if (currentGlow) img.classList.remove(currentGlow);
-      const glows = GLOW[refs.side];
-      const nextGlow = Math.random() > 0.4 ? glows[Math.floor(Math.random() * glows.length)] : "";
-      if (nextGlow) img.classList.add(nextGlow);
-      currentGlow = nextGlow;
-    }, 2500 + Math.random() * 1500));
+    refs.card.style.setProperty("--glow-duration", `${(8 + Math.random() * 4).toFixed(2)}s`);
+    refs.card.style.setProperty("--glow-delay", `${(-Math.random() * 12).toFixed(2)}s`);
+    refs.card.classList.add("glowing");
   }, 900));
 }
 
@@ -388,9 +384,21 @@ function setLogo(side, data) {
 }
 
 // Reuses the "blue-score" / "red-score" localStorage keys that clear.js already resets.
+const shownScore = { blue: 0, red: 0 };
+
 function setScore(side, value) {
-  const wins = Math.max(0, Math.min(MAX_WINS, parseInt(value, 10) || 0));
-  document.querySelectorAll(`#hd-pips-${side} .pip`).forEach((pip, i) => {
+  shownScore[side] = parseInt(value, 10) || 0;
+  const wins = Math.max(0, Math.min(MAX_WINS, shownScore[side]));
+  const box = document.getElementById(`hd-pips-${side}`);
+  // one pip per win needed (race to 1/2/3)
+  if (box.children.length !== MAX_WINS) {
+    box.replaceChildren(...Array.from({ length: MAX_WINS }, () => {
+      const pip = document.createElement("span");
+      pip.className = "pip";
+      return pip;
+    }));
+  }
+  box.querySelectorAll(".pip").forEach((pip, i) => {
     // Blue fills from the inside (next to the name), red mirrors it.
     const idx = side === "blue" ? i : MAX_WINS - 1 - i;
     pip.classList.toggle("won", idx < wins);
@@ -445,6 +453,37 @@ function loadFromStorage() {
   }
 }
 
+// ---------- Outro (before the controller switches this source to another page) ----------
+// The css intro in reverse: cards drop below the frame (center cards first, the edges
+// last), the ribbon closes to its middle, the team plates slide off their sides, and
+// the corner labels and sponsor strip go up. Slides and wipes only, no opacity (OBS
+// shows half-transparent panels as grey). `translate` matches the intro keyframes.
+let leaving = false;
+
+function playOutro(done) {
+  if (leaving) return; // the same message comes over BroadcastChannel and WebSocket
+  leaving = true;
+  const EASE = "cubic-bezier(0.55, 0, 0.75, 0.2)";
+  let end = 0;
+  const go = (el, keyframes, delay, duration) => {
+    if (!el) return;
+    el.animate(keyframes, { duration, delay, easing: EASE, fill: "forwards" });
+    end = Math.max(end, delay + duration);
+  };
+  document.querySelectorAll(".card").forEach((card) => {
+    const i = Number(card.style.getPropertyValue("--i")) || 0; // 0 = outer edge .. 4 = center
+    go(card, [{ translate: "0 0" }, { translate: "0 120%" }], (4 - i) * 60, 420);
+  });
+  go(document.querySelector(".ribbon"), [{ clipPath: "inset(0 0 0 0)" }, { clipPath: "inset(0 50% 0 50%)" }], 250, 320);
+  go(document.querySelector(".team-plate.blue"), [{ translate: "0 0" }, { translate: "-1100px 0" }], 380, 450);
+  go(document.querySelector(".team-plate.red"), [{ translate: "0 0" }, { translate: "1100px 0" }], 380, 450);
+  document.querySelectorAll(".corner").forEach((el) =>
+    go(el, [{ translate: "0 0" }, { translate: "0 -90px" }], 420, 320));
+  const strip = document.getElementById("hd-sponsors");
+  if (strip && !strip.hidden) go(strip, [{ translate: "0 0" }, { translate: "0 -110%" }], 480, 320);
+  setTimeout(done, end + 60);
+}
+
 // ---------- Message handling (BroadcastChannel + WebSocket) ----------
 
 function handleMessage(data) {
@@ -464,9 +503,15 @@ function handleMessage(data) {
         if (p !== undefined) setPick(i, p, false);
       }
       return;
-    case "show-draft-display":
-      // Timer was reset on the controller: go back to the draft overlay (same room)
-      window.location.href = "display.html" + window.location.search;
+    // page switches from the controller (js/overlayChain.js), same room; outro first
+    case "show-draft-display": // SHOW DRAFT / timer RESET
+      playOutro(() => goTo("display.html"));
+      return;
+    case "show-ingame-display":
+      playOutro(() => goTo("gameDisplay.html"));
+      return;
+    case "show-cams-display":
+      playOutro(() => goTo("cams.html"));
       return;
     case "reset":
       setBlueName("");
@@ -575,8 +620,21 @@ function handleStorage(e) {
 
 // ---------- Boot ----------
 
+// Scale the 1920x1080 stage to fit the window / OBS source (keeps 16:9, top-left anchored)
+function fitStage() {
+  const stage = document.querySelector(".stage");
+  stage.style.transform = `scale(${Math.min(window.innerWidth / 1920, window.innerHeight / 1080)})`;
+}
+window.addEventListener("resize", fitStage);
+fitStage();
+
 buildCards();
 loadFromStorage();
+watchSeriesRace((value) => {
+  MAX_WINS = value;
+  setScore("blue", shownScore.blue);
+  setScore("red", shownScore.red);
+});
 
 const channel = new BroadcastChannel("team_channel");
 channel.onmessage = (event) => handleMessage(event.data);

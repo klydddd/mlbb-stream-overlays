@@ -136,23 +136,81 @@ export const heroes = [
 
 const containers = [...Array(10)].map((_, i) => document.getElementById(`hero-${i + 1}`));
 
+// Timers started for each pick / ban slot, so a re-render (restore, swap, reset,
+// re-sent message) cancels the old ones instead of piling them up.
+const slotTimers = new Map(); // slot element -> [timer ids]
+
+function clearSlotTimers(el) {
+  (slotTimers.get(el) || []).forEach((t) => clearTimeout(t));
+  slotTimers.set(el, []);
+}
+
+function later(el, fn, ms) {
+  const id = setTimeout(fn, ms);
+  slotTimers.get(el).push(id);
+  return id;
+}
+
+// Marks the matching background slot (.pick-N, under the portrait) as filled, which stops
+// its shimmer animation (display.css) while a hero covers it.
+function markFilled(heroSlot, filled) {
+  const bg = document.querySelector(`.pick-section-background .pick-${heroSlot}`);
+  if (bg) bg.classList.toggle("filled", filled);
+}
+
+// Reset the slot's own classes from a previous render (flash, glow).
+function resetPickSlot(container) {
+  clearSlotTimers(container);
+  container.classList.remove("blue-select", "red-select", "portrait-glow", "glow-blue", "glow-red");
+}
+
+// Float + glow once the portrait has revealed. The glow is CSS only (.portrait-glow in
+// display.css); each slot gets its own random rhythm so the slots don't pulse in step.
+function startPortraitGlow(container, img, isBlueTeam) {
+  img.classList.add("float");
+  container.style.setProperty("--glow-duration", `${(8 + Math.random() * 4).toFixed(2)}s`);
+  container.style.setProperty("--glow-delay", `${(-Math.random() * 12).toFixed(2)}s`);
+  container.classList.add("portrait-glow", isBlueTeam ? "glow-blue" : "glow-red");
+}
+
+function hideHeroName(heroSlot) {
+  markFilled(heroSlot, false);
+  const nameText = document.getElementById(`hero-name-${heroSlot}`);
+  const nameDiv = document.getElementById(`hero-name-bg-${heroSlot}`);
+  if (nameText) nameText.textContent = '';
+  if (nameDiv) {
+    nameDiv.style.opacity = '0';
+    nameDiv.style.pointerEvents = 'none';
+    nameDiv.style.width = '0';
+    nameDiv.style.overflow = 'hidden';
+  }
+}
+
+function showHeroName(heroSlot, name) {
+  markFilled(heroSlot, true);
+  const nameText = document.getElementById(`hero-name-${heroSlot}`);
+  const nameDiv = document.getElementById(`hero-name-bg-${heroSlot}`);
+  if (nameText && nameDiv) {
+    nameText.textContent = name;
+    nameDiv.style.transition = 'opacity 0.3s ease, width 1s ease';
+    nameDiv.style.opacity = '1';
+    nameDiv.style.pointerEvents = 'auto';
+    nameDiv.style.height = '310px';
+    nameDiv.style.width = '30px';
+    nameDiv.style.overflow = 'visible';
+  }
+}
+
 export function updateHeroPick(index, heroName, silent = false) {
   const heroSlot = index + 1;
   const container = containers[index];
 
   if (!container) return;
+  resetPickSlot(container);
 
   if (!heroName || typeof heroName !== "string" || heroName.trim() === "") {
     container.innerHTML = "";
-    const nameText = document.getElementById(`hero-name-${heroSlot}`);
-    const nameDiv = document.getElementById(`hero-name-bg-${heroSlot}`);
-    if (nameText) nameText.textContent = '';
-    if (nameDiv) {
-      nameDiv.style.opacity = '0';
-      nameDiv.style.pointerEvents = 'none';
-      nameDiv.style.width = '0';
-      nameDiv.style.overflow = 'hidden';
-    }
+    hideHeroName(heroSlot);
     return;
   }
 
@@ -160,15 +218,7 @@ export function updateHeroPick(index, heroName, silent = false) {
   container.innerHTML = "";
 
   if (!hero) {
-    const nameText = document.getElementById(`hero-name-${heroSlot}`);
-    const nameDiv = document.getElementById(`hero-name-bg-${heroSlot}`);
-    if (nameText) nameText.textContent = '';
-    if (nameDiv) {
-      nameDiv.style.opacity = '0';
-      nameDiv.style.pointerEvents = 'none';
-      nameDiv.style.width = '0';
-      nameDiv.style.overflow = 'hidden';
-    }
+    hideHeroName(heroSlot);
     return;
   }
 
@@ -177,7 +227,7 @@ export function updateHeroPick(index, heroName, silent = false) {
 
   if (!silent) {
     container.classList.add(flashGlowClass);
-    setTimeout(() => container.classList.remove(flashGlowClass), 1000);
+    later(container, () => container.classList.remove(flashGlowClass), 1000);
     // Real lock-in (not a silent restore): js/heroStatsDisplay.js shows the hero's tournament stats
     document.dispatchEvent(new CustomEvent("hero-locked", { detail: { slot: heroSlot, name: hero.name, container } }));
   }
@@ -191,7 +241,7 @@ export function updateHeroPick(index, heroName, silent = false) {
     img.classList.add("wipeDown");
   }
 
-  setTimeout(() => {
+  later(container, () => {
     container.innerHTML = "";
     container.appendChild(img);
 
@@ -205,35 +255,10 @@ export function updateHeroPick(index, heroName, silent = false) {
       container.appendChild(audio);
     }
 
-    const nameText = document.getElementById(`hero-name-${heroSlot}`);
-    const nameDiv = document.getElementById(`hero-name-bg-${heroSlot}`);
-    if (nameText && nameDiv) {
-      nameText.textContent = hero.name;
-      nameDiv.style.transition = 'opacity 0.3s ease, width 1s ease';
-      nameDiv.style.opacity = '1';
-      nameDiv.style.pointerEvents = 'auto';
-      nameDiv.style.height = '310px';
-      nameDiv.style.width = '30px';
-      nameDiv.style.overflow = 'visible';
-    }
+    showHeroName(heroSlot, hero.name);
 
     if (!silent) {
-      setTimeout(() => {
-        img.classList.add("float");
-        const glowClasses = isBlueTeam
-          ? ["glow-blue-1", "glow-blue-2", "glow-blue-3"]
-          : ["glow-red-1", "glow-red-2", "glow-red-3"];
-
-        let currentGlow = "";
-        setInterval(() => {
-          if (currentGlow) img.classList.remove(currentGlow);
-          const nextGlow = Math.random() > 0.4
-            ? glowClasses[Math.floor(Math.random() * glowClasses.length)]
-            : "";
-          if (nextGlow) img.classList.add(nextGlow);
-          currentGlow = nextGlow;
-        }, 2500 + Math.random() * 1500);
-      }, 900);
+      later(container, () => startPortraitGlow(container, img, isBlueTeam), 900);
     }
   }, silent ? 0 : 100);
 }
@@ -244,25 +269,15 @@ export function updateHeroPickSilent(index, heroName) {
   const heroSlot = index + 1;
 
   if (!container) return;
+  resetPickSlot(container);
   container.innerHTML = "";
 
   if (!hero) {
-    const nameText = document.getElementById(`hero-name-${heroSlot}`);
-    const nameDiv = document.getElementById(`hero-name-bg-${heroSlot}`);
-    if (nameText) nameText.textContent = '';
-    if (nameDiv) {
-      nameDiv.style.opacity = '0';
-      nameDiv.style.pointerEvents = 'none';
-      nameDiv.style.width = '0';
-      nameDiv.style.overflow = 'hidden';
-    }
+    hideHeroName(heroSlot);
     return;
   }
 
   const isBlueTeam = [1, 4, 5, 8, 9].includes(heroSlot);
-  const glowClasses = isBlueTeam
-    ? ["glow-blue-1", "glow-blue-2", "glow-blue-3"]
-    : ["glow-red-1", "glow-red-2", "glow-red-3"];
 
   const img = document.createElement('img');
   img.src = hero.img;
@@ -270,55 +285,30 @@ export function updateHeroPickSilent(index, heroName) {
   img.className = "hero-portrait-silent wipeDown";
 
   container.appendChild(img);
+  showHeroName(heroSlot, hero.name);
 
-  const nameText = document.getElementById(`hero-name-${heroSlot}`);
-  const nameDiv = document.getElementById(`hero-name-bg-${heroSlot}`);
-  if (nameText && nameDiv) {
-    nameText.textContent = hero.name;
-    nameDiv.style.transition = 'opacity 0.3s ease, width 1s ease';
-    nameDiv.style.opacity = '1';
-    nameDiv.style.pointerEvents = 'auto';
-    nameDiv.style.height = '310px';
-    nameDiv.style.width = '30px';
-    nameDiv.style.overflow = 'visible';
-  }
-
-  setTimeout(() => {
-    img.classList.add("float");
-    let currentGlow = "";
-    setInterval(() => {
-      if (currentGlow) img.classList.remove(currentGlow);
-      const nextGlow = Math.random() > 0.4
-        ? glowClasses[Math.floor(Math.random() * glowClasses.length)]
-        : "";
-      if (nextGlow) img.classList.add(nextGlow);
-      currentGlow = nextGlow;
-    }, 2500 + Math.random() * 1500);
-  }, 900);
+  later(container, () => startPortraitGlow(container, img, isBlueTeam), 900);
 }
 
 export function updateBanPick(index, heroName) {
-  if (!heroName || typeof heroName !== "string" || heroName.trim() === "") {
-    const container = document.getElementById(`ban-${index + 1}`);
-    if (container) container.innerHTML = "";
-    return;
-  }
-
-  const hero = heroes.find(h => h.name.toLowerCase() === heroName.toLowerCase());
   const container = document.getElementById(`ban-${index + 1}`);
   if (!container) return;
-
+  clearSlotTimers(container);
   container.innerHTML = "";
+
+  if (!heroName || typeof heroName !== "string" || heroName.trim() === "") return;
+
+  const hero = heroes.find(h => h.name.toLowerCase() === heroName.toLowerCase());
   if (!hero) return;
 
   const img = document.createElement("img");
-  setTimeout(() => {
+  later(container, () => {
     img.src = hero.img;
     img.alt = hero.name;
     img.className = "ban-portrait shake";
 
     container.appendChild(img);
-    setTimeout(() => {
+    later(container, () => {
       img.classList.remove("shake");
       img.classList.add("grayscale");
     }, 300);

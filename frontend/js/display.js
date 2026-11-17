@@ -1,6 +1,7 @@
-import { heroes, updateBanPick, updateHeroPick, updateHeroPickSilent } from "./hero.js";
+import { heroes, updateBanPick, updateHeroPick, updateHeroPickSilent } from "./hero.js?v=2";
 import { onMessage } from "./websocketClient.js";
-import { watchSeriesRace, DEFAULT_RACE } from "./seriesRace.js";
+import { goTo } from "./overlayChain.js";
+import { watchSeriesRace, DEFAULT_RACE } from "./seriesRace.js?v=2";
 
 const blueName = localStorage.getItem(`blue-team-name`);
 const redName = localStorage.getItem(`red-team-name`);
@@ -54,11 +55,17 @@ function handleIncomingMessage(data) {
         }
       }
       return;
+    case "show-ingame-display":
+      // SHOW INGAME on the controller (heroes screen skipped): outro, then the live HUD
+      playOutro(() => goTo("gameDisplay.html"));
+      return;
+    case "show-cams-display":
+      // SHOW CAMS on the controller: outro, then the caster cams screen
+      playOutro(() => goTo("cams.html"));
+      return;
     case "show-heroes-display":
       // Last phase countdown finished: play the outro, then switch to the lineup screen (same room)
-      playOutro(() => {
-        window.location.href = "heroes-display.html" + window.location.search;
-      });
+      playOutro(() => goTo("heroes-display.html"));
       return;
     case "reset":
       resetText("blue-team-name", "Blue Team Name");
@@ -343,21 +350,17 @@ function clearNames() {
   }
 }
 
+// Clearing goes through hero.js so the slot's pending timers, glow and shimmer state
+// are reset too (a pending reveal would otherwise put the hero back after the clear).
 function clearPicks() {
   for (let i = 1; i <= 10; i++) {
     resetText(`hero-name-${i}`, "");
-    const heroContainer = document.getElementById(`hero-${i}`);
-    if (heroContainer) heroContainer.innerHTML = "";
-    const bgContainer = document.getElementById(`hero-name-bg-${i}`);
-    if (bgContainer) bgContainer.style.width = "0";
+    updateHeroPick(i - 1, "");
   }
 }
 
 function clearBans() {
-  for (let i = 1; i <= 10; i++) {
-    const heroContainer = document.getElementById(`ban-${i}`);
-    if (heroContainer) heroContainer.innerHTML = "";
-  }
+  for (let i = 1; i <= 10; i++) updateBanPick(i - 1, "");
 }
 
 // Series score: light up the score boxes, filling outward from the team-name side:
@@ -451,3 +454,93 @@ window.addEventListener('storage', (e) => {
     if (mn) mn.textContent = e.newValue;
   }
 });
+
+// ---------- Intro (on load: after another page's outro, an OBS refresh, a RESET) ----------
+// The outro above in reverse: the panels wipe open (ban bar from the top, picks / names /
+// progress bar from the bottom), then bans, team names and match info slide down into the
+// ban bar while picks, role icons, names and scores rise into theirs, the timer column
+// opens downward, the caster cams open from their middle line and the sponsor strip wipes
+// down from the top edge. Slides and wipes only, no opacity (OBS greys half-transparent
+// panels). Every animation is cancelled when done, so the page is back to its plain css.
+
+const INTRO_CLIP = {
+  // selector: [closed, open] (open = the outro's start state)
+  ".ban-section": ["inset(0 0 100% 0)", "inset(0 0 0 0)"],
+  ".pick-section": ["inset(100% 0 0 0)", "inset(0 0 0 0)"],
+  ".name-section": ["inset(100% 0 -20px 0)", "inset(0 0 -20px 0)"],
+  ".progress-container": ["inset(100% 0 0 0)", "inset(0 0 0 0)"],
+};
+
+// Shut the panels right away, so the finished layout never flashes before the intro starts
+// (display.html's inline guard covers the moments before this script runs)
+Object.entries(INTRO_CLIP).forEach(([sel, [closed]]) => {
+  document.querySelectorAll(sel).forEach((el) => (el.style.clipPath = closed));
+});
+document.documentElement.classList.remove("intro-wait");
+
+function playIntro() {
+  if (outroPlaying) return;
+  const EASE_IN = "cubic-bezier(0.2, 0.8, 0.2, 1)"; // fast start, soft landing
+  const STEP = 45;
+  const intro = [];
+  const run = (el, keyframes, delay, duration) => {
+    intro.push(el.animate(keyframes, { duration, delay, easing: EASE_IN, fill: "both" }));
+  };
+
+  // 1. Panels wipe open (they were shut above; the animation takes over from the inline style)
+  Object.entries(INTRO_CLIP).forEach(([sel, [closed, open]]) => {
+    document.querySelectorAll(sel).forEach((el) => {
+      run(el, [{ clipPath: closed }, { clipPath: open }], 0, 380);
+      el.style.clipPath = "";
+    });
+  });
+
+  // 2. Items slide into their sections (same offsets the outro slides them out to)
+  const slides = [
+    [".ban-section .ban-container", "0 -110%", 180, 420],
+    [".ban-section .team-name", "0 -110%", 120, 420],
+    [".ban-section .match-info", "0 -110%", 200, 420],
+    [".pick-section:not(.pick-section-background) .player-pick", "0 110%", 220, 480],
+    [".pick-section-background .media-container", "0 110%", 220, 480],
+    [".name-section .name", "0 220%", 380, 420],
+    [".name-section .gap > *", "0 220%", 420, 420],
+  ];
+  slides.forEach(([selector, from, start, duration]) => {
+    document.querySelectorAll(selector).forEach((el, i) => {
+      run(el, [{ translate: from }, { translate: "0 0" }], start + i * STEP, duration);
+    });
+  });
+
+  // 3. Timer / DRAFTING column opens downward
+  document.querySelectorAll(".pick-section:not(.pick-section-background) > .gap").forEach((el) => {
+    run(el, [{ clipPath: "inset(0 0 100% 0)" }, { clipPath: "inset(0 0 0 0)" }], 300, 450);
+  });
+
+  // 4. Caster cams: the camera opens from its middle line, then the name bar drops out of it
+  document.querySelectorAll(".caster-cams:not([hidden]) .caster-cam:not([hidden])").forEach((cam, i) => {
+    const offset = 250 + i * 90;
+    const frame = cam.querySelector(".caster-cam-frame");
+    const name = cam.querySelector(".caster-cam-name");
+    if (frame) run(frame, [{ clipPath: "inset(50% 0 50% 0)" }, { clipPath: "inset(0 0 0 0)" }], offset, 450);
+    if (name) run(name, [{ clipPath: "inset(0 0 100% 0)" }, { clipPath: "inset(0 0 0 0)" }], offset + 330, 300);
+  });
+
+  // 5. Top sponsor strip wipes down from the top edge, then its groups slide in
+  const strip = document.querySelector(".top-area.has-strip .top-sponsors:not([hidden])");
+  if (strip) {
+    run(strip, [{ clipPath: "inset(0 0 100% 0)" }, { clipPath: "inset(0 0 0 0)" }], 0, 350);
+    strip.querySelectorAll(".sponsor-group:not([hidden])").forEach((group, i) => {
+      run(group, [{ translate: "0 -110%" }, { translate: "0 0" }], 250 + i * STEP, 400);
+    });
+  }
+
+  // back to the plain css once everything has landed (unless the outro took over)
+  Promise.all(intro.map((a) => a.finished)).then(() => {
+    if (!outroPlaying) intro.forEach((a) => a.cancel());
+  }, () => {});
+}
+
+// all module scripts (cams, sponsor strip, photos) have run by DOMContentLoaded
+if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", playIntro);
+else playIntro();
+

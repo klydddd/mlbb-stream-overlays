@@ -383,103 +383,125 @@ p {
     animation: floatUpDown 5s ease-in-out infinite;
 }
 
-.glow-blue-1 {
-    filter: brightness(1.1) saturate(1.1) drop-shadow(0 0 8px #87b9f5);
+/* Portrait glow once a hero has locked in (hero.js adds .portrait-glow to the slot when
+   the portrait starts floating). The brightness boost is a constant filter, drawn once,
+   and the glow is a fixed team-colour layer over the portrait whose opacity pulses at an
+   uneven rhythm. Each slot gets its own random --glow-delay / --glow-duration, so the
+   slots don't pulse together. This replaces the old JS interval that switched
+   drop-shadow filters every few seconds (AUDIT_OPTIMIZATION.md #5). */
+.hero-portrait.float,
+.hero-portrait-silent.float {
+    filter: brightness(1.1) saturate(1.1);
 }
 
-.glow-blue-2 {
-    filter: brightness(1.2) saturate(1.2) drop-shadow(0 0 12px #6fa8f0);
+.media-container.portrait-glow::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0;
+    animation: portrait-glow var(--glow-duration, 9s) ease-in-out var(--glow-delay, 0s) infinite;
 }
 
-.glow-blue-3 {
-    filter: brightness(1.3) saturate(1.3) drop-shadow(0 0 16px #a9cdf8);
+.media-container.portrait-glow.glow-blue::after {
+    background: radial-gradient(ellipse 75% 70% at 50% 45%, rgba(169, 205, 248, 0.22) 0%, rgba(135, 185, 245, 0.1) 55%, rgba(111, 168, 240, 0.32) 100%);
 }
 
-.glow-red-1 {
-    filter: brightness(1.1) saturate(1.1) drop-shadow(0 0 8px #f5a92b);
+.media-container.portrait-glow.glow-red::after {
+    background: radial-gradient(ellipse 75% 70% at 50% 45%, rgba(248, 196, 106, 0.22) 0%, rgba(245, 169, 43, 0.1) 55%, rgba(232, 150, 26, 0.32) 100%);
 }
 
-.glow-red-2 {
-    filter: brightness(1.2) saturate(1.2) drop-shadow(0 0 12px #e8961a);
+@keyframes portrait-glow {
+    0%, 100% { opacity: 0; }
+    12% { opacity: 0.55; }
+    26% { opacity: 0.55; }
+    34% { opacity: 0; }
+    46% { opacity: 1; }
+    60% { opacity: 1; }
+    68% { opacity: 0.3; }
+    80% { opacity: 0.8; }
+    90% { opacity: 0; }
 }
 
-.glow-red-3 {
-    filter: brightness(1.3) saturate(1.3) drop-shadow(0 0 16px #f8c46a);
+/* Lock-in flash (hero.js adds .blue-select / .red-select for 1 s): a fixed team-colour
+   edge glow on a layer under the hero portrait; only its opacity animates, instead of a
+   300px inset box-shadow redrawn every frame (AUDIT_OPTIMIZATION.md #3). */
+.pick-section:not(.pick-section-background) .media-container {
+    isolation: isolate;
 }
 
-/* Optional: glow state applied dynamically */
-.hero-portrait.glow {
-    filter: brightness(1.4) drop-shadow(0 0 10px rgba(255, 255, 255, 0.6));
-    transition: filter 0.5s ease-in-out;
+.media-container.blue-select::before,
+.media-container.red-select::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0;
+    animation: select-flash 1s ease-out;
 }
 
-@keyframes blue-select {
-    0% {
-        box-shadow: inset 0 0 0px rgba(135, 185, 245, 0.7);
-    }
+.media-container.blue-select::before {
+    background: radial-gradient(ellipse at center, rgba(135, 185, 245, 0.35) 0%, rgb(135, 185, 245) 100%);
+}
 
+.media-container.red-select::before {
+    background: radial-gradient(ellipse at center, rgba(245, 169, 43, 0.35) 0%, rgb(245, 169, 43) 100%);
+}
+
+@keyframes select-flash {
     50% {
-        box-shadow: inset 0 0 300px rgb(135, 185, 245);
-    }
-
-    100% {
-        box-shadow: inset 0 0 0px rgba(135, 185, 245, 0.7);
+        opacity: 1;
     }
 }
 
-@keyframes red-select {
-    0% {
-        box-shadow: inset 0 0 0px rgba(245, 169, 43, 0.9);
-    }
 
-    50% {
-        box-shadow: inset 0 0 300px rgb(245, 169, 43);
-    }
-
-    100% {
-        box-shadow: inset 0 0 0px rgba(245, 169, 43, 0.9);
-    }
+/* Active pick slot effects (classes .blue-picks / .red-picks set by activePick.js, which
+   also inserts the .pick-fx-* layers on first use). Every moving layer animates only
+   transform, so the browser composites it on the GPU instead of repainting the slot each
+   frame (see AUDIT_OPTIMIZATION.md #2). The layers are hidden unless the slot is active. */
+.pick-section-background .media-container {
+    contain: paint;
 }
 
-@keyframes white-glow {
-    0% {
-        box-shadow: inset 0 0 0px rgba(255, 255, 255, 0.7);
-    }
-
-    50% {
-        box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.7);
-    }
-
-    100% {
-        box-shadow: inset 0 0 0px rgba(255, 255, 255, 0.7);
-    }
+/* positioned so it stacks in DOM order with the backdrop (below) and the photo (above) */
+.pick-section-background .media-container > img:not(.draft-player-photo) {
+    position: relative;
 }
 
-.media-container.blue-select {
-    animation: blue-select 1s ease-out;
+.pick-fx-backdrop,
+.pick-fx-glow {
+    display: none;
+    position: absolute;
+    pointer-events: none;
 }
 
-.media-container.red-select {
-    animation: red-select 1s ease-out;
+.blue-picks > .pick-fx-backdrop,
+.red-picks > .pick-fx-backdrop,
+.blue-picks > .pick-fx-glow,
+.red-picks > .pick-fx-glow {
+    display: block;
 }
 
-
-/* Active pick slot: a subtle, low-opacity team-colour gradient drifting slowly behind
-   the player photo (drawn as the slot's own background, so it stays under the photo). */
-.blue-picks,
-.red-picks {
-    background-size: 250% 250%;
-    background-repeat: no-repeat;
+/* Backdrop: a subtle, low-opacity team-colour gradient drifting slowly behind the
+   player photo. The layer is 250% of the slot and slides from its top-left corner to
+   its bottom-right corner (-60% of its own size = -150% of the slot). */
+.pick-fx-backdrop {
+    top: 0;
+    left: 0;
+    width: 250%;
+    height: 250%;
+    will-change: transform;
     animation: pick-backdrop 9s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
 }
 
-.blue-picks {
+.blue-picks > .pick-fx-backdrop {
     background-image: linear-gradient(135deg,
             rgba(47, 111, 214, 0.06) 0%, rgba(63, 134, 238, 0.22) 30%, rgba(156, 200, 255, 0.1) 50%,
             rgba(30, 80, 190, 0.24) 72%, rgba(47, 111, 214, 0.06) 100%);
 }
 
-.red-picks {
+.red-picks > .pick-fx-backdrop {
     background-image: linear-gradient(135deg,
             rgba(236, 138, 31, 0.06) 0%, rgba(245, 169, 43, 0.22) 30%, rgba(255, 214, 140, 0.1) 50%,
             rgba(200, 95, 15, 0.24) 72%, rgba(236, 138, 31, 0.06) 100%);
@@ -487,78 +509,154 @@ p {
 
 @keyframes pick-backdrop {
     from {
-        background-position: 0% 0%;
+        transform: translate(0, 0);
     }
 
     to {
-        background-position: 100% 100%;
+        transform: translate(-60%, -60%);
     }
 }
 
-/* Active pick slot: a team-colour glow rising from the bottom of the slot up to about
-   chest height (classes set by activePick.js). It is a layer above the slot's contents,
-   so it washes over the player photo and role icon. Layers, top to bottom:
-   two sets of light sparks drifting upward, a bright edge line, a breathing bloom,
-   and a soft base wash. A mask fades everything out before it reaches the face. */
-.blue-picks::before,
-.red-picks::before {
+/* Glow rising from the bottom of the slot up to about chest height, above the photo
+   and role icon. Layers, top to bottom: two sets of light sparks drifting upward, a
+   bright edge line, a breathing bloom and a soft base wash. The mask sits on this
+   wrapper, which never animates, and fades everything out before the face. */
+.pick-fx-glow {
+    inset: 0;
+    z-index: 1;
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(to top, #000 0%, #000 22%, transparent 50%);
+    mask-image: linear-gradient(to top, #000 0%, #000 22%, transparent 50%);
+}
+
+.pick-fx-glow > i {
+    position: absolute;
+    left: 0;
+    right: 0;
+}
+
+.pick-fx-base,
+.pick-fx-edge {
+    top: 0;
+    bottom: 0;
+}
+
+.blue-picks .pick-fx-base {
+    background: linear-gradient(to top, rgba(20, 70, 170, 0.45) 0%, rgba(20, 70, 170, 0) 30%);
+}
+
+.red-picks .pick-fx-base {
+    background: linear-gradient(to top, rgba(170, 70, 10, 0.45) 0%, rgba(170, 70, 10, 0) 30%);
+}
+
+.blue-picks .pick-fx-edge {
+    background: linear-gradient(to top, rgba(225, 240, 255, 0.95) 0%, rgba(80, 145, 240, 0.85) 1.5%, rgba(80, 145, 240, 0) 7%);
+}
+
+.red-picks .pick-fx-edge {
+    background: linear-gradient(to top, rgba(255, 244, 220, 0.95) 0%, rgba(245, 160, 40, 0.9) 1.5%, rgba(245, 160, 40, 0) 7%);
+}
+
+/* Bloom: drawn at its largest size (190% x 52% of the slot, bottom-centred) and scaled
+   down from the bottom edge to its smallest (140% x 26%), so it breathes up towards the
+   chest and settles back. */
+.pick-fx-glow > .pick-fx-bloom {
+    left: -45%;
+    right: auto;
+    bottom: 0;
+    width: 190%;
+    height: 52%;
+    transform-origin: 50% 100%;
+    will-change: transform;
+    animation: pick-bloom 2.6s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
+}
+
+.blue-picks .pick-fx-bloom {
+    background: radial-gradient(ellipse 50% 100% at 50% 100%,
+            rgba(47, 111, 214, 0.85) 0%, rgba(63, 134, 238, 0.45) 40%, rgba(63, 134, 238, 0.12) 65%, rgba(63, 134, 238, 0) 85%);
+}
+
+.red-picks .pick-fx-bloom {
+    background: radial-gradient(ellipse 50% 100% at 50% 100%,
+            rgba(236, 138, 31, 0.9) 0%, rgba(245, 169, 43, 0.5) 40%, rgba(245, 169, 43, 0.14) 65%, rgba(245, 169, 43, 0) 85%);
+}
+
+@keyframes pick-bloom {
+    from {
+        transform: scale(0.7368, 0.5);
+    }
+
+    to {
+        transform: scale(1, 1);
+    }
+}
+
+/* Sparks: tall repeating tiles that slide up by a whole number of tiles per loop,
+   so the loop is seamless (37x53 tiles move 2 tiles, 61x79 tiles move 1 tile). */
+.pick-fx-sparks-a,
+.pick-fx-sparks-b {
+    top: 0;
+    will-change: transform;
+}
+
+.pick-fx-sparks-a {
+    height: calc(100% + 106px);
+    background-size: 37px 53px;
+    animation: pick-sparks-a 3.4s linear infinite;
+}
+
+.pick-fx-sparks-b {
+    height: calc(100% + 79px);
+    background-size: 61px 79px;
+    background-position: 19px 31px;
+    animation: pick-sparks-b 3.4s linear infinite;
+}
+
+.pick-fx-sparks-a {
+    background-image: radial-gradient(circle, rgba(255, 255, 255, 0.85) 0 1.1px, rgba(255, 255, 255, 0) 2px);
+}
+
+.blue-picks .pick-fx-sparks-b {
+    background-image: radial-gradient(circle, rgba(170, 210, 255, 0.8) 0 1.5px, rgba(170, 210, 255, 0) 2.6px);
+}
+
+.red-picks .pick-fx-sparks-b {
+    background-image: radial-gradient(circle, rgba(255, 220, 150, 0.85) 0 1.5px, rgba(255, 220, 150, 0) 2.6px);
+}
+
+@keyframes pick-sparks-a {
+    to {
+        transform: translateY(-106px);
+    }
+}
+
+@keyframes pick-sparks-b {
+    to {
+        transform: translateY(-79px);
+    }
+}
+
+/* Ban glow on the active ban slot: a fixed inset shadow on a layer under the ban
+   portrait; only its opacity pulses (AUDIT_OPTIMIZATION.md #3). */
+.ban-container {
+    isolation: isolate;
+}
+
+.bans::before {
     content: '';
     position: absolute;
     inset: 0;
-    z-index: 1;
+    z-index: -1;
     pointer-events: none;
-    background-repeat: repeat, repeat, no-repeat, no-repeat, no-repeat;
-    -webkit-mask-image: linear-gradient(to top, #000 0%, #000 22%, transparent 50%);
-    mask-image: linear-gradient(to top, #000 0%, #000 22%, transparent 50%);
-    animation:
-        pick-bloom 2.6s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate,
-        pick-sparks 3.4s linear infinite;
+    box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.7);
+    opacity: 0;
+    animation: glow-pulse 1s infinite;
 }
 
-.blue-picks::before {
-    background-image:
-        radial-gradient(circle, rgba(255, 255, 255, 0.85) 0 1.1px, rgba(255, 255, 255, 0) 2px),
-        radial-gradient(circle, rgba(170, 210, 255, 0.8) 0 1.5px, rgba(170, 210, 255, 0) 2.6px),
-        linear-gradient(to top, rgba(225, 240, 255, 0.95) 0%, rgba(80, 145, 240, 0.85) 1.5%, rgba(80, 145, 240, 0) 7%),
-        radial-gradient(ellipse 50% 100% at 50% 100%,
-            rgba(47, 111, 214, 0.85) 0%, rgba(63, 134, 238, 0.45) 40%, rgba(63, 134, 238, 0.12) 65%, rgba(63, 134, 238, 0) 85%),
-        linear-gradient(to top, rgba(20, 70, 170, 0.45) 0%, rgba(20, 70, 170, 0) 30%);
-}
-
-.red-picks::before {
-    background-image:
-        radial-gradient(circle, rgba(255, 255, 255, 0.85) 0 1.1px, rgba(255, 255, 255, 0) 2px),
-        radial-gradient(circle, rgba(255, 220, 150, 0.85) 0 1.5px, rgba(255, 220, 150, 0) 2.6px),
-        linear-gradient(to top, rgba(255, 244, 220, 0.95) 0%, rgba(245, 160, 40, 0.9) 1.5%, rgba(245, 160, 40, 0) 7%),
-        radial-gradient(ellipse 50% 100% at 50% 100%,
-            rgba(236, 138, 31, 0.9) 0%, rgba(245, 169, 43, 0.5) 40%, rgba(245, 169, 43, 0.14) 65%, rgba(245, 169, 43, 0) 85%),
-        linear-gradient(to top, rgba(170, 70, 10, 0.45) 0%, rgba(170, 70, 10, 0) 30%);
-}
-
-/* the bloom breathes up towards the chest and settles back (eased, back and forth) */
-@keyframes pick-bloom {
-    from {
-        background-size: 37px 53px, 61px 79px, 100% 100%, 140% 26%, 100% 100%;
+@keyframes glow-pulse {
+    50% {
+        opacity: 1;
     }
-
-    to {
-        background-size: 37px 53px, 61px 79px, 100% 100%, 190% 52%, 100% 100%;
-    }
-}
-
-/* sparks float upward; each set moves a whole number of tiles, so the loop is seamless */
-@keyframes pick-sparks {
-    from {
-        background-position: 0 0, 19px 31px, 50% 100%, 50% 100%, 50% 100%;
-    }
-
-    to {
-        background-position: 0 -106px, 19px -48px, 50% 100%, 50% 100%, 50% 100%;
-    }
-}
-
-.bans {
-    animation: white-glow 1s infinite;
 }
 
 
@@ -626,6 +724,12 @@ p {
   */
     background: -webkit-linear-gradient(bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.5) 50%, rgba(128, 186, 232, 0) 99%, rgba(125, 185, 232, 0) 100%);
     /* Chrome10+,Safari5.1+ */
+}
+
+/* No shimmer behind a locked hero: the portrait covers the slot (.filled from hero.js) */
+.pick-section-background .media-container.filled:after {
+    animation: none;
+    display: none;
 }
 
 /* animation */

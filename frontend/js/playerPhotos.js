@@ -9,11 +9,11 @@ import { removeBackground, hasTransparency, isModelLoaded } from "./bgRemoval.js
 const channel = new BroadcastChannel("team_channel");
 
 // Photos are downscaled before saving so 10 of them fit in localStorage
-// (~5MB shared with logos) and stay light over the WebSocket. 1000px keeps them
-// sharp on the 170px-wide cards even when zoomed in.
-const MAX_HEIGHT = 1000;
-const MAX_WIDTH = 1000;
-const WEBP_QUALITY = 0.92;
+// (~5MB shared with logos) and stay light over the WebSocket. 600px is still sharp
+// on the 170px-wide cards and the draft pick slots, and keeps decoding cheap in OBS.
+const MAX_HEIGHT = 600;
+const MAX_WIDTH = 600;
+const WEBP_QUALITY = 0.85;
 
 function readFile(file) {
   return new Promise((resolve, reject) => {

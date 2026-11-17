@@ -99,6 +99,47 @@ export function playIntro() {
   return new Promise((resolve) => setTimeout(resolve, REDUCED ? 0 : INTRO_MS));
 }
 
+// ---------- Outro (before the controller switches this source to another page) ----------
+// The intro in reverse: the right column and the numbers leave first, then the name
+// plates and team sides fold back to the center, and the white band closes last.
+
+const OUTRO_MS = 900;
+
+// Resolves when the outro has finished; the elements stay hidden (fill: forwards)
+export function playOutro() {
+  const go = (el, keyframes, delay, duration) =>
+    anim(el, keyframes, { duration, delay, easing: IN, fill: "forwards" });
+
+  // 1. Right column out: casters and map to the right edge, sponsors up
+  go($(".map-type"), [{ clipPath: FULL }, { clipPath: "inset(0 0 0 100%)" }], 0, 320);
+  go($(".casters"), [{ clipPath: FULL }, { clipPath: "inset(0 0 0 100%)" }], 60, 320);
+  go($(".sponsors"), [{ clipPath: FULL }, { clipPath: "inset(0 0 100% 0)" }], 60, 320);
+
+  // 2. Scores, pips and stat icons go
+  ["blue", "red"].forEach((side) => {
+    go($(`#${side}-score`), [{ scale: "1" }, { scale: "0" }], 0, 300);
+    [...$(`#${side}-pips`).children].forEach((pip, i) =>
+      go(pip, [{ scale: "1 1" }, { scale: "0 1" }], i * 40, 260));
+    $$(`.${side} .sb-icons .ic`).forEach((ic, i) =>
+      go(ic, [{ translate: "0 0" }, { translate: "0 -34px" }], 60 + i * 40, 260));
+  });
+
+  // 3. Names erase, plates and team sides fold to the center
+  go($("#blue-name"), [{ clipPath: FULL }, { clipPath: HIDDEN_TEXT.left }], 150, 260);
+  go($("#red-name"), [{ clipPath: FULL }, { clipPath: HIDDEN_TEXT.right }], 150, 260);
+  go($(".blue .sb-plate"), close(SHAPES.plateBlue), 250, 320);
+  go($(".red .sb-plate"), close(SHAPES.plateRed), 250, 320);
+  go($(".sb-side.blue"), close(SHAPES.sideBlue), 380, 360);
+  go($(".sb-side.red"), close(SHAPES.sideRed), 380, 360);
+
+  // 4. Timer + logo up, then the band closes onto the middle
+  go($(".sb-logo"), [{ scale: "1" }, { scale: "0.6" }], 480, 260);
+  go($(".sb-center"), [{ clipPath: FULL }, { clipPath: "inset(0 0 100% 0)" }], 480, 300);
+  go($(".sb-band"), [{ clipPath: FULL }, { clipPath: "inset(0 60.6% 0 39.4%)" }], 520, 380);
+
+  return new Promise((resolve) => setTimeout(resolve, REDUCED ? 0 : OUTRO_MS));
+}
+
 // ---------- Text swap: old value wipes out, new value wipes in ----------
 
 export async function wipeSwap(el, anchor, apply) {

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="Assets/favico/favicon_io/android-chrome-512x512.png">
+    <title>Caster Cam Feed</title>
+    <!-- One caster's camera, filling the whole OBS browser source (16:9, e.g. 1280x720).
+         cam-feed.html?room=<code>&cam=1|2. Made and placed by the controller's
+         CASTER CAMS > OBS CAM SOURCES (js/obsWebsocket/camSources.js), so the feed stays
+         loaded while the draft source switches between display.html and cams.html.
+         Zoom / position / mirror come from the controller like on the other pages. -->
+    <style>
+        html, body {
+            margin: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: transparent;
+        }
+        .caster-cams, .caster-cam, .caster-cam-frame {
+            position: absolute;
+            inset: 0;
+        }
+        .caster-cams[hidden], .caster-cam[hidden] { display: none; }
+        .caster-cam-frame { overflow: hidden; }
+        .caster-cam-frame iframe {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+        .caster-cam-name { display: none; }
+    </style>
+</head>
+
+<body>
+    <!-- same ids/classes as display.html, so js/casterCamsDisplay.js drives it; data-only is set from ?cam= -->
+    <div class="caster-cams" id="caster-cams" hidden>
+        <div class="caster-cam" hidden>
+            <div class="caster-cam-frame"><iframe title="Caster 1 camera" allow="autoplay; fullscreen" scrolling="no"></iframe></div>
+            <div class="caster-cam-name"></div>
+        </div>
+        <div class="caster-cam" hidden>
+            <div class="caster-cam-frame"><iframe title="Caster 2 camera" allow="autoplay; fullscreen" scrolling="no"></iframe></div>
+            <div class="caster-cam-name"></div>
+        </div>
+    </div>
+
+    <script>
+        // which cam this source plays (1 or 2), before js/casterCamsDisplay.js reads it
+        document.getElementById("caster-cams").dataset.only =
+            new URLSearchParams(location.search).get("cam") === "2" ? "2" : "1";
+    </script>
+    <!-- answer: on connect, ask the controller for the cams (js/casterCams.js answers "cams-request") -->
+    <script type="module">
+        import { send } from "./js/websocketClient.js";
+        let asks = 0;
+        const ask = setInterval(() => {
+            if (send({ type: "cams-request" }) || ++asks > 20) clearInterval(ask);
+        }, 500);
+    </script>
+    <script type="module" src="js/casterCamsDisplay.js?v=6"></script>
+</body>
+
+</html>

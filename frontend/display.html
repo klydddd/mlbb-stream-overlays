@@ -9,15 +9,27 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Anton&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="css/display.css?v=23">
-    <link id="themeStyelesheet" rel="stylesheet" href="css/default.css?v=2">
+    <link rel="stylesheet" href="css/display.css?v=26">
+    <link id="themeStyelesheet" rel="stylesheet" href="css/default.css?v=3">
     <link rel="stylesheet" href="css/casterCams.css?v=6">
     <link rel="stylesheet" href="css/heroStats.css?v=5">
     <link rel="icon" href="Assets/favico/favicon_io/android-chrome-512x512.png">
     <title>Display</title>
+    <!-- intro guard: panels stay shut until js/display.js starts the intro (no flash of the
+         finished layout); released after 3 s in case the script never runs -->
+    <style>
+        html.intro-wait .ban-section,
+        html.intro-wait .pick-section,
+        html.intro-wait .name-section,
+        html.intro-wait .progress-container { clip-path: inset(50% 0 50% 0); }
+    </style>
+    <script>
+        document.documentElement.classList.add("intro-wait");
+        setTimeout(() => document.documentElement.classList.remove("intro-wait"), 3000);
+    </script>
 </head>
 
-<body data-page="index">
+<body data-page="index" data-cam-page="draft">
 
     <!-- top area above the draft overlay: sponsor strip (js/sponsorStrip.js), caster cams below
          (js/casterCamsDisplay.js). The controller picks the strip or the center slideshow. -->
@@ -40,7 +52,7 @@
             <div class="sponsor-group-logos"></div>
         </div>
     </div>
-    <div class="caster-cams" id="caster-cams" hidden>
+    <div class="caster-cams" id="caster-cams" data-report="always" hidden>
         <div class="caster-cam" hidden>
             <div class="caster-cam-frame"><iframe title="Caster 1 camera" allow="autoplay; fullscreen" scrolling="no"></iframe></div>
             <div class="caster-cam-name">CASTER</div>
@@ -253,9 +265,9 @@
     </div>
 
 
-    <script type="module" src="js/display.js?v=15"></script>
+    <script type="module" src="js/display.js?v=20"></script>
     <script type="module" src="js/heroStatsDisplay.js?v=4"></script>
-    <script type="module" src="js/casterCamsDisplay.js?v=1"></script>
+    <script type="module" src="js/casterCamsDisplay.js?v=6"></script>
     <script type="module">
         import { mountSponsorSlideshow } from "./js/sponsorSlideshow.js?v=3";
         mountSponsorSlideshow(document.getElementById("center-sponsors"));
@@ -264,8 +276,8 @@
     <script type="module" src="js/draftSponsors.js?v=1"></script>
     <script type="module" src="js/draftPlayerPhotos.js?v=5"></script>
     <script type="module" src="js/showLogo.js"></script>
-    <script src="js/displayTimer.js"></script>
-    <script src="js/activePick.js"></script>
+    <script src="js/displayTimer.js?v=2"></script>
+    <script src="js/activePick.js?v=2"></script>
 
 </body>
 

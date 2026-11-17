@@ -25,16 +25,21 @@
 
 html,
 body {
-    width: 1920px;
-    height: 1080px;
+    width: 100%;
+    height: 100%;
     overflow: hidden;
     background: transparent;
 }
 
+/* fixed 1920x1080 layout, scaled to fit the window / OBS source by js/heroesDisplay.js
+   (fitStage), so any source size works, including 3840x2160 for supersampling */
 .stage {
-    position: relative;
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 1920px;
     height: 1080px;
+    transform-origin: 0 0;
     font-family: var(--font-body);
     color: var(--ink);
 }
@@ -521,72 +526,78 @@ body {
     animation: floatUpDown 5s ease-in-out infinite;
 }
 
-.glow-blue-1 {
-    filter: brightness(1.1) saturate(1.1) drop-shadow(0 0 8px #87b9f5);
+/* Glow once the art is floating (heroesDisplay.js adds .glowing to the card): a constant
+   brightness filter, drawn once, plus a fixed team-colour layer over the art whose
+   opacity pulses at an uneven rhythm. Each card gets its own random --glow-delay /
+   --glow-duration. Replaces the JS interval that switched drop-shadow filters
+   (AUDIT_OPTIMIZATION.md #5). The layer matches .card-art's box, under the player photo. */
+.card-art img.float {
+    filter: brightness(1.1) saturate(1.1);
 }
 
-.glow-blue-2 {
-    filter: brightness(1.2) saturate(1.2) drop-shadow(0 0 12px #6fa8f0);
+.card-glow {
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 100%;
+    pointer-events: none;
+    opacity: 0;
+    transition: height 0.6s ease;
 }
 
-.glow-blue-3 {
-    filter: brightness(1.3) saturate(1.3) drop-shadow(0 0 16px #a9cdf8);
+.card.picked.has-photo .card-glow {
+    height: 400px;
+    -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 60px), transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 calc(100% - 60px), transparent 100%);
 }
 
-.glow-red-1 {
-    filter: brightness(1.1) saturate(1.1) drop-shadow(0 0 8px #f5a92b);
+.card.glowing .card-glow {
+    animation: card-glow var(--glow-duration, 9s) ease-in-out var(--glow-delay, 0s) infinite;
 }
 
-.glow-red-2 {
-    filter: brightness(1.2) saturate(1.2) drop-shadow(0 0 12px #e8961a);
+.team-cards.blue .card-glow {
+    background: radial-gradient(ellipse 75% 70% at 50% 45%, rgba(169, 205, 248, 0.22) 0%, rgba(135, 185, 245, 0.1) 55%, rgba(111, 168, 240, 0.32) 100%);
 }
 
-.glow-red-3 {
-    filter: brightness(1.3) saturate(1.3) drop-shadow(0 0 16px #f8c46a);
+.team-cards.red .card-glow {
+    background: radial-gradient(ellipse 75% 70% at 50% 45%, rgba(248, 196, 106, 0.22) 0%, rgba(245, 169, 43, 0.1) 55%, rgba(232, 150, 26, 0.32) 100%);
 }
 
-/* Select flash on a live pick (same as display.css blue-select / red-select) */
+@keyframes card-glow {
+    0%, 100% { opacity: 0; }
+    12% { opacity: 0.55; }
+    26% { opacity: 0.55; }
+    34% { opacity: 0; }
+    46% { opacity: 1; }
+    60% { opacity: 1; }
+    68% { opacity: 0.3; }
+    80% { opacity: 0.8; }
+    90% { opacity: 0; }
+}
+
+/* Select flash on a live pick: a fixed team-colour edge glow whose opacity animates,
+   instead of a 300px inset box-shadow redrawn every frame (AUDIT_OPTIMIZATION.md #3) */
 .card::before {
     content: '';
     position: absolute;
     inset: 0;
     z-index: 1;
     pointer-events: none;
+    opacity: 0;
 }
 
 .card.blue-select::before {
-    animation: blue-select 1s ease-out;
+    background: radial-gradient(ellipse at center, rgba(135, 185, 245, 0.35) 0%, rgb(135, 185, 245) 100%);
+    animation: select-flash 1s ease-out;
 }
 
 .card.red-select::before {
-    animation: red-select 1s ease-out;
+    background: radial-gradient(ellipse at center, rgba(245, 169, 43, 0.35) 0%, rgb(245, 169, 43) 100%);
+    animation: select-flash 1s ease-out;
 }
 
-@keyframes blue-select {
-    0% {
-        box-shadow: inset 0 0 0px rgba(135, 185, 245, 0.7);
-    }
-
+@keyframes select-flash {
     50% {
-        box-shadow: inset 0 0 300px rgb(135, 185, 245);
-    }
-
-    100% {
-        box-shadow: inset 0 0 0px rgba(135, 185, 245, 0.7);
-    }
-}
-
-@keyframes red-select {
-    0% {
-        box-shadow: inset 0 0 0px rgba(245, 169, 43, 0.9);
-    }
-
-    50% {
-        box-shadow: inset 0 0 300px rgb(245, 169, 43);
-    }
-
-    100% {
-        box-shadow: inset 0 0 0px rgba(245, 169, 43, 0.9);
+        opacity: 1;
     }
 }
 

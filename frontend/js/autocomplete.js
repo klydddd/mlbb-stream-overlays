@@ -1,4 +1,4 @@
-import { heroes, updateBanPick, updateHeroPick } from "./hero.js";
+import { heroes, updateBanPick, updateHeroPick } from "./hero.js?v=2";
 import { send } from "./websocketClient.js";
 import { heroIsTaken, rejectTakenHero } from "./draftGuard.js";
 

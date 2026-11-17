@@ -1,0 +1,478 @@
+/* Caster cams screen (cams.html). Fixed 1920x1080 stage in px; js/camsDisplay.js
+   scales it to fit the window. Same look as the cams and sponsor strip on display.html. */
+:root {
+    --blue: #87b9f5;
+    --orange: #f5a92b;
+    --navy: rgb(0, 16, 31);
+    --light: aliceblue;
+    --strip-h: 0px;
+    --match-h: 0px;
+    --name-h: 56px;
+    /* match card: the waiting.html tokens (css/waiting.css) */
+    --panel: #a28a05;
+    --chip: rgba(30, 12, 0, 0.55);
+    --accent: #ffe27a;
+    --text: #ffffff;
+    --lost: #4a3d02;    /* losing team of a decided match (js/matchResult.js) */
+    --font-big: "Anton", "Impact", "Arial Narrow", sans-serif;
+    --font: "Archivo", "Arial", sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: transparent;
+}
+
+[hidden] {
+    display: none !important;
+}
+
+.stage {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1920px;
+    height: 1080px;
+    transform-origin: 0 0;
+    display: flex;
+    flex-direction: column;
+    font-family: "Roboto", Arial, sans-serif;
+}
+
+.stage.has-strip { --strip-h: 136px; }
+.stage.has-match { --match-h: 300px; }
+
+/* ---------- sponsor strip (js/sponsorStrip.js) ---------- */
+.cams-sponsors {
+    flex: none;
+    height: var(--strip-h);
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    background: var(--light);
+    border-bottom: 5px solid;
+    border-image: linear-gradient(90deg, var(--blue) 50%, var(--orange) 50%) 1;
+}
+
+.sponsor-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 0 48px;
+}
+
+.sponsor-group + .sponsor-group:not([hidden]) {
+    border-left: 2px solid rgba(0, 16, 31, 0.12);
+}
+
+.sponsor-group-label {
+    color: var(--navy);
+    font-size: 16px;
+    font-weight: 900;
+    letter-spacing: 0.14em;
+    line-height: 1;
+}
+
+.sponsor-group-logos {
+    display: flex;
+    align-items: center;
+    gap: 26px;
+}
+
+.sponsor-group-logos img {
+    height: 80px;
+    max-width: 320px;
+    object-fit: contain;
+}
+
+/* ---------- caster cams (js/casterCamsDisplay.js) ---------- */
+.caster-cams {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 40px;
+    padding: 32px 48px;
+}
+
+/* height left for one cam frame: stage minus strip, match card, name bar and padding */
+.caster-cam {
+    --cam-h: calc(1080px - var(--strip-h) - var(--match-h) - var(--name-h) - 64px);
+    --cam-w: min(1500px, calc(var(--cam-h) * 16 / 9));
+    display: flex;
+    flex-direction: column;
+    width: var(--cam-w);
+    animation: cam-in 0.55s 0.12s cubic-bezier(0, 0, 0.2, 1) both;
+}
+
+/* two casters side by side */
+.caster-cams[data-count="2"] .caster-cam {
+    --cam-w: min(calc((1920px - 96px - 40px) / 2), calc(var(--cam-h) * 16 / 9));
+}
+
+.caster-cams[data-count="2"] .caster-cam:nth-child(2) { animation-delay: 0.21s; }
+
+.caster-cam-frame {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: rgb(33, 33, 33);
+    border-top: 5px solid var(--blue);
+    overflow: hidden;
+}
+
+.caster-cams[data-count="2"] .caster-cam:nth-child(2) .caster-cam-frame {
+    border-top-color: var(--orange);
+}
+
+.caster-cam-frame iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+}
+
+.caster-cam.no-feed .caster-cam-frame::after {
+    content: "NO CAMERA LINK";
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.35);
+    font-family: "Anton", sans-serif;
+    font-size: 36px;
+    letter-spacing: 0.08em;
+}
+
+.caster-cam-name {
+    height: var(--name-h);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 20px;
+    background: var(--light);
+    color: var(--navy);
+    font-family: "Anton", sans-serif;
+    font-size: 32px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ---------- match card: same look as the schedule rows on waiting.html ---------- */
+/* no cams on screen: the card sits in the middle instead of at the bottom */
+.caster-cams[hidden] + .next-match { margin: auto 48px; }
+
+/* full width with the cams' 48px side margins; left 2/3 rotating slide, right 1/3 list */
+.next-match {
+    flex: none;
+    height: calc(var(--match-h) - 40px);
+    margin: 0 48px 40px;
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 24px;
+    padding: 14px 30px 22px;
+    background: var(--grain, none), var(--panel); /* one gold panel with grain, as on waiting.html */
+    color: var(--text);
+    font-family: var(--font);
+    text-transform: uppercase;
+    animation: card-in 0.55s 0.3s cubic-bezier(0, 0, 0.2, 1) both;
+}
+
+/* the two halves inside the panel */
+.next-main,
+.match-list {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+/* label row */
+.next-label {
+    flex: none;
+    overflow: hidden; /* the text swipes inside it */
+    margin-bottom: 14px;
+    text-align: center;
+    font-weight: 900;
+    font-size: 26px;
+    line-height: 1.1;
+    letter-spacing: 0.04em;
+}
+
+.next-label-text { display: block; }
+
+/* holds the petals outside the clipped row */
+.next-slot {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    display: flex;
+}
+
+.petal {
+    position: absolute;
+    z-index: 1;
+    width: 30px;
+    height: 34px;
+    fill: var(--text);
+}
+
+.petal-tr { right: -8px; top: -16px; }
+.petal-bl { left: -16px; bottom: -16px; }
+
+/* the match row: no fill of its own, it sits on the gold panel */
+.next-row {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr minmax(120px, auto) 1fr;
+    align-items: center;
+    gap: 20px;
+    padding: 0 24px;
+    overflow: hidden; /* contents swipe up inside the row */
+}
+
+.next-team {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    min-width: 0;
+}
+
+.next-team.b {
+    justify-content: flex-end;
+    text-align: right;
+}
+
+.next-logo {
+    flex: none;
+    width: 96px;
+    height: 96px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.next-logo img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.next-text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.next-tag {
+    font-family: var(--font-big);
+    font-size: 58px;
+    line-height: 1.05;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.next-name {
+    font-weight: 800;
+    font-size: 18px;
+    line-height: 1.1;
+    text-transform: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.next-name:empty { display: none; }
+
+.next-mid {
+    justify-self: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+.next-vs {
+    font-family: var(--font-big);
+    font-size: 44px;
+    line-height: 1;
+}
+
+/* time / format chip */
+.next-info {
+    padding: 5px 10px;
+    background: var(--chip);
+    font-size: 18px;
+    line-height: 1.15;
+    white-space: nowrap;
+}
+
+.next-info:empty { display: none; }
+
+/* played match: the score takes the VS spot */
+.next-match.is-result .next-vs {
+    font-size: 64px;
+    font-variant-numeric: tabular-nums;
+    color: var(--accent);
+}
+
+/* ---------- In transition (each part also plays it when it appears later) ----------
+   Slides and wipes only, no opacity (OBS greys half-transparent panels).
+   The out transition is the reverse, in js/camsDisplay.js (playOutro). */
+.cams-sponsors { animation: strip-in 0.5s cubic-bezier(0, 0, 0.2, 1) both; }
+
+@keyframes strip-in {
+    from { transform: translateY(-100%); }
+    to { transform: none; }
+}
+
+/* cams: wiped in from the bottom edge up, rising a little */
+@keyframes cam-in {
+    from { clip-path: inset(100% 0 0 0); transform: translateY(40px); }
+    to { clip-path: inset(0 0 0 0); transform: none; }
+}
+
+/* scoreboard: up from below the screen edge */
+@keyframes card-in {
+    from { transform: translateY(calc(100% + 40px)); }
+    to { transform: none; }
+}
+
+/* ---------- match list (right 1/3) ---------- */
+
+.list-label {
+    flex: none;
+    margin-bottom: 10px;
+    text-align: center;
+    font-weight: 900;
+    font-size: 26px;
+    line-height: 1.1;
+    letter-spacing: 0.04em;
+}
+
+.list-rows {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    gap: 4px;
+}
+
+.list-row {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 12px;
+    height: 40px;
+    padding: 0 10px;
+}
+
+/* the match showing on the left */
+.list-row.current { background: var(--chip); }
+
+.list-team {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+}
+
+.list-team.b { justify-content: flex-end; }
+
+.list-logo {
+    flex: none;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.list-logo:has(img[hidden]) { display: none; }
+
+.list-logo img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.list-tag {
+    font-family: var(--font-big);
+    font-size: 28px;
+    line-height: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.list-mid {
+    min-width: 76px;
+    text-align: center;
+    font-weight: 800;
+    font-size: 17px;
+    white-space: nowrap;
+}
+
+/* decided match (BO1: 1 win, BO3: 2, BO5: 3; js/matchResult.js): the losing team's name and logo go a darker shade (colour and
+   brightness, never opacity: OBS greys half-transparent things) */
+.next-team.lost,
+.list-team.lost { color: var(--lost); }
+.next-team.lost img,
+.list-team.lost img { filter: brightness(0.45) saturate(0.6); }
+
+.list-row.is-result .list-mid {
+    font-family: var(--font-big);
+    font-weight: 400;
+    font-size: 26px;
+    color: var(--accent);
+}
+
+/* ---------- stage slide (WAITING > SCREEN TEXT > stage) ---------- */
+.next-label-text:empty::before { content: "\00a0"; } /* keep the label's height */
+
+.next-stage {
+    display: none;
+    grid-column: 1 / -1;
+    text-align: center;
+    font-family: var(--font-big);
+    font-size: 72px;
+    line-height: 1;
+    letter-spacing: 0.03em;
+    white-space: nowrap; /* one line only: js/camsDisplay.js shrinks it to fit */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+}
+
+.next-match.is-stage .next-stage { display: block; }
+/* the stage slide takes the whole scoreboard: the MATCHES list steps aside */
+.next-match.is-stage { grid-template-columns: 1fr; }
+.next-match.is-stage .match-list { display: none; }
+.match-list { overflow: hidden; } /* the list swipes inside the panel */
+.next-match.is-stage .next-team,
+.next-match.is-stage .next-mid { display: none; }
+
+/* the parts that swipe: own compositor layers, so the first frame doesn't hitch */
+.next-label-text,
+.next-row > *,
+.list-label,
+.list-rows { will-change: transform; }
+

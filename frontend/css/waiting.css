@@ -9,6 +9,7 @@
     --side-text: #50a9ff;    /* vertical side texts */
     --accent: #ffe27a;       /* countdown at 00:00:00 */
     --text: #ffffff;
+    --lost: #4a3d02;         /* losing team of a decided match (js/matchResult.js) */
     --font-big: "Anton", "Impact", "Arial Narrow", sans-serif;
     --font: "Archivo", "Arial", sans-serif;
 }
@@ -93,6 +94,22 @@ body {
     align-items: center;
     gap: 40px;
     padding: 0 48px;
+}
+
+/* game publisher notice, at the right end of the header beside the last sponsor logo.
+   margin-top lines it up with the logo row (below the 17px label + 10px gap) */
+.copyright {
+    flex: none;
+    margin-left: auto; /* stays at the right end even with no sponsor logos */
+    margin-top: 27px;
+    line-height: 1.3;
+    font-family: var(--font);
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    text-transform: none;
+    color: var(--text);
+    white-space: nowrap;
 }
 
 .league-logo {
@@ -207,8 +224,8 @@ body {
     position: absolute;
     left: 0;
     right: 0;
-    top: 186px;
-    height: 64px;
+    top: 192px;   /* 20px under the countdown's divider (ends at 172px) */
+    height: 70px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -219,14 +236,14 @@ body {
 }
 
 .game-logo img {
-    height: 64px;
+    height: 70px; /* full MLBB wordmark (icon + text in one image) */
 }
 
 .matches {
     position: absolute;
     left: 31px;
     right: 29px;
-    top: 268px;
+    top: 282px;   /* 20px under the game logo; 4 rows still end ~33px above the panel bottom */
     display: flex;
     flex-direction: column;
     gap: 22px;
@@ -316,6 +333,11 @@ body {
     line-height: 1.1;
     text-transform: none;
 }
+
+/* losing team once the match is decided (BO1: 1 win, BO3: 2, BO5: 3; js/matchResult.js): a darker shade (colour and brightness,
+   never opacity: OBS greys half-transparent things) */
+.team.lost { color: var(--lost); }
+.team.lost img { filter: brightness(0.45) saturate(0.6); }
 
 .match-info {
     justify-self: center;

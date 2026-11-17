@@ -2,11 +2,12 @@
 // localStorage (restore on load + `storage` events), BroadcastChannel "team_channel",
 // and the WebSocket room. Control side lives in js/ingame.js + js/control.js.
 import { onMessage } from "./websocketClient.js";
+import { followSwitch } from "./overlayChain.js?v=2";
 import { mountSponsorSlideshow } from "./sponsorSlideshow.js?v=3";
-import { watchSeriesRace, DEFAULT_RACE } from "./seriesRace.js";
+import { watchSeriesRace, DEFAULT_RACE } from "./seriesRace.js?v=2";
 import {
-  playIntro, wipeSwap, revealPanel, concealPanel, swapIcon, scoreChanged, playSwitch,
-} from "./gameDisplayAnim.js?v=5";
+  playIntro, playOutro, wipeSwap, revealPanel, concealPanel, swapIcon, scoreChanged, playSwitch,
+} from "./gameDisplayAnim.js?v=6";
 
 // pips per team: race to 1/2/3 from the controller (js/seriesRace.js)
 let MAX_WINS = DEFAULT_RACE;
@@ -301,8 +302,20 @@ function loadFromStorage() {
 
 // ---------- Messages (BroadcastChannel + WebSocket) ----------
 
+// Out transition before the page switch; once only (the message comes over both
+// BroadcastChannel and WebSocket), and no intro replays while leaving.
+let leaving = false;
+function leaveWithOutro(go) {
+  if (leaving) return;
+  leaving = true;
+  playOutro().then(go);
+}
+
 function handleMessage(data) {
   if (!data || typeof data !== "object") return;
+  // SHOW DRAFT / HEROES / CAMS: only when this tab is the draft source, not a
+  // standalone HUD source (js/overlayChain.js). The outro plays first.
+  if (followSwitch(data.type, "gameDisplay.html", leaveWithOutro)) return;
 
   switch (data.type) {
     case "reset":
@@ -415,7 +428,7 @@ ready = true;
 // played (e.g. the page just loaded because the scene became active).
 window.addEventListener("obsSourceActiveChanged", (e) => {
   if (!e.detail?.active) return;
-  if (performance.now() - lastIntro < 1500) return;
+  if (leaving || performance.now() - lastIntro < 1500) return;
   lastIntro = performance.now();
   intro();
 });
